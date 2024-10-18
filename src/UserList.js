@@ -28,7 +28,6 @@ const UserList = (props) => (
             // 自定義行樣式
             row={<StyledDatagridRow />}
         >
-            <Checkbox />
             <TextField source="id" label="ID" />
             <TextField source="username" label="帳號" />
             <TextField source="name" label="姓名" />
