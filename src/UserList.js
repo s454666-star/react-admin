@@ -1,8 +1,8 @@
 // src/UserList.js
 import React from 'react';
 import { List, Datagrid, TextField, EmailField, TextInput, Filter, EditButton, DeleteButton, ShowButton, BulkDeleteButton } from 'react-admin';
-import { Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
+import { Checkbox } from '@mui/material';
 
 const UserFilter = (props) => (
     <Filter {...props}>
@@ -10,22 +10,24 @@ const UserFilter = (props) => (
     </Filter>
 );
 
-// 自定義行的樣式 (基數偶數行顏色不同)
-const StyledRow = styled('tr')(({ theme, isOdd }) => ({
-    backgroundColor: isOdd ? theme.palette.grey[100] : theme.palette.background.paper,
+// 自定義行的樣式 (基數偶數行顏色不同，並加入 hover 高亮效果)
+const StyledDatagridRow = styled('tr')(({ theme, isOdd }) => ({
+    backgroundColor: isOdd ? '#f5f5f5' : '#ffffff',
     '&:hover': {
-        backgroundColor: theme.palette.action.hover,
+        backgroundColor: theme.palette.action.hover, // 高亮效果
     },
 }));
 
-// 批次刪除按鈕
-const UserBulkActionButtons = (props) => (
-    <BulkDeleteButton {...props} label="批次刪除" />
-);
-
 const UserList = (props) => (
-    <List {...props} filters={<UserFilter />} bulkActionButtons={<UserBulkActionButtons />} title="使用者清單">
-        <Datagrid rowClick="edit" rowStyle={(record, index) => ({ backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#fff' })}>
+    <List {...props} filters={<UserFilter />} bulkActionButtons={<BulkDeleteButton label="批次刪除" />} title="使用者清單">
+        <Datagrid
+            rowClick="edit"
+            rowStyle={(record, index) => ({
+                backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff', // 基數偶數行不同顏色
+            })}
+            // 自定義行樣式
+            row={<StyledDatagridRow />}
+        >
             <Checkbox />
             <TextField source="id" label="ID" />
             <TextField source="username" label="帳號" />
