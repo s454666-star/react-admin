@@ -10,6 +10,7 @@ import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import polyglotI18nProvider from 'ra-i18n-polyglot'; // 正確的 i18n provider
+import httpClient from './dataProvider';
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -89,9 +90,6 @@ const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages
 
 const dataProvider = simpleRestProvider('https://mystar.monster/api');
 
-// 定義 API 基本路徑
-const API_URL = 'https://mystar.monster/api';
-
 const authProvider = {
     login: async ({ username, password }) => {
         const request = new Request(`${API_URL}/login`, {
@@ -131,7 +129,6 @@ const authProvider = {
     },
     getPermissions: () => Promise.resolve(),
 };
-
 
 // 主題設置
 const theme = createTheme({
