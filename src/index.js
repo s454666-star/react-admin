@@ -81,7 +81,12 @@ const customTraditionalChineseMessages = {
             next: '下一頁',
             prev: '上一頁',
             page_rows_per_page: '每頁顯示筆數',
-        }
+        },
+        page: {
+            error: '發生錯誤',
+            not_found: '頁面未找到',
+            unauthorized: '未授權',
+        },
     },
 };
 
