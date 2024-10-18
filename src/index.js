@@ -1,14 +1,18 @@
+// src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource, ListGuesser } from 'react-admin';
-import jsonServerProvider from 'ra-data-json-server';
+import { Admin, Resource } from 'react-admin';
+import simpleRestProvider from 'ra-data-simple-rest'; // 使用 simple rest provider
 import MyAppBar from './MyAppBar';
 import Login from './Login';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { List, Datagrid, TextField, EmailField, Filter, TextInput } from 'react-admin';
+import UserList from './UserList';
+import UserCreate from './UserCreate';
+import UserEdit from './UserEdit';
+import UserShow from './UserShow';
 
-// 使用 JSONPlaceholder 作為資料來源的 provider
-const dataProvider = jsonServerProvider('https://jsonplaceholder.typicode.com');
+// 使用您提供的 API 作為資料來源的 provider
+const dataProvider = simpleRestProvider('https://mystar.monster/api');
 
 // 自定義 authProvider
 const authProvider = {
@@ -32,31 +36,14 @@ const authProvider = {
     getPermissions: () => Promise.resolve(),
 };
 
-// 定義過濾器組件
-const UserFilter = (props) => (
-    <Filter {...props}>
-        <TextInput label="搜尋名稱" source="q" alwaysOn />
-    </Filter>
-);
-
-// 定義使用者清單組件，並添加搜尋功能
-const UserList = (props) => (
-    <List {...props} filters={<UserFilter />} title="使用者清單">
-        <Datagrid rowClick="edit">
-            <TextField source="id" />
-            <TextField source="name" />
-            <EmailField source="email" />
-            <TextField source="phone" />
-            <TextField source="website" />
-        </Datagrid>
-    </List>
-);
-
-// 主題設置（可選）
+// 主題設置
 const theme = createTheme({
     palette: {
         primary: {
             main: '#1976d2',
+        },
+        background: {
+            default: '#f4f6f8',
         },
     },
 });
@@ -69,10 +56,15 @@ const App = () => (
             loginPage={Login}
             appBar={MyAppBar}
         >
-            <Resource name="users" list={UserList} />
+            <Resource
+                name="users"
+                list={UserList}
+                create={UserCreate}
+                edit={UserEdit}
+                show={UserShow}
+            />
         </Admin>
     </ThemeProvider>
 );
 
-// 使用 ReactDOM.render 渲染應用程式
 ReactDOM.render(<App />, document.getElementById('root'));
