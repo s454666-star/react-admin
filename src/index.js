@@ -10,7 +10,7 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import { mergeTranslations, TranslationProvider } from 'react-admin';
+import { mergeTranslations, defaultI18nProvider } from 'react-admin'; // 引入正確的 i18n provider 工具
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -75,10 +75,13 @@ const customTraditionalChineseMessages = {
 };
 
 // 設定繁體中文翻譯
-const i18nProvider = {
-    translate: mergeTranslations(customTraditionalChineseMessages),
-    changeLocale: () => Promise.resolve(),
-};
+const i18nProvider = defaultI18nProvider({
+    locale: 'zh',
+    messages: {
+        zh: customTraditionalChineseMessages,
+    },
+    getLocale: () => 'zh', // 返回當前使用的語言
+});
 
 // 使用您提供的 API 作為資料來源的 provider
 const dataProvider = simpleRestProvider('https://mystar.monster/api');
