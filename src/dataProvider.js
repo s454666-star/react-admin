@@ -2,7 +2,6 @@
 import { fetchUtils } from 'react-admin';
 
 const API_URL = 'https://mystar.monster/api';
-
 const httpClient = (url, options = {}) => {
     const auth = JSON.parse(localStorage.getItem('auth'));
     if (auth && auth.token) {

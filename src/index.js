@@ -88,7 +88,8 @@ const customTraditionalChineseMessages = {
 // 設定繁體中文翻譯，並使用 polyglotI18nProvider
 const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages, 'zh');
 
-const dataProvider = simpleRestProvider('https://mystar.monster/api');
+const API_URL = 'https://mystar.monster/api';
+const dataProvider = simpleRestProvider(API_URL, httpClient); // 使用自訂的 httpClient
 
 const authProvider = {
     login: async ({ username, password }) => {
@@ -129,6 +130,7 @@ const authProvider = {
     },
     getPermissions: () => Promise.resolve(),
 };
+
 
 // 主題設置
 const theme = createTheme({
