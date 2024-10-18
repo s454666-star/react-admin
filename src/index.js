@@ -89,9 +89,12 @@ const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages
 
 const dataProvider = simpleRestProvider('https://mystar.monster/api');
 
+// 定義 API 基本路徑
+const API_URL = 'https://mystar.monster/api';
+
 const authProvider = {
     login: async ({ username, password }) => {
-        const request = new Request('https://mystar.monster/api/login', {
+        const request = new Request(`${API_URL}/login`, {
             method: 'POST',
             body: JSON.stringify({ username, password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -100,12 +103,13 @@ const authProvider = {
         try {
             const response = await fetch(request);
             if (!response.ok) {
-                throw new Error('Login failed');
+                const error = await response.json();
+                throw new Error(error.message || 'Login failed');
             }
-            const { user, token } = await response.json();
+            const { user, access_token, token_type } = await response.json();
 
             // 儲存 token 和 user 信息到 localStorage
-            localStorage.setItem('auth', JSON.stringify({ user, token }));
+            localStorage.setItem('auth', JSON.stringify({ user, token: `${token_type} ${access_token}` }));
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error.message);
@@ -127,6 +131,7 @@ const authProvider = {
     },
     getPermissions: () => Promise.resolve(),
 };
+
 
 // 主題設置
 const theme = createTheme({
