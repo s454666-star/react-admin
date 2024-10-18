@@ -76,10 +76,10 @@ const customTraditionalChineseMessages = {
             page_out_of_boundaries: '頁數 %{page} 超出範圍',
             page_out_from_end: '已到達最後一頁',
             page_out_from_begin: '已到達第一頁',
-            page_range_info: '%{from}-%{to} 筆，共 %{count} 筆',
+            page_range_info: '%{offsetBegin}-%{offsetEnd} 筆，共 %{total} 筆', // 修正這行
             next: '下一頁',
             prev: '上一頁',
-            page_rows_per_page: '每頁顯示筆數', // 這行是 "Rows per page"
+            page_rows_per_page: '每頁顯示筆數',
         }
     },
 };
@@ -87,16 +87,14 @@ const customTraditionalChineseMessages = {
 // 設定繁體中文翻譯，並使用 polyglotI18nProvider
 const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages, 'zh');
 
-// 使用您提供的 API 作為資料來源的 provider
 const dataProvider = simpleRestProvider('https://mystar.monster/api');
 
-// 自定義 authProvider
 const authProvider = {
-    login: async ({username, password}) => {
+    login: async ({ username, password }) => {
         const request = new Request('https://mystar.monster/api/login', {
             method: 'POST',
-            body: JSON.stringify({username, password}),
-            headers: new Headers({'Content-Type': 'application/json'}),
+            body: JSON.stringify({ username, password }),
+            headers: new Headers({ 'Content-Type': 'application/json' }),
         });
 
         try {
@@ -104,10 +102,10 @@ const authProvider = {
             if (!response.ok) {
                 throw new Error('Login failed');
             }
-            const {user, token} = await response.json();
+            const { user, token } = await response.json();
 
             // 儲存 token 和 user 信息到 localStorage
-            localStorage.setItem('auth', JSON.stringify({user, token}));
+            localStorage.setItem('auth', JSON.stringify({ user, token }));
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error.message);
@@ -117,7 +115,7 @@ const authProvider = {
         localStorage.removeItem('auth');
         return Promise.resolve();
     },
-    checkError: ({status}) => {
+    checkError: ({ status }) => {
         if (status === 401 || status === 403) {
             localStorage.removeItem('auth');
             return Promise.reject();
@@ -129,7 +127,6 @@ const authProvider = {
     },
     getPermissions: () => Promise.resolve(),
 };
-
 
 // 主題設置
 const theme = createTheme({
@@ -150,7 +147,7 @@ const App = () => (
             dataProvider={dataProvider}
             loginPage={Login} // 使用自訂的 Login 頁面
             appBar={MyAppBar}
-            i18nProvider={i18nProvider}
+            i18nProvider={i18nProvider} // 使用修正後的 i18nProvider
         >
             <Resource
                 name="users"
@@ -163,4 +160,4 @@ const App = () => (
     </ThemeProvider>
 );
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
