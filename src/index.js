@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource } from 'react-admin';
+import {Admin, Resource} from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {ThemeProvider, createTheme} from '@mui/material/styles';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
@@ -71,6 +71,16 @@ const customTraditionalChineseMessages = {
             number: '必須是數字',
             email: '必須是有效的電子郵件',
         },
+        navigation: {
+            no_results: '未找到結果',
+            page_out_of_boundaries: '頁數 %{page} 超出範圍',
+            page_out_from_end: '已到達最後一頁',
+            page_out_from_begin: '已到達第一頁',
+            page_range_info: '%{from}-%{to} 筆，共 %{count} 筆',
+            next: '下一頁',
+            prev: '上一頁',
+            page_rows_per_page: '每頁顯示筆數', // 這行是 "Rows per page"
+        }
     },
 };
 
@@ -82,25 +92,44 @@ const dataProvider = simpleRestProvider('https://mystar.monster/api');
 
 // 自定義 authProvider
 const authProvider = {
-    login: ({ username, password }) => {
-        if (username === 'admin' && password === 'password') {
-            console.log('Login successful');
-            localStorage.setItem('auth', 'true');
+    login: async ({username, password}) => {
+        const request = new Request('https://mystar.monster/api/login', {
+            method: 'POST',
+            body: JSON.stringify({username, password}),
+            headers: new Headers({'Content-Type': 'application/json'}),
+        });
+
+        try {
+            const response = await fetch(request);
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+            const {user, token} = await response.json();
+
+            // 儲存 token 和 user 信息到 localStorage
+            localStorage.setItem('auth', JSON.stringify({user, token}));
             return Promise.resolve();
+        } catch (error) {
+            return Promise.reject(error.message);
         }
-        console.log('Login failed');
-        return Promise.reject('Invalid username or password');
     },
     logout: () => {
-        console.log('Logged out');
         localStorage.removeItem('auth');
         return Promise.resolve();
     },
-    checkError: () => Promise.resolve(),
-    checkAuth: () =>
-        localStorage.getItem('auth') ? Promise.resolve() : Promise.reject(),
+    checkError: ({status}) => {
+        if (status === 401 || status === 403) {
+            localStorage.removeItem('auth');
+            return Promise.reject();
+        }
+        return Promise.resolve();
+    },
+    checkAuth: () => {
+        return localStorage.getItem('auth') ? Promise.resolve() : Promise.reject();
+    },
     getPermissions: () => Promise.resolve(),
 };
+
 
 // 主題設置
 const theme = createTheme({
@@ -119,9 +148,9 @@ const App = () => (
         <Admin
             authProvider={authProvider}
             dataProvider={dataProvider}
-            loginPage={Login}
+            loginPage={Login} // 使用自訂的 Login 頁面
             appBar={MyAppBar}
-            i18nProvider={i18nProvider}  // 使用繁體中文翻譯
+            i18nProvider={i18nProvider}
         >
             <Resource
                 name="users"
@@ -134,4 +163,4 @@ const App = () => (
     </ThemeProvider>
 );
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App/>, document.getElementById('root'));
