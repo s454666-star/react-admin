@@ -25,6 +25,7 @@ const customTraditionalChineseMessages = {
             add_filter: '添加篩選器',
             remove_filter: '移除篩選器',
             back: '返回',
+            export: '匯出',
         },
         message: {
             yes: '是',
