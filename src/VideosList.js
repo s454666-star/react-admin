@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactStars from 'react-stars';
 import './VideosList.css'; // 引入 CSS 檔案
 
 const VideosList = () => {
@@ -8,18 +9,35 @@ const VideosList = () => {
     useEffect(() => {
         fetch('https://mystar.monster/api/screenshots')
             .then(response => response.json())
-            .then(data => setVideos(data))
+            .then(data => setVideos(data.data))  // 修改為分頁的 data
             .catch(error => console.error('Error fetching videos:', error));
     }, []);
 
-    const toggleSelect = (screenshot) => {
-        setSelectedScreenshots(prev =>
-            prev.includes(screenshot) ? prev.filter(s => s !== screenshot) : [...prev, screenshot]
-        );
+    const updateRating = (newRating, id) => {
+        fetch(`https://mystar.monster/api/screenshots/${id}/update-rating`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ rating: newRating }),
+        })
+            .then(response => response.json())
+            .then(() => {
+                setVideos(videos.map(video => video.id === id ? { ...video, rating: newRating } : video));
+            })
+            .catch(error => console.error('Error updating rating:', error));
     };
 
-    const handleDelete = () => {
-        setSelectedScreenshots([]);
+    const updateNotes = (id, notes) => {
+        fetch(`https://mystar.monster/api/screenshots/${id}/update-notes`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notes }),
+        })
+            .then(response => response.json())
+            .catch(error => console.error('Error updating notes:', error));
     };
 
     return (
@@ -34,31 +52,26 @@ const VideosList = () => {
                         </video>
                         <div className="video-info">
                             <p><strong>ID:</strong> {video.id}</p>
-                            <p><strong>Rating:</strong> {video.rating || 'N/A'}</p>
-                            <p><strong>Notes:</strong> {video.notes || 'None'}</p>
-                        </div>
-                        <div className="screenshots">
-                            {video.screenshot_paths.split(',').map((screenshot, index) => (
-                                <div
-                                    key={index}
-                                    className={`screenshot-wrapper ${selectedScreenshots.includes(screenshot) ? 'selected' : ''}`}
-                                    onClick={() => toggleSelect(screenshot)}
-                                >
-                                    <img
-                                        className="screenshot-image"
-                                        src={screenshot}
-                                        alt={`Screenshot ${index}`}
-                                    />
-                                </div>
-                            ))}
+                            <p><strong>Rating:</strong>
+                                <ReactStars
+                                    count={10} // 設為10顆星
+                                    value={video.rating || 0}
+                                    onChange={(newRating) => updateRating(newRating, video.id)}
+                                    size={24}
+                                    color2={'#ffd700'} // 黃色星星
+                                />
+                            </p>
+                            <p><strong>Notes:</strong></p>
+                            <textarea
+                                className="notes-textarea"
+                                defaultValue={video.notes || ''}
+                                onBlur={(e) => updateNotes(video.id, e.target.value)} // 滑鼠移開時自動更新
+                            />
                         </div>
                     </div>
                 ))
             ) : (
                 <p>Loading videos...</p>
-            )}
-            {selectedScreenshots.length > 0 && (
-                <button className="delete-button" onClick={handleDelete}>Delete Selected Screenshots</button>
             )}
         </div>
     );
