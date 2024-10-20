@@ -12,7 +12,7 @@ import UserShow from './UserShow';
 import polyglotI18nProvider from 'ra-i18n-polyglot'; // 正確的 i18n provider
 import httpClient from './dataProvider';
 import VideosList from './VideosList';
-import { BrowserRouter, Route, Switch } from 'react-router-dom'; // 新增導入
+import { BrowserRouter, Route, Routes } from 'react-router-dom'; // 使用 Routes 替代 Switch
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -153,24 +153,29 @@ const theme = createTheme({
 const App = () => (
     <ThemeProvider theme={theme}>
         <BrowserRouter>
-            <Switch>
-                <Route exact path="/videos-list" component={VideosList} /> {/* 添加路由 */}
-                <Admin
-                    authProvider={authProvider}
-                    dataProvider={dataProvider}
-                    loginPage={Login} // 使用自訂的 Login 頁面
-                    appBar={MyAppBar}
-                    i18nProvider={i18nProvider} // 使用修正後的 i18nProvider
-                >
-                    <Resource
-                        name="users"
-                        list={UserList}
-                        create={UserCreate}
-                        edit={UserEdit}
-                        show={UserShow}
-                    />
-                </Admin>
-            </Switch>
+            <Routes> {/* 使用 Routes 替代 Switch */}
+                <Route exact path="/videos-list" element={<VideosList />} /> {/* 修改為 element 屬性 */}
+                <Route
+                    path="*"
+                    element={(
+                        <Admin
+                            authProvider={authProvider}
+                            dataProvider={dataProvider}
+                            loginPage={Login} // 使用自訂的 Login 頁面
+                            appBar={MyAppBar}
+                            i18nProvider={i18nProvider} // 使用修正後的 i18nProvider
+                        >
+                            <Resource
+                                name="users"
+                                list={UserList}
+                                create={UserCreate}
+                                edit={UserEdit}
+                                show={UserShow}
+                            />
+                        </Admin>
+                    )}
+                />
+            </Routes>
         </BrowserRouter>
     </ThemeProvider>
 );
