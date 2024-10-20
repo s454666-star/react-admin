@@ -11,6 +11,8 @@ const VideosList = () => {
     const [sortByColumn, setSortByColumn] = useState('rating'); // 新增排序欄位
     const [sortDirection, setSortDirection] = useState('asc'); // 新增排序方向
     const [notesFilter, setNotesFilter] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // 加載狀態
+    const [error, setError] = useState(null); // 錯誤訊息
     const perPage = 20;
 
     useEffect(() => {
@@ -18,6 +20,7 @@ const VideosList = () => {
     }, [currentPage, ratingFilter, sortByColumn, sortDirection, notesFilter]);
 
     const fetchVideos = () => {
+        setIsLoading(true);
         const queryParams = new URLSearchParams({
             page: currentPage,
             per_page: perPage,
@@ -36,8 +39,14 @@ const VideosList = () => {
             .then(data => {
                 setVideos(data.data);
                 setTotalPages(data.last_page);
+                setError(null);
+                setIsLoading(false);
             })
-            .catch(error => console.error('獲取影片時出錯:', error));
+            .catch(error => {
+                console.error('獲取影片時出錯:', error);
+                setError('無法載入資料，請稍後再試。');
+                setIsLoading(false);
+            });
     };
 
     const toggleSelect = (screenshot) => {
@@ -122,50 +131,56 @@ const VideosList = () => {
                 />
             </div>
 
-            {videos.length > 0 ? (
-                videos.map(video => (
-                    <div key={video.id} className="video-card">
-                        <h3 className="video-title">{video.file_name}</h3>
-                        <video className="video-player" controls width="600" src={video.file_path}>
-                            您的瀏覽器不支援影片標籤。
-                        </video>
-                        <div className="video-info">
-                            <p><strong>ID:</strong> {video.id}</p>
-                            <p><strong>評分:</strong>
-                                <ReactStars
-                                    count={10} // 調整為10顆星
-                                    value={video.rating || 0}
-                                    onChange={(newRating) => updateRating(newRating, video.id)}
-                                    size={24}
-                                    color2={'#ffd700'}
-                                />
-                            </p>
-                            <p><strong>備註:</strong></p>
-                            <textarea
-                                className="notes-textarea"
-                                defaultValue={video.notes || ''}
-                                onBlur={(e) => updateNotes(video.id, e.target.value)}
-                            />
-                        </div>
-                        <div className="screenshots">
-                            {video.screenshot_paths.split(',').map((screenshot, index) => (
-                                <div
-                                    key={index}
-                                    className={`screenshot-wrapper ${selectedScreenshots.includes(screenshot) ? 'selected' : ''}`}
-                                    onClick={() => toggleSelect(screenshot)}
-                                >
-                                    <img
-                                        className="screenshot-image"
-                                        src={screenshot}
-                                        alt={`截圖 ${index}`}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))
-            ) : (
+            {error && <p className="error-message">{error}</p>}
+
+            {isLoading ? (
                 <p>載入影片中...</p>
+            ) : (
+                videos.length > 0 ? (
+                    videos.map(video => (
+                        <div key={video.id} className="video-card">
+                            <h3 className="video-title">{video.file_name}</h3>
+                            <video className="video-player" controls width="600" src={video.file_path}>
+                                您的瀏覽器不支援影片標籤。
+                            </video>
+                            <div className="video-info">
+                                <p><strong>ID:</strong> {video.id}</p>
+                                <p><strong>評分:</strong>
+                                    <ReactStars
+                                        count={10} // 調整為10顆星
+                                        value={video.rating || 0}
+                                        onChange={(newRating) => updateRating(newRating, video.id)}
+                                        size={24}
+                                        color2={'#ffd700'}
+                                    />
+                                </p>
+                                <p><strong>備註:</strong></p>
+                                <textarea
+                                    className="notes-textarea"
+                                    defaultValue={video.notes || ''}
+                                    onBlur={(e) => updateNotes(video.id, e.target.value)}
+                                />
+                            </div>
+                            <div className="screenshots">
+                                {video.screenshot_paths.split(',').map((screenshot, index) => (
+                                    <div
+                                        key={index}
+                                        className={`screenshot-wrapper ${selectedScreenshots.includes(screenshot) ? 'selected' : ''}`}
+                                        onClick={() => toggleSelect(screenshot)}
+                                    >
+                                        <img
+                                            className="screenshot-image"
+                                            src={screenshot}
+                                            alt={`截圖 ${index}`}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p>沒有找到符合條件的影片。</p>
+                )
             )}
 
             <div className="pagination">
