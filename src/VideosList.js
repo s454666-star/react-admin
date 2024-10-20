@@ -20,7 +20,7 @@ const VideosList = () => {
     };
 
     const updateRating = (newRating, id) => {
-        fetch(`https://mystar.monster/api/screenshots/${id}/update-rating`, {
+        fetch(`https://mystar.monster/api/screenshots/${id}/rating`, {  // 注意路徑改成 /rating
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -34,8 +34,9 @@ const VideosList = () => {
             .catch(error => console.error('Error updating rating:', error));
     };
 
+
     const updateNotes = (id, notes) => {
-        fetch(`https://mystar.monster/api/screenshots/${id}/update-notes`, {
+        fetch(`https://mystar.monster/api/screenshots/${id}/notes`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
