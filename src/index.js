@@ -11,6 +11,7 @@ import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import polyglotI18nProvider from 'ra-i18n-polyglot'; // 正確的 i18n provider
 import httpClient from './dataProvider';
+import VideosList from './VideosList';
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -165,6 +166,7 @@ const App = () => (
                 edit={UserEdit}
                 show={UserShow}
             />
+            <Route path="/videos-list" component={VideosList} />
         </Admin>
     </ThemeProvider>
 );
