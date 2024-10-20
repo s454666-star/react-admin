@@ -15,6 +15,48 @@
     margin-bottom: 20px;
 }
 
+/* 篩選器樣式 */
+.filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filters select, .filters input {
+    padding: 5px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 分頁樣式 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+}
+
+.pagination span {
+    padding: 10px;
+    font-size: 1rem;
+}
+
 /* 單個影片卡片設計 */
 .video-card {
     background-color: #fff;
