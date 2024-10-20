@@ -7,7 +7,7 @@ const VideosList = () => {
     const [selectedScreenshots, setSelectedScreenshots] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [ratingFilter, setRatingFilter] = useState('');
+    const [ratingFilter, setRatingFilter] = useState('all'); // 預設為全選
     const [sortByColumn, setSortByColumn] = useState('rating'); // 新增排序欄位
     const [sortDirection, setSortDirection] = useState('asc'); // 新增排序方向
     const [notesFilter, setNotesFilter] = useState('');
@@ -26,7 +26,7 @@ const VideosList = () => {
             sort_direction: sortDirection,
         });
 
-        // 僅在 ratingFilter 不為空時加入 rating 參數
+        // 僅在 ratingFilter 不為 'all' 時加入 rating 參數
         if (ratingFilter && ratingFilter !== 'all') {
             queryParams.append('rating', ratingFilter);
         }
@@ -92,6 +92,11 @@ const VideosList = () => {
                     <option value="3">3 星</option>
                     <option value="4">4 星</option>
                     <option value="5">5 星</option>
+                    <option value="6">6 星</option>
+                    <option value="7">7 星</option>
+                    <option value="8">8 星</option>
+                    <option value="9">9 星</option>
+                    <option value="10">10 星</option>
                     {/* 可以加入更多選項 */}
                 </select>
 
@@ -128,7 +133,7 @@ const VideosList = () => {
                             <p><strong>ID:</strong> {video.id}</p>
                             <p><strong>評分:</strong>
                                 <ReactStars
-                                    count={5} // 根據需要調整星數
+                                    count={10} // 調整為10顆星
                                     value={video.rating || 0}
                                     onChange={(newRating) => updateRating(newRating, video.id)}
                                     size={24}
