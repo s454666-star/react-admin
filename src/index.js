@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Admin, Resource} from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
-import {ThemeProvider, createTheme} from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
@@ -12,6 +12,7 @@ import UserShow from './UserShow';
 import polyglotI18nProvider from 'ra-i18n-polyglot'; // 正確的 i18n provider
 import httpClient from './dataProvider';
 import VideosList from './VideosList';
+import { BrowserRouter, Route, Switch } from 'react-router-dom'; // 新增導入
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -137,7 +138,6 @@ const authProvider = {
     getPermissions: () => Promise.resolve(),
 };
 
-
 // 主題設置
 const theme = createTheme({
     palette: {
@@ -152,22 +152,26 @@ const theme = createTheme({
 
 const App = () => (
     <ThemeProvider theme={theme}>
-        <Admin
-            authProvider={authProvider}
-            dataProvider={dataProvider}
-            loginPage={Login} // 使用自訂的 Login 頁面
-            appBar={MyAppBar}
-            i18nProvider={i18nProvider} // 使用修正後的 i18nProvider
-        >
-            <Resource
-                name="users"
-                list={UserList}
-                create={UserCreate}
-                edit={UserEdit}
-                show={UserShow}
-            />
-            <Route path="/videos-list" component={VideosList} />
-        </Admin>
+        <BrowserRouter>
+            <Switch>
+                <Route exact path="/videos-list" component={VideosList} /> {/* 添加路由 */}
+                <Admin
+                    authProvider={authProvider}
+                    dataProvider={dataProvider}
+                    loginPage={Login} // 使用自訂的 Login 頁面
+                    appBar={MyAppBar}
+                    i18nProvider={i18nProvider} // 使用修正後的 i18nProvider
+                >
+                    <Resource
+                        name="users"
+                        list={UserList}
+                        create={UserCreate}
+                        edit={UserEdit}
+                        show={UserShow}
+                    />
+                </Admin>
+            </Switch>
+        </BrowserRouter>
     </ThemeProvider>
 );
 
