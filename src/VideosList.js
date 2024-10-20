@@ -24,7 +24,6 @@ const VideosList = () => {
         const queryParams = new URLSearchParams({
             page: currentPage,
             per_page: perPage,
-            notes: notesFilter,
             sort_by: sortByColumn,
             sort_direction: sortDirection,
         });
@@ -32,6 +31,11 @@ const VideosList = () => {
         // 僅在 ratingFilter 不為 'all' 時加入 rating 參數
         if (ratingFilter && ratingFilter !== 'all') {
             queryParams.append('rating', ratingFilter);
+        }
+
+        // 僅在 notesFilter 不為空時加入 notes 參數
+        if (notesFilter && notesFilter.trim() !== '') {
+            queryParams.append('notes', notesFilter);
         }
 
         fetch(`https://mystar.monster/api/screenshots?${queryParams.toString()}`)
