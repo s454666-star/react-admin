@@ -18,6 +18,10 @@ const VideosList = () => {
         );
     };
 
+    const handleDelete = () => {
+        setSelectedScreenshots([]);
+    };
+
     return (
         <div className="videos-container">
             <h2 className="title">Video Screenshots List</h2>
@@ -52,6 +56,9 @@ const VideosList = () => {
                 ))
             ) : (
                 <p>Loading videos...</p>
+            )}
+            {selectedScreenshots.length > 0 && (
+                <button className="delete-button" onClick={handleDelete}>Delete Selected Screenshots</button>
             )}
         </div>
     );
