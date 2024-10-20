@@ -13,6 +13,12 @@ const VideosList = () => {
             .catch(error => console.error('Error fetching videos:', error));
     }, []);
 
+    const toggleSelect = (screenshot) => {
+        setSelectedScreenshots(prev =>
+            prev.includes(screenshot) ? prev.filter(s => s !== screenshot) : [...prev, screenshot]
+        );
+    };
+
     const updateRating = (newRating, id) => {
         fetch(`https://mystar.monster/api/screenshots/${id}/update-rating`, {
             method: 'PUT',
@@ -67,6 +73,21 @@ const VideosList = () => {
                                 defaultValue={video.notes || ''}
                                 onBlur={(e) => updateNotes(video.id, e.target.value)} // 滑鼠移開時自動更新
                             />
+                        </div>
+                        <div className="screenshots">
+                            {video.screenshot_paths.split(',').map((screenshot, index) => (
+                                <div
+                                    key={index}
+                                    className={`screenshot-wrapper ${selectedScreenshots.includes(screenshot) ? 'selected' : ''}`}
+                                    onClick={() => toggleSelect(screenshot)}
+                                >
+                                    <img
+                                        className="screenshot-image"
+                                        src={screenshot}
+                                        alt={`Screenshot ${index}`}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 ))
