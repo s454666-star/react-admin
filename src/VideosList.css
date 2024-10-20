@@ -19,6 +19,7 @@
 .filters {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
 
@@ -29,10 +30,17 @@
     border: 1px solid #ccc;
 }
 
+/* 排序控制樣式 */
+.sort-controls {
+    display: flex;
+    gap: 10px;
+}
+
 /* 分頁樣式 */
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-top: 20px;
 }
 
@@ -50,6 +58,7 @@
 
 .pagination button:disabled {
     background-color: #ccc;
+    cursor: not-allowed;
 }
 
 .pagination span {
@@ -159,6 +168,21 @@
     }
 
     .screenshot-image {
-        width: 120px; /* 針對小螢幕放大 1.6 倍 */
+        width: 120px; /* 針對小螢幕縮小 */
+    }
+
+    .filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sort-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 10px;
     }
 }

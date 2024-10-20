@@ -8,22 +8,28 @@ const VideosList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [ratingFilter, setRatingFilter] = useState('');
-    const [sortByRating, setSortByRating] = useState('asc');
+    const [sortByColumn, setSortByColumn] = useState('rating'); // 新增排序欄位
+    const [sortDirection, setSortDirection] = useState('asc'); // 新增排序方向
     const [notesFilter, setNotesFilter] = useState('');
     const perPage = 20;
 
     useEffect(() => {
         fetchVideos();
-    }, [currentPage, ratingFilter, sortByRating, notesFilter]);
+    }, [currentPage, ratingFilter, sortByColumn, sortDirection, notesFilter]);
 
     const fetchVideos = () => {
         const queryParams = new URLSearchParams({
             page: currentPage,
             per_page: perPage,
-            rating: ratingFilter,
-            sort_by_rating: sortByRating,
             notes: notesFilter,
+            sort_by: sortByColumn,
+            sort_direction: sortDirection,
         });
+
+        // 僅在 ratingFilter 不為空時加入 rating 參數
+        if (ratingFilter && ratingFilter !== 'all') {
+            queryParams.append('rating', ratingFilter);
+        }
 
         fetch(`https://mystar.monster/api/screenshots?${queryParams.toString()}`)
             .then(response => response.json())
@@ -31,7 +37,7 @@ const VideosList = () => {
                 setVideos(data.data);
                 setTotalPages(data.last_page);
             })
-            .catch(error => console.error('Error fetching videos:', error));
+            .catch(error => console.error('獲取影片時出錯:', error));
     };
 
     const toggleSelect = (screenshot) => {
@@ -52,7 +58,7 @@ const VideosList = () => {
             .then(() => {
                 setVideos(videos.map(video => video.id === id ? { ...video, rating: newRating } : video));
             })
-            .catch(error => console.error('Error updating rating:', error));
+            .catch(error => console.error('更新評分時出錯:', error));
     };
 
     const updateNotes = (id, notes) => {
@@ -64,7 +70,7 @@ const VideosList = () => {
             body: JSON.stringify({ notes }),
         })
             .then(response => response.json())
-            .catch(error => console.error('Error updating notes:', error));
+            .catch(error => console.error('更新備註時出錯:', error));
     };
 
     const handlePageChange = (newPage) => {
@@ -75,26 +81,37 @@ const VideosList = () => {
 
     return (
         <div className="videos-container">
-            <h2 className="title">Video Screenshots List</h2>
+            <h2 className="title">影片庫</h2>
 
             <div className="filters">
                 <select value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)}>
-                    <option value="">All Ratings</option>
-                    <option value="unrated">Unrated</option>
-                    <option value="1">1 Star</option>
-                    <option value="2">2 Stars</option>
-                    <option value="3">3 Stars</option>
+                    <option value="all">全選</option>
+                    <option value="unrated">未評分</option>
+                    <option value="1">1 星</option>
+                    <option value="2">2 星</option>
+                    <option value="3">3 星</option>
+                    <option value="4">4 星</option>
+                    <option value="5">5 星</option>
                     {/* 可以加入更多選項 */}
                 </select>
 
-                <select value={sortByRating} onChange={(e) => setSortByRating(e.target.value)}>
-                    <option value="asc">Sort by Rating Ascending</option>
-                    <option value="desc">Sort by Rating Descending</option>
-                </select>
+                <div className="sort-controls">
+                    <select value={sortByColumn} onChange={(e) => setSortByColumn(e.target.value)}>
+                        <option value="id">依ID排序</option>
+                        <option value="file_name">依檔名排序</option>
+                        <option value="rating">依評分排序</option>
+                        {/* 可以加入更多排序欄位 */}
+                    </select>
+
+                    <select value={sortDirection} onChange={(e) => setSortDirection(e.target.value)}>
+                        <option value="asc">升序</option>
+                        <option value="desc">降序</option>
+                    </select>
+                </div>
 
                 <input
                     type="text"
-                    placeholder="Filter by Notes"
+                    placeholder="按備註篩選"
                     value={notesFilter}
                     onChange={(e) => setNotesFilter(e.target.value)}
                 />
@@ -105,20 +122,20 @@ const VideosList = () => {
                     <div key={video.id} className="video-card">
                         <h3 className="video-title">{video.file_name}</h3>
                         <video className="video-player" controls width="600" src={video.file_path}>
-                            Your browser does not support the video tag.
+                            您的瀏覽器不支援影片標籤。
                         </video>
                         <div className="video-info">
                             <p><strong>ID:</strong> {video.id}</p>
-                            <p><strong>Rating:</strong>
+                            <p><strong>評分:</strong>
                                 <ReactStars
-                                    count={10}
+                                    count={5} // 根據需要調整星數
                                     value={video.rating || 0}
                                     onChange={(newRating) => updateRating(newRating, video.id)}
                                     size={24}
                                     color2={'#ffd700'}
                                 />
                             </p>
-                            <p><strong>Notes:</strong></p>
+                            <p><strong>備註:</strong></p>
                             <textarea
                                 className="notes-textarea"
                                 defaultValue={video.notes || ''}
@@ -135,7 +152,7 @@ const VideosList = () => {
                                     <img
                                         className="screenshot-image"
                                         src={screenshot}
-                                        alt={`Screenshot ${index}`}
+                                        alt={`截圖 ${index}`}
                                     />
                                 </div>
                             ))}
@@ -143,13 +160,13 @@ const VideosList = () => {
                     </div>
                 ))
             ) : (
-                <p>Loading videos...</p>
+                <p>載入影片中...</p>
             )}
 
             <div className="pagination">
-                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>上一頁</button>
+                <span>第 {currentPage} 頁，共 {totalPages} 頁</span>
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>下一頁</button>
             </div>
         </div>
     );
