@@ -1,10 +1,23 @@
 import React from 'react';
 import {
-    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, SelectInput, required,
-    Toolbar, SaveButton
-} from 'react-admin'; // 引入 Toolbar 和 SaveButton
+    List,
+    Datagrid,
+    TextField,
+    EditButton,
+    DeleteButton,
+    Create,
+    SimpleForm,
+    TextInput,
+    Edit,
+    SelectInput,
+    required,
+    Toolbar,
+    SaveButton,
+    useNotify,
+    useRedirect,
+    useRefresh
+} from 'react-admin';
 import { Card, CardContent, CardHeader } from '@mui/material';
-import { useNotify, useRedirect, useRefresh } from 'react-admin';
 import { makeStyles } from '@mui/styles';
 
 // 自定義樣式
@@ -21,6 +34,13 @@ const useStyles = makeStyles({
         color: '#1976d2',
     },
 });
+
+// 自定義 Toolbar
+const CustomToolbar = props => (
+    <Toolbar {...props}>
+        <SaveButton />
+    </Toolbar>
+);
 
 // 商品類別清單頁面
 export const ProductCategoryList = (props) => {
@@ -49,24 +69,34 @@ export const ProductCategoryCreate = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
+    const classes = useStyles();
 
     const onSuccess = () => {
         notify('新增成功', { type: 'success' });
-        redirect('/product-categories'); // 返回列表頁面
+        redirect('list'); // 使用 'list' 來重定向到當前資源的列表頁面
         refresh();
     };
 
     return (
         <Create {...props} onSuccess={onSuccess} title="新增商品類別">
-            <SimpleForm toolbar={<Toolbar alwaysEnableSaveButton />}>
-                <TextInput source="category_name" label="名稱" validate={required()} />
-                <TextInput source="description" label="描述" />
-                <SelectInput source="status" label="狀態" choices={[
-                    { id: 1, name: '啟用' },
-                    { id: 0, name: '停用' },
-                ]} validate={required()} />
-                {/* SaveButton 可以省略，因為 Toolbar 已包含 Save 按鈕 */}
-            </SimpleForm>
+            <Card className={classes.card}>
+                <CardHeader className={classes.header} title="新增商品類別" />
+                <CardContent>
+                    <SimpleForm toolbar={<CustomToolbar />}>
+                        <TextInput source="category_name" label="名稱" validate={required()} />
+                        <TextInput source="description" label="描述" />
+                        <SelectInput
+                            source="status"
+                            label="狀態"
+                            choices={[
+                                { id: 1, name: '啟用' },
+                                { id: 0, name: '停用' },
+                            ]}
+                            validate={required()}
+                        />
+                    </SimpleForm>
+                </CardContent>
+            </Card>
         </Create>
     );
 };
@@ -76,24 +106,34 @@ export const ProductCategoryEdit = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
+    const classes = useStyles();
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
-        redirect('/product-categories'); // 返回列表頁面
+        redirect('list'); // 使用 'list' 來重定向到當前資源的列表頁面
         refresh();
     };
 
     return (
         <Edit {...props} onSuccess={onSuccess} title="編輯商品類別">
-            <SimpleForm toolbar={<Toolbar alwaysEnableSaveButton />}>
-                <TextInput source="category_name" label="名稱" validate={required()} />
-                <TextInput source="description" label="描述" />
-                <SelectInput source="status" label="狀態" choices={[
-                    { id: 1, name: '啟用' },
-                    { id: 0, name: '停用' },
-                ]} validate={required()} />
-                {/* SaveButton 可以省略，因為 Toolbar 已包含 Save 按鈕 */}
-            </SimpleForm>
+            <Card className={classes.card}>
+                <CardHeader className={classes.header} title="編輯商品類別" />
+                <CardContent>
+                    <SimpleForm toolbar={<CustomToolbar />}>
+                        <TextInput source="category_name" label="名稱" validate={required()} />
+                        <TextInput source="description" label="描述" />
+                        <SelectInput
+                            source="status"
+                            label="狀態"
+                            choices={[
+                                { id: 1, name: '啟用' },
+                                { id: 0, name: '停用' },
+                            ]}
+                            validate={required()}
+                        />
+                    </SimpleForm>
+                </CardContent>
+            </Card>
         </Edit>
     );
 };
