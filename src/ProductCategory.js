@@ -73,7 +73,7 @@ export const ProductCategoryCreate = (props) => {
 
     const onSuccess = () => {
         notify('新增成功', { type: 'success' });
-        redirect('list'); // 使用 'list' 來重定向到當前資源的列表頁面
+        redirect('list', 'product-categories');
         refresh();
     };
 
@@ -110,7 +110,7 @@ export const ProductCategoryEdit = (props) => {
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
-        redirect('list'); // 使用 'list' 來重定向到當前資源的列表頁面
+        redirect('list', 'product-categories');
         refresh();
     };
 
