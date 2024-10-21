@@ -1,0 +1,188 @@
+/* 整體容器設計 */
+.videos-container {
+    background-color: #f7f9fc;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* 篩選器樣式 */
+.filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filters select, .filters input {
+    padding: 5px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 排序控制樣式 */
+.sort-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* 分頁樣式 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* 單個影片卡片設計 */
+.video-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.video-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.video-player {
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* 影片資訊設計 */
+.video-info {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.video-info p {
+    margin: 5px 0;
+}
+
+/* 截圖區域設計 */
+.screenshots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.screenshot-wrapper {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-color: #f0f4f8;
+    padding: 5px;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s, background-color 0.3s;
+}
+
+.screenshot-wrapper.selected {
+    border-color: #007bff;
+    background-color: #e0efff;
+}
+
+.screenshot-image {
+    width: 160px; /* 放大1.6倍 */
+    height: auto;
+    display: block;
+    border-radius: 5px;
+}
+
+/* 刪除按鈕設計 */
+.delete-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* 增加備註 textarea 風格 */
+.notes-textarea {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+/* 星星評分風格 */
+.ReactStars {
+    margin: 5px 0;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .video-player {
+        width: 100%;
+    }
+
+    .screenshot-image {
+        width: 120px; /* 針對小螢幕縮小 */
+    }
+
+    .filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sort-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

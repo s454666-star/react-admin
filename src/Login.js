@@ -1,6 +1,31 @@
 import React, { useState } from 'react';
 import { useLogin, useNotify, Notification } from 'react-admin';
-import { Card, CardContent, TextField, Button, Typography, Box } from '@mui/material';
+import { TextField, Button, Grid, Paper, Typography, Box } from '@mui/material';
+import { keyframes } from '@emotion/react';
+import { styled } from '@mui/material/styles';
+
+// Define fade-in animation
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
+
+// Styled Paper component with animation
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    animation: `${fadeIn} 1s ease-out`,
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    borderRadius: '15px',
+}));
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -11,55 +36,76 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         login({ username, password }).catch(() =>
-            notify('無效的用戶名或密碼')
+            notify('Invalid username or password', 'warning')
         );
     };
 
     return (
-        <Box
-            display="flex"
+        <Grid
+            container
+            sx={{
+                height: '100vh',
+                background: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)',
+            }}
             justifyContent="center"
             alignItems="center"
-            minHeight="100vh"
-            bgcolor="#f5f5f5"
         >
-            <Card sx={{ minWidth: 300, padding: 2 }}>
-                <CardContent>
-                    <Typography variant="h5" component="div" gutterBottom>
+            <Grid item xs={10} sm={8} md={4}>
+                <StyledPaper>
+                    <Typography
+                        component="h1"
+                        variant="h5"
+                        sx={{ marginBottom: 2, color: '#333' }}
+                    >
                         登入
                     </Typography>
-                    <form onSubmit={handleSubmit}>
+                    <Box
+                        component="form"
+                        sx={{ width: '100%', marginTop: 1 }}
+                        onSubmit={handleSubmit}
+                        noValidate
+                    >
                         <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
                             label="用戶名"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            fullWidth
-                            required
-                            margin="normal"
+                            autoFocus
                         />
                         <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
                             label="密碼"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            fullWidth
-                            required
-                            margin="normal"
                         />
                         <Button
                             type="submit"
-                            variant="contained"
-                            color="primary"
                             fullWidth
-                            sx={{ marginTop: 2 }}
+                            variant="contained"
+                            sx={{
+                                margin: (theme) => theme.spacing(3, 0, 2),
+                                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                                color: '#fff',
+                                '&:hover': {
+                                    background:
+                                        'linear-gradient(45deg, #21CBF3 30%, #2196F3 90%)',
+                                },
+                            }}
                         >
                             登入
                         </Button>
-                    </form>
-                </CardContent>
-            </Card>
-            <Notification />
-        </Box>
+                    </Box>
+                    <Notification />
+                </StyledPaper>
+            </Grid>
+        </Grid>
     );
 };
 
