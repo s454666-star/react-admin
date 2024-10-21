@@ -51,19 +51,20 @@ export const ProductCategoryCreate = (props) => {
 
     const onSuccess = () => {
         notify('新增成功', { type: 'success' });
-        redirect('/product-categories'); // 新增完後重導回列表頁面
+        redirect('/product-categories'); // 確保返回到列表頁面
         refresh();
     };
 
     return (
         <Create {...props} onSuccess={onSuccess} title="新增商品類別">
-            <SimpleForm>
+            <SimpleForm toolbar={<Toolbar alwaysEnableSaveButton />}>
                 <TextInput source="category_name" label="名稱" validate={required()} />
                 <TextInput source="description" label="描述" />
                 <SelectInput source="status" label="狀態" choices={[
                     { id: 1, name: '啟用' },
                     { id: 0, name: '停用' },
                 ]} validate={required()} />
+                <SaveButton alwaysEnableSaveButton />
             </SimpleForm>
         </Create>
     );
@@ -77,19 +78,20 @@ export const ProductCategoryEdit = (props) => {
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
-        redirect('/product-categories'); // 更新完後重導回列表頁面
+        redirect('/product-categories'); // 確保編輯後返回到列表頁面
         refresh();
     };
 
     return (
         <Edit {...props} onSuccess={onSuccess} title="編輯商品類別">
-            <SimpleForm>
+            <SimpleForm toolbar={<Toolbar alwaysEnableSaveButton />}>
                 <TextInput source="category_name" label="名稱" validate={required()} />
                 <TextInput source="description" label="描述" />
                 <SelectInput source="status" label="狀態" choices={[
                     { id: 1, name: '啟用' },
                     { id: 0, name: '停用' },
                 ]} validate={required()} />
+                <SaveButton alwaysEnableSaveButton />
             </SimpleForm>
         </Edit>
     );
