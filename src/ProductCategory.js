@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, SelectInput, required
-} from 'react-admin';
+    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, SelectInput, required,
+    Toolbar, SaveButton
+} from 'react-admin'; // 引入 Toolbar 和 SaveButton
 import { Card, CardContent, CardHeader } from '@mui/material';
 import { useNotify, useRedirect, useRefresh } from 'react-admin';
 import { makeStyles } from '@mui/styles';
@@ -51,7 +52,7 @@ export const ProductCategoryCreate = (props) => {
 
     const onSuccess = () => {
         notify('新增成功', { type: 'success' });
-        redirect('/product-categories'); // 確保返回到列表頁面
+        redirect('/product-categories'); // 返回列表頁面
         refresh();
     };
 
@@ -64,7 +65,7 @@ export const ProductCategoryCreate = (props) => {
                     { id: 1, name: '啟用' },
                     { id: 0, name: '停用' },
                 ]} validate={required()} />
-                <SaveButton alwaysEnableSaveButton />
+                {/* SaveButton 可以省略，因為 Toolbar 已包含 Save 按鈕 */}
             </SimpleForm>
         </Create>
     );
@@ -78,7 +79,7 @@ export const ProductCategoryEdit = (props) => {
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
-        redirect('/product-categories'); // 確保編輯後返回到列表頁面
+        redirect('/product-categories'); // 返回列表頁面
         refresh();
     };
 
@@ -91,7 +92,7 @@ export const ProductCategoryEdit = (props) => {
                     { id: 1, name: '啟用' },
                     { id: 0, name: '停用' },
                 ]} validate={required()} />
-                <SaveButton alwaysEnableSaveButton />
+                {/* SaveButton 可以省略，因為 Toolbar 已包含 Save 按鈕 */}
             </SimpleForm>
         </Edit>
     );
