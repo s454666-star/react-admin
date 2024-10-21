@@ -82,7 +82,7 @@ export const ProductCategoryCreate = (props) => {
             <Card className={classes.card}>
                 <CardHeader className={classes.header} title="新增商品類別" />
                 <CardContent>
-                    <SimpleForm toolbar={<CustomToolbar />}>
+                    <SimpleForm redirect="list" toolbar={<CustomToolbar />}>
                         <TextInput source="category_name" label="名稱" validate={required()} />
                         <TextInput source="description" label="描述" />
                         <SelectInput
@@ -100,6 +100,7 @@ export const ProductCategoryCreate = (props) => {
         </Create>
     );
 };
+
 
 // 商品類別編輯頁面
 export const ProductCategoryEdit = (props) => {
