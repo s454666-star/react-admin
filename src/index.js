@@ -7,6 +7,9 @@ import Login from './Login';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { List, Datagrid, TextField, EmailField, Filter, TextInput } from 'react-admin';
 
+// 引入商品類別頁面
+import { ProductCategoryList, ProductCategoryCreate, ProductCategoryEdit } from './ProductCategory';
+
 // 使用 JSONPlaceholder 作為資料來源的 provider
 const dataProvider = jsonServerProvider('https://jsonplaceholder.typicode.com');
 
@@ -32,27 +35,7 @@ const authProvider = {
     getPermissions: () => Promise.resolve(),
 };
 
-// 定義過濾器組件
-const UserFilter = (props) => (
-    <Filter {...props}>
-        <TextInput label="搜尋名稱" source="q" alwaysOn />
-    </Filter>
-);
-
-// 定義使用者清單組件，並添加搜尋功能
-const UserList = (props) => (
-    <List {...props} filters={<UserFilter />} title="使用者清單">
-        <Datagrid rowClick="edit">
-            <TextField source="id" />
-            <TextField source="name" />
-            <EmailField source="email" />
-            <TextField source="phone" />
-            <TextField source="website" />
-        </Datagrid>
-    </List>
-);
-
-// 主題設置（可選）
+// 主題設置
 const theme = createTheme({
     palette: {
         primary: {
@@ -69,7 +52,13 @@ const App = () => (
             loginPage={Login}
             appBar={MyAppBar}
         >
-            <Resource name="users" list={UserList} />
+            {/* 商品類別資源 */}
+            <Resource
+                name="product-categories"
+                list={ProductCategoryList}
+                create={ProductCategoryCreate}
+                edit={ProductCategoryEdit}
+            />
         </Admin>
     </ThemeProvider>
 );
