@@ -45,6 +45,53 @@ const customTraditionalChineseMessages = {
             saved: '儲存成功',
             deleted: '刪除成功',
         },
+        input: {
+            file: {
+                upload_several: '將文件拖放到此處或點擊進行上傳。',
+                upload_single: '將文件拖放到此處或點擊進行上傳。',
+            },
+            image: {
+                upload_several: '將圖片拖放到此處或點擊進行上傳。',
+                upload_single: '將圖片拖放到此處或點擊進行上傳。',
+            },
+        },
+        auth: {
+            username: '帳號',
+            password: '密碼',
+            sign_in: '登入',
+            sign_in_error: '登入失敗，請重試',
+            logout: '登出',
+        },
+        notification: {
+            updated: '已更新',
+            created: '已新增',
+            deleted: '已刪除',
+            item_doesnt_exist: '該項目不存在',
+        },
+        validation: {
+            required: '必填',
+            minLength: '最小長度為 %{min}',
+            maxLength: '最大長度為 %{max}',
+            minValue: '最小值為 %{min}',
+            maxValue: '最大值為 %{max}',
+            number: '必須是數字',
+            email: '必須是有效的電子郵件',
+        },
+        navigation: {
+            no_results: '未找到結果',
+            page_out_of_boundaries: '頁數 %{page} 超出範圍',
+            page_out_from_end: '已到達最後一頁',
+            page_out_from_begin: '已到達第一頁',
+            page_range_info: '%{offsetBegin}-%{offsetEnd} 筆，共 %{total} 筆', // 修正這行
+            next: '下一頁',
+            prev: '上一頁',
+            page_rows_per_page: '每頁顯示筆數',
+        },
+        page: {
+            error: '發生錯誤',
+            not_found: '頁面未找到',
+            unauthorized: '未授權',
+        },
     },
 };
 
