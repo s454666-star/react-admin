@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, required
+    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, SelectInput, required
 } from 'react-admin';
-import { Card, CardContent, CardHeader, Button } from '@mui/material';
+import { Card, CardContent, CardHeader } from '@mui/material';
 import { useNotify, useRedirect, useRefresh } from 'react-admin';
 import { makeStyles } from '@mui/styles';
 
@@ -33,6 +33,7 @@ export const ProductCategoryList = (props) => {
                         <TextField source="id" label="編號" />
                         <TextField source="category_name" label="名稱" />
                         <TextField source="description" label="描述" />
+                        <TextField source="status" label="狀態" />
                         <EditButton />
                         <DeleteButton />
                     </Datagrid>
@@ -59,6 +60,10 @@ export const ProductCategoryCreate = (props) => {
             <SimpleForm>
                 <TextInput source="category_name" label="名稱" validate={required()} />
                 <TextInput source="description" label="描述" />
+                <SelectInput source="status" label="狀態" choices={[
+                    { id: 1, name: '啟用' },
+                    { id: 0, name: '停用' },
+                ]} validate={required()} />
             </SimpleForm>
         </Create>
     );
@@ -81,6 +86,10 @@ export const ProductCategoryEdit = (props) => {
             <SimpleForm>
                 <TextInput source="category_name" label="名稱" validate={required()} />
                 <TextInput source="description" label="描述" />
+                <SelectInput source="status" label="狀態" choices={[
+                    { id: 1, name: '啟用' },
+                    { id: 0, name: '停用' },
+                ]} validate={required()} />
             </SimpleForm>
         </Edit>
     );
