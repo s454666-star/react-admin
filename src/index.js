@@ -169,15 +169,14 @@ const App = () => (
                             i18nProvider={i18nProvider}
                         >
                             <Resource
-                                name="users"
+                                name="使用者"
                                 list={UserList}
                                 create={UserCreate}
                                 edit={UserEdit}
                                 show={UserShow}
                             />
-                            {/* 添加商品類別資源 */}
                             <Resource
-                                name="product-categories"
+                                name="產品類別"
                                 list={ProductCategoryList}
                                 create={ProductCategoryCreate}
                                 edit={ProductCategoryEdit}
