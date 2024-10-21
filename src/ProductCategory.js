@@ -1,6 +1,8 @@
 import React from 'react';
-import { List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, required } from 'react-admin';
-import { Card, CardContent, CardHeader, Button, Typography } from '@mui/material';
+import {
+    List, Datagrid, TextField, EditButton, DeleteButton, Create, SimpleForm, TextInput, Edit, required
+} from 'react-admin';
+import { Card, CardContent, CardHeader, Button } from '@mui/material';
 import { useNotify, useRedirect, useRefresh } from 'react-admin';
 import { makeStyles } from '@mui/styles';
 
@@ -42,7 +44,6 @@ export const ProductCategoryList = (props) => {
 
 // 商品類別新增頁面
 export const ProductCategoryCreate = (props) => {
-    const classes = useStyles();
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
@@ -55,22 +56,16 @@ export const ProductCategoryCreate = (props) => {
 
     return (
         <Create {...props} onSuccess={onSuccess} title="新增商品類別">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="新增商品類別" />
-                <CardContent>
-                    <SimpleForm>
-                        <TextInput source="category_name" label="名稱" validate={required()} />
-                        <TextInput source="description" label="描述" />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
+            <SimpleForm>
+                <TextInput source="category_name" label="名稱" validate={required()} />
+                <TextInput source="description" label="描述" />
+            </SimpleForm>
         </Create>
     );
 };
 
 // 商品類別編輯頁面
 export const ProductCategoryEdit = (props) => {
-    const classes = useStyles();
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
@@ -83,15 +78,10 @@ export const ProductCategoryEdit = (props) => {
 
     return (
         <Edit {...props} onSuccess={onSuccess} title="編輯商品類別">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="編輯商品類別" />
-                <CardContent>
-                    <SimpleForm>
-                        <TextInput source="category_name" label="名稱" validate={required()} />
-                        <TextInput source="description" label="描述" />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
+            <SimpleForm>
+                <TextInput source="category_name" label="名稱" validate={required()} />
+                <TextInput source="description" label="描述" />
+            </SimpleForm>
         </Edit>
     );
 };
