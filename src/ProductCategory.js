@@ -78,7 +78,7 @@ export const ProductCategoryCreate = (props) => {
     };
 
     return (
-        <Create {...props} onSuccess={onSuccess} title="新增商品類別">
+        <Create {...props} mutationOptions={{onSuccess}} title="新增商品類別">
             <Card className={classes.card}>
                 <CardHeader className={classes.header} title="新增商品類別" />
                 <CardContent>
