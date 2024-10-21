@@ -11,7 +11,6 @@ import {
     ShowButton,
     BulkDeleteButton
 } from 'react-admin';
-import { styled } from '@mui/system';
 import { TableRow } from '@mui/material';
 
 const UserFilter = (props) => (
@@ -21,21 +20,18 @@ const UserFilter = (props) => (
 );
 
 // 自定義行的樣式 (滑鼠移到哪裡  哪個row就高亮效果)
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const rowStyle = (record, index) => ({
+    backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff',
     '&:hover': {
-        backgroundColor: theme.palette.action.hover, // 高亮效果
+        backgroundColor: '#e0e0e0', // 高亮效果
     },
-}));
+});
 
 const UserList = (props) => (
     <List {...props} filters={<UserFilter />} bulkActionButtons={<BulkDeleteButton label="批次刪除" />} title="使用者清單">
         <Datagrid
             rowClick="edit"
-            rowStyle={(record, index) => ({
-                backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff', // 基數偶數行不同顏色
-            })}
-            // 自定義行樣式
-            row={<StyledTableRow />}
+            rowStyle={rowStyle}
         >
             <TextField source="id" label="ID" />
             <TextField source="username" label="帳號" />
