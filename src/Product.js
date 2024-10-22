@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     List,
     Datagrid,
@@ -18,6 +18,7 @@ import {
     useRedirect,
     useRefresh,
     ReferenceInput,
+    useRecordContext
 } from 'react-admin';
 import { Card, CardContent, CardHeader } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -122,7 +123,7 @@ export const ProductCreate = (props) => {
                         />
 
                         {/* 傳遞 Base64 字符串到後端 */}
-                        <TextInput source="image_base64" value={imageBase64} style={{ display: 'none' }} />
+                        <TextInput source="image_base64" defaultValue={imageBase64} style={{ display: 'none' }} />
                     </SimpleForm>
                 </CardContent>
             </Card>
@@ -137,6 +138,13 @@ export const ProductEdit = (props) => {
     const refresh = useRefresh();
     const [imageBase64, setImageBase64] = useState(''); // 用來保存編輯圖片的 Base64 字符串
     const classes = useStyles();
+    const record = useRecordContext();
+
+    useEffect(() => {
+        if (record && record.image_base64) {
+            setImageBase64(record.image_base64); // 當記錄有 Base64 圖片時，初始化狀態
+        }
+    }, [record]);
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
@@ -185,7 +193,7 @@ export const ProductEdit = (props) => {
                         />
 
                         {/* 傳遞 Base64 字符串到後端 */}
-                        <TextInput source="image_base64" value={imageBase64} style={{ display: 'none' }} />
+                        <TextInput source="image_base64" defaultValue={imageBase64} style={{ display: 'none' }} />
                     </SimpleForm>
                 </CardContent>
             </Card>
