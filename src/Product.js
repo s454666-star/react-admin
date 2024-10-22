@@ -137,7 +137,7 @@ export const ProductList = (props) => {
         <List {...props} title="商品清單">
             <Datagrid rowClick="edit">
                 <TextField source="id" label="編號" />
-                <ImageField source="image_base64" label="商品圖片" sx={{ width: 50, height: 50 }} />
+                <ImageField source="image_base64" label="商品圖片" sx={{ width: 50, height: 50, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
                 <TextField source="product_name" label="商品名稱" />
                 <NumberField source="price" label="價格" />
                 <NumberField source="stock_quantity" label="庫存數量" />
