@@ -139,7 +139,7 @@ export const ProductList = (props) => {
                 <CardContent>
                     <Datagrid rowClick="edit">
                         <TextField source="id" label="編號" />
-                        <TextField source="product_name" label="商品名稱" />
+                        <TextInput source="product_name" label="商品名稱" defaultValue="" validate={required()} />
                         <TextField source="price" label="價格" />
                         <TextField source="stock_quantity" label="庫存數量" />
                         <TextField source="status" label="狀態" />
@@ -221,7 +221,7 @@ export const ProductEdit = (props) => {
                         <ReferenceInput source="category_id" reference="product-categories" label="商品類別" validate={required()}>
                             <SelectInput optionText="category_name" />
                         </ReferenceInput>
-                        <TextInput source="product_name" label="商品名稱" validate={required()} />
+                        <TextInput source="product_name" label="商品名稱" defaultValue="" validate={required()} />
                         <NumberInput source="price" label="價格" validate={required()} />
                         <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
 
