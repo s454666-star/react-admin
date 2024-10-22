@@ -5,17 +5,16 @@ import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import polyglotI18nProvider from 'ra-i18n-polyglot';
+import httpClient from './dataProvider';
+import { ProductList, ProductCreate, ProductEdit } from './Product';
+import { ProductCategoryList, ProductCategoryCreate, ProductCategoryEdit } from './ProductCategory';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import polyglotI18nProvider from 'ra-i18n-polyglot';
-import httpClient from './dataProvider';
-import VideosList from './VideosList';
+import VideosList from './VideosList'; // 保留 videos-list 功能
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
-// 引入商品類別 CRUD 頁面
-import { ProductCategoryList, ProductCategoryCreate, ProductCategoryEdit } from './ProductCategory';
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -82,7 +81,7 @@ const customTraditionalChineseMessages = {
             page_out_of_boundaries: '頁數 %{page} 超出範圍',
             page_out_from_end: '已到達最後一頁',
             page_out_from_begin: '已到達第一頁',
-            page_range_info: '%{offsetBegin}-%{offsetEnd} 筆，共 %{total} 筆', // 修正這行
+            page_range_info: '%{offsetBegin}-%{offsetEnd} 筆，共 %{total} 筆',
             next: '下一頁',
             prev: '上一頁',
             page_rows_per_page: '每頁顯示筆數',
@@ -171,10 +170,17 @@ const App = () => (
                             <Resource
                                 name="users"
                                 list={UserList}
-                                options={{ label: '使用者' }}
                                 create={UserCreate}
                                 edit={UserEdit}
                                 show={UserShow}
+                                options={{ label: '使用者' }}
+                            />
+                            <Resource
+                                name="products"
+                                options={{ label: '商品' }}
+                                list={ProductList}
+                                create={ProductCreate}
+                                edit={ProductEdit}
                             />
                             <Resource
                                 name="product-categories"
