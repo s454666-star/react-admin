@@ -68,8 +68,8 @@ const CustomToolbar = props => (
 const ImageBase64Input = (props) => {
     const classes = useStyles();
     const {
-        input: { value, onChange },
-        meta: { touched, error },
+        field: { value, onChange },
+        fieldState: { isTouched, error },
     } = useInput(props);
 
     const onDrop = useCallback((acceptedFiles, fileRejections) => {
@@ -121,9 +121,9 @@ const ImageBase64Input = (props) => {
                     <img src={value} alt="預覽圖片" width="200" />
                 </Box>
             )}
-            {touched && error && (
+            {isTouched && error && (
                 <Typography color="error" variant="caption">
-                    {error}
+                    {error.message || error}
                 </Typography>
             )}
         </Box>
