@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     List,
     Datagrid,
@@ -14,8 +14,6 @@ import {
     required,
     Toolbar,
     SaveButton,
-    ImageInput,
-    ImageField,
     useNotify,
     useRedirect,
     useRefresh,
@@ -74,12 +72,21 @@ export const ProductCreate = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
+    const [imageBase64, setImageBase64] = useState(''); // 用來保存圖片的 Base64 字符串
     const classes = useStyles();
 
     const onSuccess = () => {
         notify('新增成功', { type: 'success' });
         redirect('/products');
         refresh();
+    };
+
+    const handleImageChange = (file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageBase64(reader.result); // 將 Base64 字符串保存到狀態
+        };
+        reader.readAsDataURL(file); // 將圖片轉換為 Base64
     };
 
     return (
@@ -94,9 +101,15 @@ export const ProductCreate = (props) => {
                         <TextInput source="product_name" label="商品名稱" validate={required()} />
                         <NumberInput source="price" label="價格" validate={required()} />
                         <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
-                        <ImageInput source="image_base64" label="上傳圖片" accept="image/*">
-                            <ImageField source="src" title="圖片" />
-                        </ImageInput>
+
+                        {/* 圖片上傳處理 */}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e.target.files[0])}
+                        />
+                        {imageBase64 && <img src={imageBase64} alt="預覽圖片" width="100" />}
+
                         <SelectInput
                             source="status"
                             label="狀態"
@@ -107,6 +120,9 @@ export const ProductCreate = (props) => {
                             ]}
                             validate={required()}
                         />
+
+                        {/* 傳遞 Base64 字符串到後端 */}
+                        <TextInput source="image_base64" value={imageBase64} style={{ display: 'none' }} />
                     </SimpleForm>
                 </CardContent>
             </Card>
@@ -119,12 +135,21 @@ export const ProductEdit = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
     const refresh = useRefresh();
+    const [imageBase64, setImageBase64] = useState(''); // 用來保存編輯圖片的 Base64 字符串
     const classes = useStyles();
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
         redirect('list', 'products');
         refresh();
+    };
+
+    const handleImageChange = (file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageBase64(reader.result); // 將 Base64 字符串保存到狀態
+        };
+        reader.readAsDataURL(file); // 將圖片轉換為 Base64
     };
 
     return (
@@ -139,9 +164,15 @@ export const ProductEdit = (props) => {
                         <TextInput source="product_name" label="商品名稱" validate={required()} />
                         <NumberInput source="price" label="價格" validate={required()} />
                         <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
-                        <ImageInput source="image_base64" label="上傳圖片" accept="image/*">
-                            <ImageField source="src" title="圖片" />
-                        </ImageInput>
+
+                        {/* 圖片上傳處理 */}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e.target.files[0])}
+                        />
+                        {imageBase64 && <img src={imageBase64} alt="預覽圖片" width="100" />}
+
                         <SelectInput
                             source="status"
                             label="狀態"
@@ -152,6 +183,9 @@ export const ProductEdit = (props) => {
                             ]}
                             validate={required()}
                         />
+
+                        {/* 傳遞 Base64 字符串到後端 */}
+                        <TextInput source="image_base64" value={imageBase64} style={{ display: 'none' }} />
                     </SimpleForm>
                 </CardContent>
             </Card>
