@@ -87,6 +87,8 @@ const customTraditionalChineseMessages = {
             page_rows_per_page: '每頁顯示筆數',
         },
         page: {
+            empty: '目前沒有資料',
+            invite: '',
             error: '發生錯誤',
             not_found: '頁面未找到',
             unauthorized: '未授權',
