@@ -20,7 +20,7 @@ import {
     useRefresh,
     ReferenceInput,
     useRecordContext,
-    useInput
+    useInput, ImageField
 } from 'react-admin';
 import { Card, CardContent, CardHeader, Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
