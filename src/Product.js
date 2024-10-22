@@ -3,6 +3,7 @@ import {
     List,
     Datagrid,
     TextField,
+    NumberField,
     EditButton,
     DeleteButton,
     Create,
@@ -134,20 +135,15 @@ export const ProductList = (props) => {
     const classes = useStyles();
     return (
         <List {...props} title="商品清單">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="商品清單" />
-                <CardContent>
-                    <Datagrid rowClick="edit">
-                        <TextField source="id" label="編號" />
-                        <TextInput source="product_name" label="商品名稱" defaultValue="" validate={required()} />
-                        <TextField source="price" label="價格" />
-                        <TextField source="stock_quantity" label="庫存數量" />
-                        <TextField source="status" label="狀態" />
-                        <EditButton />
-                        <DeleteButton />
-                    </Datagrid>
-                </CardContent>
-            </Card>
+            <Datagrid rowClick="edit">
+                <TextField source="id" label="編號" />
+                <TextField source="product_name" label="商品名稱" />
+                <NumberField source="price" label="價格" />
+                <NumberField source="stock_quantity" label="庫存數量" />
+                <TextField source="status" label="狀態" />
+                <EditButton />
+                <DeleteButton />
+            </Datagrid>
         </List>
     );
 };
@@ -167,10 +163,10 @@ export const ProductCreate = (props) => {
 
     return (
         <Create {...props} mutationOptions={{ onSuccess }} title="新增商品">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="新增商品" />
-                <CardContent>
-                    <SimpleForm toolbar={<CustomToolbar />} redirect="list">
+            <SimpleForm toolbar={<CustomToolbar />} redirect="list">
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="新增商品" />
+                    <CardContent>
                         <ReferenceInput source="category_id" reference="product-categories" label="商品類別" validate={required()}>
                             <SelectInput optionText="category_name" />
                         </ReferenceInput>
@@ -191,9 +187,9 @@ export const ProductCreate = (props) => {
                             ]}
                             validate={required()}
                         />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </SimpleForm>
         </Create>
     );
 };
@@ -214,14 +210,14 @@ export const ProductEdit = (props) => {
 
     return (
         <Edit {...props} onSuccess={onSuccess} title="編輯商品">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="編輯商品" />
-                <CardContent>
-                    <SimpleForm toolbar={<CustomToolbar />}>
+            <SimpleForm toolbar={<CustomToolbar />}>
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="編輯商品" />
+                    <CardContent>
                         <ReferenceInput source="category_id" reference="product-categories" label="商品類別" validate={required()}>
                             <SelectInput optionText="category_name" />
                         </ReferenceInput>
-                        <TextInput source="product_name" label="商品名稱" defaultValue="" validate={required()} />
+                        <TextInput source="product_name" label="商品名稱" validate={required()} />
                         <NumberInput source="price" label="價格" validate={required()} />
                         <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
 
@@ -238,9 +234,9 @@ export const ProductEdit = (props) => {
                             ]}
                             validate={required()}
                         />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </SimpleForm>
         </Edit>
     );
 };
