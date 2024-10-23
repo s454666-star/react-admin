@@ -10,7 +10,8 @@ import {
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { getFullImageUrl } from './utils'; // 引入輔助函數
+import { getFullImageUrl } from './utils';
+import {API_BASE_URL} from "./config"; // 引入輔助函數
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
@@ -26,7 +27,7 @@ const AlbumDetail = () => {
 
     const fetchAlbumDetails = async () => {
         try {
-            const response = await axios.get(`https://star-admin.mystar.monster/api/albums/${albumId}`);
+            const response = await axios.get(`${API_BASE_URL}albums/${albumId}`);
             setAlbum(response.data);
         } catch (error) {
             console.error('Error fetching album details:', error);
@@ -40,7 +41,7 @@ const AlbumDetail = () => {
                 per_page: 20, // 確保每頁 20 筆
                 album_id: albumId,
             };
-            const response = await axios.get('https://star-admin.mystar.monster/api/album-photos', { params });
+            const response = await axios.get(`${API_BASE_URL}album-photos`, { params });
             const newPhotos = response.data;
 
             if (reset) {

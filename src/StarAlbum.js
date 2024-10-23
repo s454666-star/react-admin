@@ -24,6 +24,7 @@ import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
 import { getFullImageUrl } from './utils'; // 引入輔助函數
+import { API_BASE_URL } from './config';
 
 // 定義粉紫色主題
 const starTheme = createTheme({
@@ -72,7 +73,7 @@ const StarAlbum = () => {
 
     const fetchActors = async () => {
         try {
-            const response = await axios.get('https://mystar.monster/api/actors');
+            const response = await axios.get(`${API_BASE_URL}actors`);
             setActors(response.data);
         } catch (error) {
             console.error('Error fetching actors:', error);
@@ -198,7 +199,7 @@ const AlbumsList = ({ actorId }) => {
             if (actorId !== 'all') {
                 params.actor = actorId;
             }
-            const response = await axios.get('https://star-admin.mystar.monster/api/albums', { params });
+            const response = await axios.get(`${API_BASE_URL}albums`, { params });
             const newAlbums = response.data;
 
             if (reset) {
