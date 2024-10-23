@@ -51,11 +51,12 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
         padding: theme.spacing(3),
         backgroundColor: theme.palette.background.default,
         minHeight: '100vh',
-        marginLeft: open ? `${drawerWidth}px` : '0px',
-        transition: theme.transitions.create('margin-left', {
+        transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+        // 根據選單的開關狀態調整 marginLeft
+        marginLeft: open ? `${drawerWidth}px` : 0,
     }),
 );
 
@@ -252,7 +253,7 @@ const AlbumsList = ({ actorId, drawerOpen }) => {
                 sx={{
                     display: 'grid',
                     gridTemplateColumns: {
-                        xs: 'repeat(2, 1fr)', // 手機，每行顯示 2 個
+                        xs: 'repeat(1, 1fr)', // 手機，每行顯示 1 個
                         sm: 'repeat(3, 1fr)', // 小螢幕，每行顯示 3 個
                         md: 'repeat(4, 1fr)', // 中等螢幕，每行顯示 4 個
                     },
