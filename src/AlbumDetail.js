@@ -92,13 +92,14 @@ const AlbumDetail = () => {
                                 sx={{
                                     border: '2px solid #b39ddb',
                                     borderRadius: '10px',
-                                    overflow: 'hidden',
+                                    overflow: 'hidden',  // 禁止容器內滾動條
                                     boxShadow: 5,
                                     transition: 'transform 0.4s, box-shadow 0.4s',
                                     '&:hover': {
                                         transform: 'scale(1.02)',
                                         boxShadow: 12,
                                     },
+                                    maxHeight: 'calc(100vh - 100px)', // 根據螢幕大小限制圖片高度
                                 }}
                             >
                                 <img
@@ -107,7 +108,7 @@ const AlbumDetail = () => {
                                     style={{
                                         width: '100%',
                                         height: 'auto',
-                                        maxHeight: 'calc(100vh - 100px)', // 根據螢幕大小調整
+                                        maxHeight: '100%', // 確保圖片在容器內不超過高度
                                         objectFit: 'cover',
                                     }}
                                 />
