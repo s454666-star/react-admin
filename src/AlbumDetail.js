@@ -3,13 +3,12 @@ import {
     Box,
     Typography,
     CircularProgress,
-    Grid,
 } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
-import { API_BASE_URL } from './config'; // 引入輔助函數
+import { API_BASE_URL } from './config';
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
@@ -17,7 +16,6 @@ const AlbumDetail = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [album, setAlbum] = useState(null);
-    const [loadingPhotos, setLoadingPhotos] = useState(false);
 
     // 判斷是否為視頻文件
     const isVideo = (path) => {
@@ -41,7 +39,6 @@ const AlbumDetail = () => {
 
     const fetchPhotos = async (pageNumber, albumId, reset = false) => {
         try {
-            setLoadingPhotos(true); // 加載圖片期間設置 loading 狀態
             const params = {
                 page: pageNumber,
                 per_page: 10, // 每頁 10 筆
@@ -61,8 +58,6 @@ const AlbumDetail = () => {
             }
         } catch (error) {
             console.error('Error fetching photos:', error);
-        } finally {
-            setLoadingPhotos(false); // 結束加載
         }
     };
 
@@ -90,7 +85,7 @@ const AlbumDetail = () => {
     });
 
     return (
-        <Box sx={{ padding: 2, overflow: 'hidden' }}> {/* 確保主容器不產生額外滾動 */}
+        <Box sx={{ padding: 0, margin: 0 }}> {/* 移除多餘的內邊距和外邊距 */}
             <Typography variant="h4" gutterBottom>
                 {album.title} - 相簿詳情
             </Typography>
@@ -102,7 +97,7 @@ const AlbumDetail = () => {
                 next={fetchMoreData}
                 hasMore={hasMore}
                 loader={
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                         <CircularProgress />
                     </Box>
                 }
@@ -111,68 +106,42 @@ const AlbumDetail = () => {
                         已顯示所有相片
                     </Typography>
                 }
-                // 移除 scrollableTarget 和內部滾動樣式，讓整個頁面使用單一滾動條
+                style={{ overflow: 'visible' }} // 防止產生內部滾動條
             >
-                <Grid container spacing={2}>
-                    {sortedPhotos.map((photo) => (
-                        <Grid item xs={12} sm={6} md={4} key={photo.id}>
-                            <Box
-                                sx={{
-                                    border: '2px solid #b39ddb',
-                                    borderRadius: '10px',
-                                    overflow: 'hidden', // 禁止容器內滾動條
-                                    boxShadow: 5,
-                                    transition: 'transform 0.4s, box-shadow 0.4s',
-                                    '&:hover': {
-                                        transform: 'scale(1.02)',
-                                        boxShadow: 12,
-                                    },
-                                    position: 'relative', // 設定為 relative 以便處理加載動畫
-                                    // 移除 maxHeight 以避免內部滾動條
+                {sortedPhotos.map((photo) => (
+                    <Box
+                        key={photo.id}
+                        sx={{
+                            width: '100vw',
+                            height: '100vh',
+                            position: 'relative',
+                        }}
+                    >
+                        {isVideo(photo.photo_path) ? (
+                            <video
+                                controls
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
                                 }}
                             >
-                                {loadingPhotos && (
-                                    <CircularProgress
-                                        size={60}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: '50%',
-                                            left: '50%',
-                                            transform: 'translate(-50%, -50%)',
-                                        }}
-                                    />
-                                )}
-                                {isVideo(photo.photo_path) ? (
-                                    <video
-                                        controls
-                                        style={{
-                                            width: '100%',
-                                            height: 'auto',
-                                            objectFit: 'cover',
-                                            display: loadingPhotos ? 'none' : 'block',
-                                        }}
-                                        onLoadedData={() => setLoadingPhotos(false)}
-                                    >
-                                        <source src={getFullImageUrl(photo.photo_path)} type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`} />
-                                        您的瀏覽器不支持視頻標籤。
-                                    </video>
-                                ) : (
-                                    <img
-                                        src={getFullImageUrl(photo.photo_path)}
-                                        alt=""
-                                        style={{
-                                            width: '100%',
-                                            height: 'auto',
-                                            objectFit: 'cover',
-                                            display: loadingPhotos ? 'none' : 'block', // 在圖片加載前隱藏圖片
-                                        }}
-                                        onLoad={() => setLoadingPhotos(false)} // 圖片加載完成後隱藏 loading
-                                    />
-                                )}
-                            </Box>
-                        </Grid>
-                    ))}
-                </Grid>
+                                <source src={getFullImageUrl(photo.photo_path)} type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`} />
+                                您的瀏覽器不支持視頻標籤。
+                            </video>
+                        ) : (
+                            <img
+                                src={getFullImageUrl(photo.photo_path)}
+                                alt=""
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
+                            />
+                        )}
+                    </Box>
+                ))}
             </InfiniteScroll>
         </Box>
     );
