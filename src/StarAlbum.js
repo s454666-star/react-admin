@@ -17,17 +17,17 @@ import {
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail'; // 相簿详情页面组件
+import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
-import { getFullImageUrl } from './utils'; // 引入辅助函数
+import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
 
-// 定义星夜主题
+// 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星夜蓝色
+            main: '#3f51b5', // 星夜藍色
         },
         secondary: {
             main: '#7986cb',
@@ -41,18 +41,25 @@ const starryNightTheme = createTheme({
     },
 });
 
-// 左侧 Drawer 的宽度
-const drawerWidth = 240;
+// 左側 Drawer 的寬度，調整為原來的65%
+const drawerWidth = 240 * 0.65; // 縮小65%
 
-// 主要内容的样式
-const Main = styled('main')(({ theme }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    backgroundColor: theme.palette.background.default,
-    minHeight: '100vh',
-}));
+// 主要內容的樣式，根據 Drawer 的開啟狀態調整寬度
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+    ({ theme, open }) => ({
+        flexGrow: 1,
+        padding: theme.spacing(3),
+        backgroundColor: theme.palette.background.default,
+        minHeight: '100vh',
+        marginLeft: open ? `${drawerWidth}px` : '0px',
+        transition: theme.transitions.create('margin-left', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    }),
+);
 
-// AppBar 的样式调整
+// AppBar 的樣式調整
 const MyAppBar = styled(AppBar)(({ theme }) => ({
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: theme.palette.primary.main,
@@ -130,6 +137,7 @@ const StarAlbum = () => {
                                 <ListItemButton
                                     selected={selectedActor === 'all'}
                                     onClick={() => handleActorSelect('all')}
+                                    sx={{ fontSize: '0.8rem' }} // 縮小文字
                                 >
                                     <ListItemText primary="全部演員" />
                                 </ListItemButton>
@@ -140,6 +148,7 @@ const StarAlbum = () => {
                                     <ListItemButton
                                         selected={selectedActor === actor.id}
                                         onClick={() => handleActorSelect(actor.id)}
+                                        sx={{ fontSize: '0.8rem' }} // 縮小文字
                                     >
                                         <ListItemText primary={actor.actor_name} />
                                     </ListItemButton>
@@ -148,12 +157,12 @@ const StarAlbum = () => {
                         </List>
                     </Box>
                 </Drawer>
-                <Main>
+                <Main open={drawerOpen}>
                     <Toolbar />
                     <Routes>
-                        <Route path="/" element={<AlbumsList actorId="all" />} />
-                        <Route path="actor/:actorId" element={<AlbumsListWrapper />} />
-                        <Route path="album/:albumId" element={<AlbumDetail />} />
+                        <Route path="/" element={<AlbumsList actorId="all" drawerOpen={drawerOpen} />} />
+                        <Route path="actor/:actorId" element={<AlbumsListWrapper drawerOpen={drawerOpen} />} />
+                        <Route path="album/:albumId" element={<AlbumDetail drawerOpen={drawerOpen} />} />
                     </Routes>
                 </Main>
             </Box>
@@ -161,14 +170,14 @@ const StarAlbum = () => {
     );
 };
 
-// Wrapper 组件，用于从 URL 参数获取 actorId
-const AlbumsListWrapper = () => {
+// 包裝組件，用於從 URL 參數獲取 actorId
+const AlbumsListWrapper = ({ drawerOpen }) => {
     const { actorId } = useParams();
-    return <AlbumsList actorId={actorId} />;
+    return <AlbumsList actorId={actorId} drawerOpen={drawerOpen} />;
 };
 
-// AlbumsList 组件
-const AlbumsList = ({ actorId }) => {
+// AlbumsList 組件
+const AlbumsList = ({ actorId, drawerOpen }) => {
     const [albums, setAlbums] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -185,7 +194,7 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 确保每页 20 条
+                per_page: 20, // 確保每頁 20 條
             };
             if (actorId !== 'all') {
                 params.actor = actorId;
@@ -217,7 +226,7 @@ const AlbumsList = ({ actorId }) => {
         navigate(`/star-album/album/${album.id}`, {
             state: {
                 albumTitleFromMain: album.title,
-                albumThemeFromMain: album.name, // 使用 album.name 作为主题
+                albumThemeFromMain: album.name, // 使用 album.name 作為主題
             },
         });
     };
@@ -234,18 +243,18 @@ const AlbumsList = ({ actorId }) => {
             }
             endMessage={
                 <Typography variant="body2" color="text.secondary" align="center">
-                    已显示所有相簿
+                    已顯示所有相簿
                 </Typography>
             }
-            style={{ overflow: 'visible' }} // 防止产生内部滚动条
+            style={{ overflow: 'visible' }} // 防止產生內部滾動條
         >
             <Box
                 sx={{
                     display: 'grid',
                     gridTemplateColumns: {
-                        xs: 'repeat(2, 1fr)', // 手机，每行显示 2 个
-                        sm: 'repeat(3, 1fr)', // 小屏幕，每行显示 3 个
-                        md: 'repeat(4, 1fr)', // 中等屏幕，每行显示 4 个
+                        xs: 'repeat(2, 1fr)', // 手機，每行顯示 2 個
+                        sm: 'repeat(3, 1fr)', // 小螢幕，每行顯示 3 個
+                        md: 'repeat(4, 1fr)', // 中等螢幕，每行顯示 4 個
                     },
                     gap: 2,
                     padding: 0,
@@ -283,7 +292,7 @@ const AlbumsList = ({ actorId }) => {
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {album.name} {/* 显示主题 */}
+                                {album.name} {/* 顯示主題 */}
                             </Typography>
                         </Box>
                     </Box>
