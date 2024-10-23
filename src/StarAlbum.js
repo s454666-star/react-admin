@@ -17,17 +17,17 @@ import {
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
+import AlbumDetail from './AlbumDetail'; // 相簿详情页面组件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
-import { getFullImageUrl } from './utils'; // 引入輔助函數
+import { getFullImageUrl } from './utils'; // 引入辅助函数
 import { API_BASE_URL } from './config';
 
-// 定義星夜主題
+// 定义星夜主题
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星夜藍色
+            main: '#3f51b5', // 星夜蓝色
         },
         secondary: {
             main: '#7986cb',
@@ -41,10 +41,10 @@ const starryNightTheme = createTheme({
     },
 });
 
-// 左側 Drawer 的寬度
+// 左侧 Drawer 的宽度
 const drawerWidth = 240;
 
-// 主要內容的樣式
+// 主要内容的样式
 const Main = styled('main')(({ theme }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -52,7 +52,7 @@ const Main = styled('main')(({ theme }) => ({
     minHeight: '100vh',
 }));
 
-// AppBar 的樣式調整
+// AppBar 的样式调整
 const MyAppBar = styled(AppBar)(({ theme }) => ({
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: theme.palette.primary.main,
@@ -161,13 +161,13 @@ const StarAlbum = () => {
     );
 };
 
-// Wrapper 組件，用於從 URL 參數獲取 actorId
+// Wrapper 组件，用于从 URL 参数获取 actorId
 const AlbumsListWrapper = () => {
     const { actorId } = useParams();
     return <AlbumsList actorId={actorId} />;
 };
 
-// AlbumsList 組件
+// AlbumsList 组件
 const AlbumsList = ({ actorId }) => {
     const [albums, setAlbums] = useState([]);
     const [page, setPage] = useState(1);
@@ -185,7 +185,7 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 確保每頁 20 筆
+                per_page: 20, // 确保每页 20 条
             };
             if (actorId !== 'all') {
                 params.actor = actorId;
@@ -217,7 +217,7 @@ const AlbumsList = ({ actorId }) => {
         navigate(`/star-album/album/${album.id}`, {
             state: {
                 albumTitleFromMain: album.title,
-                albumThemeFromMain: album.name, // 使用 album.name 作為主題
+                albumThemeFromMain: album.name, // 使用 album.name 作为主题
             },
         });
     };
@@ -234,15 +234,19 @@ const AlbumsList = ({ actorId }) => {
             }
             endMessage={
                 <Typography variant="body2" color="text.secondary" align="center">
-                    已顯示所有相簿
+                    已显示所有相簿
                 </Typography>
             }
-            style={{ overflow: 'visible' }} // 防止產生內部滾動條
+            style={{ overflow: 'visible' }} // 防止产生内部滚动条
         >
             <Box
                 sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(600px, 1fr))', // 調整圖片大小
+                    gridTemplateColumns: {
+                        xs: 'repeat(2, 1fr)', // 手机，每行显示 2 个
+                        sm: 'repeat(3, 1fr)', // 小屏幕，每行显示 3 个
+                        md: 'repeat(4, 1fr)', // 中等屏幕，每行显示 4 个
+                    },
                     gap: 2,
                     padding: 0,
                     margin: 0,
@@ -268,14 +272,18 @@ const AlbumsList = ({ actorId }) => {
                         <img
                             src={getFullImageUrl(album.cover_path)}
                             alt={album.title}
-                            style={{ width: '100%', height: '450px', objectFit: 'cover' }} // 調整圖片高度
+                            style={{
+                                width: '100%',
+                                height: '200px',
+                                objectFit: 'cover',
+                            }}
                         />
                         <Box sx={{ p: 2 }}>
                             <Typography variant="h6" component="div" gutterBottom>
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {album.name} {/* 顯示主題 */}
+                                {album.name} {/* 显示主题 */}
                             </Typography>
                         </Box>
                     </Box>

@@ -13,13 +13,13 @@ import { API_BASE_URL } from './config';
 const AlbumDetail = () => {
     const { albumId } = useParams();
     const location = useLocation();
-    const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱和主題
+    const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 从主页面获取传递的相簿名称和主题
     const [photos, setPhotos] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [album, setAlbum] = useState(null);
 
-    // 判斷是否為視頻文件
+    // 判断是否为视频文件
     const isVideo = (path) => {
         const ext = path.split('.').pop().toLowerCase();
         return ext === 'mp4' || ext === 'mov';
@@ -43,7 +43,7 @@ const AlbumDetail = () => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 10, // 每頁 10 條
+                per_page: 10, // 每页 10 条
                 album_id: albumId,
             };
             const response = await axios.get(`${API_BASE_URL}album-photos`, { params });
@@ -77,7 +77,7 @@ const AlbumDetail = () => {
         );
     }
 
-    // 將視頻文件放在最上方
+    // 将视频文件放在最上方
     const sortedPhotos = [...photos].sort((a, b) => {
         const aIsVideo = isVideo(a.photo_path);
         const bIsVideo = isVideo(b.photo_path);
@@ -91,8 +91,8 @@ const AlbumDetail = () => {
             <Typography variant="h4" gutterBottom>
                 {albumTitleFromMain || album.title}
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-                {albumThemeFromMain || album.name} {/* 顯示主題 */}
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                {albumThemeFromMain || album.name} {/* 显示主题，字体更大 */}
             </Typography>
             <InfiniteScroll
                 dataLength={photos.length}
@@ -105,10 +105,10 @@ const AlbumDetail = () => {
                 }
                 endMessage={
                     <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-                        已顯示所有相片
+                        已显示所有相片
                     </Typography>
                 }
-                style={{ overflow: 'visible' }} // 防止產生內部滾動條
+                style={{ overflow: 'visible' }} // 防止产生内部滚动条
             >
                 {sortedPhotos.map((photo) => (
                     <Box
@@ -116,7 +116,7 @@ const AlbumDetail = () => {
                         sx={{
                             width: '100%',
                             maxWidth: '100%',
-                            marginBottom: 2, // 留出圖片之間的距離
+                            marginBottom: 2, // 留出图片之间的距离
                             overflow: 'hidden',
                         }}
                     >
@@ -133,7 +133,7 @@ const AlbumDetail = () => {
                                     src={getFullImageUrl(photo.photo_path)}
                                     type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`}
                                 />
-                                您的瀏覽器不支持視頻標籤。
+                                您的浏览器不支持视频标签。
                             </video>
                         ) : (
                             <img
