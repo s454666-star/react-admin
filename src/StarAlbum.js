@@ -13,25 +13,21 @@ import {
     AppBar,
     Toolbar,
     IconButton,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail'; // 相簿详情页面组件
+import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { getFullImageUrl } from './utils'; // 引入辅助函数
+import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
 
-// 定义星夜主题
+// 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星夜蓝色
+            main: '#3f51b5', // 星夜藍色
         },
         secondary: {
             main: '#7986cb',
@@ -45,10 +41,10 @@ const starryNightTheme = createTheme({
     },
 });
 
-// 左侧 Drawer 的宽度
+// 左側 Drawer 的寬度
 const drawerWidth = 240;
 
-// 主要内容的样式
+// 主要內容的樣式
 const Main = styled('main')(({ theme }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -56,7 +52,7 @@ const Main = styled('main')(({ theme }) => ({
     minHeight: '100vh',
 }));
 
-// AppBar 的样式调整
+// AppBar 的樣式調整
 const MyAppBar = styled(AppBar)(({ theme }) => ({
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: theme.palette.primary.main,
@@ -129,38 +125,27 @@ const StarAlbum = () => {
                 >
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
-                        <Accordion defaultExpanded>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="actor-list-content"
-                                id="actor-list-header"
-                            >
-                                <Typography>演員列表</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <List>
-                                    <ListItem disablePadding>
-                                        <ListItemButton
-                                            selected={selectedActor === 'all'}
-                                            onClick={() => handleActorSelect('all')}
-                                        >
-                                            <ListItemText primary="全部演員" />
-                                        </ListItemButton>
-                                    </ListItem>
-                                    <Divider />
-                                    {actors.map((actor) => (
-                                        <ListItem key={actor.id} disablePadding>
-                                            <ListItemButton
-                                                selected={selectedActor === actor.id}
-                                                onClick={() => handleActorSelect(actor.id)}
-                                            >
-                                                <ListItemText primary={actor.actor_name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </AccordionDetails>
-                        </Accordion>
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    selected={selectedActor === 'all'}
+                                    onClick={() => handleActorSelect('all')}
+                                >
+                                    <ListItemText primary="全部演員" />
+                                </ListItemButton>
+                            </ListItem>
+                            <Divider />
+                            {actors.map((actor) => (
+                                <ListItem key={actor.id} disablePadding>
+                                    <ListItemButton
+                                        selected={selectedActor === actor.id}
+                                        onClick={() => handleActorSelect(actor.id)}
+                                    >
+                                        <ListItemText primary={actor.actor_name} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
                     </Box>
                 </Drawer>
                 <Main>
@@ -176,13 +161,13 @@ const StarAlbum = () => {
     );
 };
 
-// Wrapper 组件，用于从 URL 参数获取 actorId
+// Wrapper 組件，用於從 URL 參數獲取 actorId
 const AlbumsListWrapper = () => {
     const { actorId } = useParams();
     return <AlbumsList actorId={actorId} />;
 };
 
-// AlbumsList 组件
+// AlbumsList 組件
 const AlbumsList = ({ actorId }) => {
     const [albums, setAlbums] = useState([]);
     const [page, setPage] = useState(1);
@@ -200,7 +185,7 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 确保每页 20 条
+                per_page: 20, // 確保每頁 20 筆
             };
             if (actorId !== 'all') {
                 params.actor = actorId;
@@ -232,7 +217,7 @@ const AlbumsList = ({ actorId }) => {
         navigate(`/star-album/album/${album.id}`, {
             state: {
                 albumTitleFromMain: album.title,
-                albumThemeFromMain: album.theme,
+                albumThemeFromMain: album.name, // 使用 album.name 作為主題
             },
         });
     };
@@ -252,12 +237,12 @@ const AlbumsList = ({ actorId }) => {
                     已顯示所有相簿
                 </Typography>
             }
-            style={{ overflow: 'visible' }} // 防止产生内部滚动条
+            style={{ overflow: 'visible' }} // 防止產生內部滾動條
         >
             <Box
                 sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', // 调整图片大小
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(600px, 1fr))', // 調整圖片大小
                     gap: 2,
                     padding: 0,
                     margin: 0,
@@ -283,14 +268,14 @@ const AlbumsList = ({ actorId }) => {
                         <img
                             src={getFullImageUrl(album.cover_path)}
                             alt={album.title}
-                            style={{ width: '100%', height: '225px', objectFit: 'cover' }} // 调整图片高度
+                            style={{ width: '100%', height: '450px', objectFit: 'cover' }} // 調整圖片高度
                         />
                         <Box sx={{ p: 2 }}>
                             <Typography variant="h6" component="div" gutterBottom>
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {album.theme}
+                                {album.name} {/* 顯示主題 */}
                             </Typography>
                         </Box>
                     </Box>
