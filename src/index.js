@@ -159,6 +159,7 @@ const App = () => (
         <BrowserRouter>
             <Routes>
                 <Route exact path="/videos-list" element={<VideosList />} />
+                <Route exact path="/star-album/*" element={<StarAlbum />} />
                 <Route
                     path="*"
                     element={(
