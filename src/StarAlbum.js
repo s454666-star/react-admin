@@ -18,12 +18,11 @@ import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
-
 // 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星夜藍色
+            main: '#3f51b5', // 星空藍色
         },
         secondary: {
             main: '#7986cb',
@@ -83,19 +82,30 @@ const StarAlbum = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="h6" noWrap component="div">
-                            星夜相簿
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+                            星空相簿
                         </Typography>
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
-                            <InputLabel id="actor-select-label">選擇演員</InputLabel>
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
+                            <InputLabel id="actor-select-label" sx={{ color: 'white' }}>
+                                選擇Coser
+                            </InputLabel>
                             <Select
                                 labelId="actor-select-label"
                                 value={selectedActor}
                                 onChange={(event) => handleActorSelect(event.target.value)}
-                                label="選擇演員"
+                                label="選擇Coser"
+                                sx={{ color: 'white' }} // 調整選單文字顏色
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            backgroundColor: '#3f51b5', // 調整下拉選單背景色
+                                            color: 'white', // 調整下拉選單文字顏色
+                                        },
+                                    },
+                                }}
                             >
-                                <MenuItem value="all">全部演員</MenuItem>
+                                <MenuItem value="all">全部Coser</MenuItem>
                                 {actors.map((actor) => (
                                     <MenuItem key={actor.id} value={actor.id}>
                                         {actor.actor_name}
@@ -103,6 +113,7 @@ const StarAlbum = () => {
                                 ))}
                             </Select>
                         </FormControl>
+                        <Box sx={{ flexGrow: 1 }} /> {/* 佔位元素，使選單居中 */}
                     </Toolbar>
                 </MyAppBar>
                 <Main>
@@ -236,7 +247,16 @@ const AlbumsList = ({ actorId }) => {
                             }}
                         />
                         <Box sx={{ p: 2 }}>
-                            <Typography variant="h6" component="div" gutterBottom>
+                            <Typography
+                                component="div"
+                                gutterBottom
+                                sx={{
+                                    fontSize: {
+                                        xs: '1rem',   // 手機版字體大小
+                                        md: '1.5rem', // 電腦版字體大小
+                                    },
+                                }}
+                            >
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">

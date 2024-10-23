@@ -1,11 +1,15 @@
+// AlbumDetail.js
+
 import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
     CircularProgress,
+    Button,
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
@@ -13,6 +17,7 @@ import { API_BASE_URL } from './config';
 const AlbumDetail = () => {
     const { albumId } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
     const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱和主題
     const [photos, setPhotos] = useState([]);
     const [page, setPage] = useState(1);
@@ -88,11 +93,41 @@ const AlbumDetail = () => {
 
     return (
         <Box sx={{ padding: 0, margin: 0 }}>
-            <Typography variant="h4" gutterBottom>
-                {albumTitleFromMain || album.title}
-            </Typography>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
-                {albumThemeFromMain || album.name} {/* 顯示主題，字體更大 */}
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                <Button
+                    variant="contained"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => navigate(-1)}
+                    sx={{ marginRight: 2 }}
+                >
+                    返回上頁
+                </Button>
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    sx={{
+                        fontSize: {
+                            xs: '1.5rem', // 手機版
+                            md: '2.5rem', // 電腦版
+                        },
+                    }}
+                >
+                    {albumTitleFromMain || album.title}
+                </Typography>
+            </Box>
+            <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                    fontWeight: 'bold',
+                    color: 'text.secondary',
+                    fontSize: {
+                        xs: '1.2rem', // 手機版
+                        md: '2rem',   // 電腦版
+                    },
+                }}
+            >
+                {albumThemeFromMain || album.name}
             </Typography>
             <InfiniteScroll
                 dataLength={photos.length}
@@ -139,6 +174,7 @@ const AlbumDetail = () => {
                             <img
                                 src={getFullImageUrl(photo.photo_path)}
                                 alt=""
+                                loading="lazy" // 延遲載入
                                 style={{
                                     width: '100%',
                                     height: 'auto',
