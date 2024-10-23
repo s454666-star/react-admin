@@ -23,6 +23,7 @@ import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
+import { getFullImageUrl } from './utils'; // 引入輔助函數
 
 // 定義粉紫色主題
 const starTheme = createTheme({
@@ -80,7 +81,11 @@ const StarAlbum = () => {
 
     const handleActorSelect = (actorId) => {
         setSelectedActor(actorId);
-        navigate(`/star-album/actor/${actorId}`);
+        if (actorId === 'all') {
+            navigate(`/star-album`);
+        } else {
+            navigate(`/star-album/actor/${actorId}`);
+        }
     };
 
     const toggleDrawer = () => {
@@ -188,12 +193,12 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20,
+                per_page: 20, // 確保每頁 20 筆
             };
             if (actorId !== 'all') {
                 params.actor = actorId;
             }
-            const response = await axios.get('https://mystar.monster/api/albums', { params });
+            const response = await axios.get('https://star-admin.mystar.monster/api/albums', { params });
             const newAlbums = response.data;
 
             if (reset) {
@@ -257,7 +262,7 @@ const AlbumsList = ({ actorId }) => {
                         onClick={() => handleAlbumClick(album.id)}
                     >
                         <img
-                            src={album.thumbnail_url || 'https://via.placeholder.com/200'}
+                            src={getFullImageUrl(album.thumbnail_url)}
                             alt={album.title}
                             style={{ width: '100%', height: '150px', objectFit: 'cover' }}
                         />

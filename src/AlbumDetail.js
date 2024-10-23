@@ -10,6 +10,7 @@ import {
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { getFullImageUrl } from './utils'; // 引入輔助函數
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
@@ -25,7 +26,7 @@ const AlbumDetail = () => {
 
     const fetchAlbumDetails = async () => {
         try {
-            const response = await axios.get(`https://mystar.monster/api/albums/${albumId}`);
+            const response = await axios.get(`https://star-admin.mystar.monster/api/albums/${albumId}`);
             setAlbum(response.data);
         } catch (error) {
             console.error('Error fetching album details:', error);
@@ -36,10 +37,10 @@ const AlbumDetail = () => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20,
+                per_page: 20, // 確保每頁 20 筆
                 album_id: albumId,
             };
-            const response = await axios.get('https://mystar.monster/api/album-photos', { params });
+            const response = await axios.get('https://star-admin.mystar.monster/api/album-photos', { params });
             const newPhotos = response.data;
 
             if (reset) {
@@ -102,7 +103,7 @@ const AlbumDetail = () => {
                                 }}
                             >
                                 <img
-                                    src={photo.url || 'https://via.placeholder.com/300'}
+                                    src={getFullImageUrl(photo.url)}
                                     alt={photo.title}
                                     style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                                 />
