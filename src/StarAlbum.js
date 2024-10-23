@@ -272,7 +272,7 @@ const AlbumsList = ({ actorId }) => {
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                主題：{album.theme}
+                                主題：{album.name}
                             </Typography>
                         </Box>
                     </Box>
