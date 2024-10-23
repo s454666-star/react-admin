@@ -263,7 +263,7 @@ const AlbumsList = ({ actorId }) => {
                         onClick={() => handleAlbumClick(album.id)}
                     >
                         <img
-                            src={getFullImageUrl(album.thumbnail_url)}
+                            src={getFullImageUrl(album.cover_path)}
                             alt={album.title}
                             style={{ width: '100%', height: '150px', objectFit: 'cover' }}
                         />

@@ -104,7 +104,7 @@ const AlbumDetail = () => {
                                 }}
                             >
                                 <img
-                                    src={getFullImageUrl(photo.url)}
+                                    src={getFullImageUrl(photo.photo_path)}
                                     alt={photo.title}
                                     style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                                 />
