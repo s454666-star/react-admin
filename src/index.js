@@ -15,6 +15,7 @@ import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import VideosList from './VideosList'; // 保留 videos-list 功能
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import StarAlbum from "./StarAlbum";
 
 const customTraditionalChineseMessages = {
     ra: {
