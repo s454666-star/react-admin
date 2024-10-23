@@ -1,5 +1,3 @@
-// AlbumDetail.js
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -11,7 +9,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
-import {API_BASE_URL} from "./config"; // 引入輔助函數
+import { API_BASE_URL } from './config'; // 引入輔助函數
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
@@ -38,7 +36,7 @@ const AlbumDetail = () => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 確保每頁 20 筆
+                per_page: 10, // 改為每頁 10 筆
                 album_id: albumId,
             };
             const response = await axios.get(`${API_BASE_URL}album-photos`, { params });
@@ -50,7 +48,7 @@ const AlbumDetail = () => {
                 setPhotos((prev) => [...prev, ...newPhotos]);
             }
 
-            if (newPhotos.length < 20) {
+            if (newPhotos.length < 10) {
                 setHasMore(false);
             }
         } catch (error) {
@@ -89,28 +87,30 @@ const AlbumDetail = () => {
             >
                 <Grid container spacing={2}>
                     {photos.map((photo) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={photo.id}>
+                        <Grid item xs={12} key={photo.id}>
                             <Box
                                 sx={{
-                                    border: '1px solid #b39ddb',
-                                    borderRadius: 2,
+                                    border: '2px solid #b39ddb',
+                                    borderRadius: '10px',
                                     overflow: 'hidden',
-                                    boxShadow: 3,
-                                    transition: 'transform 0.2s',
+                                    boxShadow: 5,
+                                    transition: 'transform 0.4s, box-shadow 0.4s',
                                     '&:hover': {
-                                        transform: 'scale(1.05)',
-                                        boxShadow: 6,
+                                        transform: 'scale(1.02)',
+                                        boxShadow: 12,
                                     },
                                 }}
                             >
                                 <img
                                     src={getFullImageUrl(photo.photo_path)}
-                                    alt={photo.title}
-                                    style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                                    alt=""
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        maxHeight: 'calc(100vh - 100px)', // 根據螢幕大小調整
+                                        objectFit: 'cover',
+                                    }}
                                 />
-                                <Box sx={{ p: 1 }}>
-                                    <Typography variant="body1">{photo.title}</Typography>
-                                </Box>
                             </Box>
                         </Grid>
                     ))}
