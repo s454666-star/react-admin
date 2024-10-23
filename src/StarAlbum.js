@@ -222,8 +222,8 @@ const AlbumsList = ({ actorId }) => {
         setPage(nextPage);
     };
 
-    const handleAlbumClick = (albumId) => {
-        navigate(`/star-album/album/${albumId}`);
+    const handleAlbumClick = (album) => {
+        navigate(`/star-album/album/${album.id}`, { state: { albumTitleFromMain: album.title } });
     };
 
     return (
@@ -260,7 +260,7 @@ const AlbumsList = ({ actorId }) => {
                             },
                             cursor: 'pointer',
                         }}
-                        onClick={() => handleAlbumClick(album.id)}
+                        onClick={() => handleAlbumClick(album)}
                     >
                         <img
                             src={getFullImageUrl(album.cover_path)}

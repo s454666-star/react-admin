@@ -1,3 +1,5 @@
+// AlbumDetail.js
+
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -5,13 +7,15 @@ import {
     CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
+    const location = useLocation();
+    const { albumTitleFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱
     const [photos, setPhotos] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -85,12 +89,12 @@ const AlbumDetail = () => {
     });
 
     return (
-        <Box sx={{ padding: 0, margin: 0 }}> {/* 移除多餘的內邊距和外邊距 */}
+        <Box sx={{ padding: 0, margin: 0 }}>
             <Typography variant="h4" gutterBottom>
-                {album.title} - 相簿詳情
+                {albumTitleFromMain || album.title}
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
-                主題：{album.theme}
+                {album.theme}
             </Typography>
             <InfiniteScroll
                 dataLength={photos.length}
@@ -112,9 +116,10 @@ const AlbumDetail = () => {
                     <Box
                         key={photo.id}
                         sx={{
-                            width: '100vw',
-                            height: '100vh',
-                            position: 'relative',
+                            width: '100%',
+                            maxWidth: '100%',
+                            marginBottom: 2, // 留出圖片之間的距離
+                            overflow: 'hidden',
                         }}
                     >
                         {isVideo(photo.photo_path) ? (
@@ -122,8 +127,8 @@ const AlbumDetail = () => {
                                 controls
                                 style={{
                                     width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
+                                    height: 'auto',
+                                    objectFit: 'contain',
                                 }}
                             >
                                 <source src={getFullImageUrl(photo.photo_path)} type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`} />
@@ -135,8 +140,8 @@ const AlbumDetail = () => {
                                 alt=""
                                 style={{
                                     width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
+                                    height: 'auto',
+                                    objectFit: 'contain',
                                 }}
                             />
                         )}
