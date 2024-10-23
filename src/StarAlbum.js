@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
     Typography,
     CircularProgress,
-    Divider,
     CssBaseline,
     AppBar,
     Toolbar,
-    IconButton,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
-import MenuIcon from '@mui/icons-material/Menu';
 import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
 
@@ -41,24 +37,13 @@ const starryNightTheme = createTheme({
     },
 });
 
-// 左側 Drawer 的寬度，調整為原來的65%
-const drawerWidth = 240 * 0.65; // 縮小65%
-
-// 主要內容的樣式，根據 Drawer 的開啟狀態調整寬度
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        flexGrow: 1,
-        padding: theme.spacing(3),
-        backgroundColor: theme.palette.background.default,
-        minHeight: '100vh',
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        // 根據選單的開關狀態調整 marginLeft
-        marginLeft: open ? `${drawerWidth}px` : 0,
-    }),
-);
+// 主要內容的樣式
+const Main = styled('main')(({ theme }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    backgroundColor: theme.palette.background.default,
+    minHeight: '100vh',
+}));
 
 // AppBar 的樣式調整
 const MyAppBar = styled(AppBar)(({ theme }) => ({
@@ -69,7 +54,6 @@ const MyAppBar = styled(AppBar)(({ theme }) => ({
 const StarAlbum = () => {
     const [actors, setActors] = useState([]);
     const [selectedActor, setSelectedActor] = useState('all');
-    const [drawerOpen, setDrawerOpen] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -94,76 +78,39 @@ const StarAlbum = () => {
         }
     };
 
-    const toggleDrawer = () => {
-        setDrawerOpen(!drawerOpen);
-    };
-
     return (
         <ThemeProvider theme={starryNightTheme}>
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
-                    <Toolbar>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            edge="start"
-                            onClick={toggleDrawer}
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="h6" noWrap component="div">
                             星夜相簿
                         </Typography>
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
+                            <InputLabel id="actor-select-label">選擇演員</InputLabel>
+                            <Select
+                                labelId="actor-select-label"
+                                value={selectedActor}
+                                onChange={(event) => handleActorSelect(event.target.value)}
+                                label="選擇演員"
+                            >
+                                <MenuItem value="all">全部演員</MenuItem>
+                                {actors.map((actor) => (
+                                    <MenuItem key={actor.id} value={actor.id}>
+                                        {actor.actor_name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Toolbar>
                 </MyAppBar>
-                <Drawer
-                    variant="persistent"
-                    open={drawerOpen}
-                    sx={{
-                        width: drawerWidth,
-                        flexShrink: 0,
-                        '& .MuiDrawer-paper': {
-                            width: drawerWidth,
-                            boxSizing: 'border-box',
-                            backgroundColor: '#e8eaf6',
-                        },
-                    }}
-                >
-                    <Toolbar />
-                    <Box sx={{ overflow: 'auto' }}>
-                        <List>
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    selected={selectedActor === 'all'}
-                                    onClick={() => handleActorSelect('all')}
-                                    sx={{ fontSize: '0.8rem' }} // 縮小文字
-                                >
-                                    <ListItemText primary="全部演員" />
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider />
-                            {actors.map((actor) => (
-                                <ListItem key={actor.id} disablePadding>
-                                    <ListItemButton
-                                        selected={selectedActor === actor.id}
-                                        onClick={() => handleActorSelect(actor.id)}
-                                        sx={{ fontSize: '0.8rem' }} // 縮小文字
-                                    >
-                                        <ListItemText primary={actor.actor_name} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
-                </Drawer>
-                <Main open={drawerOpen}>
+                <Main>
                     <Toolbar />
                     <Routes>
-                        <Route path="/" element={<AlbumsList actorId="all" drawerOpen={drawerOpen} />} />
-                        <Route path="actor/:actorId" element={<AlbumsListWrapper drawerOpen={drawerOpen} />} />
-                        <Route path="album/:albumId" element={<AlbumDetail drawerOpen={drawerOpen} />} />
+                        <Route path="/" element={<AlbumsList actorId="all" />} />
+                        <Route path="actor/:actorId" element={<AlbumsListWrapper />} />
+                        <Route path="album/:albumId" element={<AlbumDetail />} />
                     </Routes>
                 </Main>
             </Box>
@@ -172,13 +119,13 @@ const StarAlbum = () => {
 };
 
 // 包裝組件，用於從 URL 參數獲取 actorId
-const AlbumsListWrapper = ({ drawerOpen }) => {
+const AlbumsListWrapper = () => {
     const { actorId } = useParams();
-    return <AlbumsList actorId={actorId} drawerOpen={drawerOpen} />;
+    return <AlbumsList actorId={actorId} />;
 };
 
 // AlbumsList 組件
-const AlbumsList = ({ actorId, drawerOpen }) => {
+const AlbumsList = ({ actorId }) => {
     const [albums, setAlbums] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -253,7 +200,7 @@ const AlbumsList = ({ actorId, drawerOpen }) => {
                 sx={{
                     display: 'grid',
                     gridTemplateColumns: {
-                        xs: 'repeat(1, 1fr)', // 手機，每行顯示 1 個
+                        xs: 'repeat(2, 1fr)', // 手機，每行顯示 2 個
                         sm: 'repeat(3, 1fr)', // 小螢幕，每行顯示 3 個
                         md: 'repeat(4, 1fr)', // 中等螢幕，每行顯示 4 個
                     },

@@ -10,7 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
 
-const AlbumDetail = ({ drawerOpen }) => {
+const AlbumDetail = () => {
     const { albumId } = useParams();
     const location = useLocation();
     const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱和主題
