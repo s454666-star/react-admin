@@ -19,6 +19,12 @@ const AlbumDetail = () => {
     const [album, setAlbum] = useState(null);
     const [loadingPhotos, setLoadingPhotos] = useState(false);
 
+    // 判斷是否為視頻文件
+    const isVideo = (path) => {
+        const ext = path.split('.').pop().toLowerCase();
+        return ext === 'mp4' || ext === 'mov';
+    };
+
     useEffect(() => {
         fetchAlbumDetails();
         fetchPhotos(1, albumId, true);
@@ -83,14 +89,8 @@ const AlbumDetail = () => {
         return 0;
     });
 
-    // 判斷是否為視頻文件
-    const isVideo = (path) => {
-        const ext = path.split('.').pop().toLowerCase();
-        return ext === 'mp4' || ext === 'mov';
-    };
-
     return (
-        <Box sx={{ padding: 2 }}> {/* 添加內邊距以防止內容緊貼邊緣 */}
+        <Box sx={{ padding: 2, overflow: 'hidden' }}> {/* 確保主容器不產生額外滾動 */}
             <Typography variant="h4" gutterBottom>
                 {album.title} - 相簿詳情
             </Typography>
@@ -128,7 +128,7 @@ const AlbumDetail = () => {
                                         boxShadow: 12,
                                     },
                                     position: 'relative', // 設定為 relative 以便處理加載動畫
-                                    maxHeight: 'calc(100vh - 100px)', // 根據螢幕大小限制高度
+                                    // 移除 maxHeight 以避免內部滾動條
                                 }}
                             >
                                 {loadingPhotos && (
@@ -148,7 +148,6 @@ const AlbumDetail = () => {
                                         style={{
                                             width: '100%',
                                             height: 'auto',
-                                            maxHeight: '100%',
                                             objectFit: 'cover',
                                             display: loadingPhotos ? 'none' : 'block',
                                         }}
@@ -164,7 +163,6 @@ const AlbumDetail = () => {
                                         style={{
                                             width: '100%',
                                             height: 'auto',
-                                            maxHeight: '100%', // 確保圖片在容器內不超過高度
                                             objectFit: 'cover',
                                             display: loadingPhotos ? 'none' : 'block', // 在圖片加載前隱藏圖片
                                         }}
