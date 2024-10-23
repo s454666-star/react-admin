@@ -1,5 +1,3 @@
-// StarAlbum.js
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -8,7 +6,6 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    ListSubheader,
     Typography,
     CircularProgress,
     Divider,
@@ -16,6 +13,9 @@ import {
     AppBar,
     Toolbar,
     IconButton,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
@@ -23,20 +23,21 @@ import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
 import MenuIcon from '@mui/icons-material/Menu';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
 
-// 定義粉紫色主題
-const starTheme = createTheme({
+// 定義星夜主題
+const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#b388eb', // 粉紫色
+            main: '#3f51b5', // 星夜藍色
         },
         secondary: {
-            main: '#7c4dff',
+            main: '#7986cb',
         },
         background: {
-            default: '#f3e5f5',
+            default: '#e8eaf6',
         },
     },
     typography: {
@@ -94,7 +95,7 @@ const StarAlbum = () => {
     };
 
     return (
-        <ThemeProvider theme={starTheme}>
+        <ThemeProvider theme={starryNightTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
@@ -104,12 +105,12 @@ const StarAlbum = () => {
                             aria-label="open drawer"
                             edge="start"
                             onClick={toggleDrawer}
-                            sx={{ mr: 2, display: { sm: 'none' } }}
+                            sx={{ mr: 2 }}
                         >
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            Star Album
+                            星夜相簿
                         </Typography>
                     </Toolbar>
                 </MyAppBar>
@@ -122,39 +123,44 @@ const StarAlbum = () => {
                         '& .MuiDrawer-paper': {
                             width: drawerWidth,
                             boxSizing: 'border-box',
-                            backgroundColor: '#ede7f6',
+                            backgroundColor: '#e8eaf6',
                         },
                     }}
                 >
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
-                        <List
-                            subheader={
-                                <ListSubheader component="div" id="nested-list-subheader">
-                                    演員列表
-                                </ListSubheader>
-                            }
-                        >
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    selected={selectedActor === 'all'}
-                                    onClick={() => handleActorSelect('all')}
-                                >
-                                    <ListItemText primary="全部演員" />
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider />
-                            {actors.map((actor) => (
-                                <ListItem key={actor.id} disablePadding>
-                                    <ListItemButton
-                                        selected={selectedActor === actor.id}
-                                        onClick={() => handleActorSelect(actor.id)}
-                                    >
-                                        <ListItemText primary={actor.actor_name} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
+                        <Accordion defaultExpanded>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="actor-list-content"
+                                id="actor-list-header"
+                            >
+                                <Typography>演員列表</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List>
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            selected={selectedActor === 'all'}
+                                            onClick={() => handleActorSelect('all')}
+                                        >
+                                            <ListItemText primary="全部演員" />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <Divider />
+                                    {actors.map((actor) => (
+                                        <ListItem key={actor.id} disablePadding>
+                                            <ListItemButton
+                                                selected={selectedActor === actor.id}
+                                                onClick={() => handleActorSelect(actor.id)}
+                                            >
+                                                <ListItemText primary={actor.actor_name} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
                     </Box>
                 </Drawer>
                 <Main>
@@ -223,7 +229,12 @@ const AlbumsList = ({ actorId }) => {
     };
 
     const handleAlbumClick = (album) => {
-        navigate(`/star-album/album/${album.id}`, { state: { albumTitleFromMain: album.title } });
+        navigate(`/star-album/album/${album.id}`, {
+            state: {
+                albumTitleFromMain: album.title,
+                albumThemeFromMain: album.theme,
+            },
+        });
     };
 
     return (
@@ -249,7 +260,7 @@ const AlbumsList = ({ actorId }) => {
                     <Box
                         key={album.id}
                         sx={{
-                            border: '1px solid #b39ddb',
+                            border: '1px solid #7986cb',
                             borderRadius: 2,
                             overflow: 'hidden',
                             boxShadow: 3,
@@ -272,7 +283,7 @@ const AlbumsList = ({ actorId }) => {
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                主題：{album.name}
+                                {album.theme}
                             </Typography>
                         </Box>
                     </Box>

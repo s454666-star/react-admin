@@ -1,5 +1,3 @@
-// AlbumDetail.js
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -15,7 +13,7 @@ import { API_BASE_URL } from './config';
 const AlbumDetail = () => {
     const { albumId } = useParams();
     const location = useLocation();
-    const { albumTitleFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱
+    const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱和主題
     const [photos, setPhotos] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -94,7 +92,7 @@ const AlbumDetail = () => {
                 {albumTitleFromMain || album.title}
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
-                {album.theme}
+                {albumThemeFromMain || album.theme}
             </Typography>
             <InfiniteScroll
                 dataLength={photos.length}
@@ -131,25 +129,4 @@ const AlbumDetail = () => {
                                     objectFit: 'contain',
                                 }}
                             >
-                                <source src={getFullImageUrl(photo.photo_path)} type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`} />
-                                您的瀏覽器不支持視頻標籤。
-                            </video>
-                        ) : (
-                            <img
-                                src={getFullImageUrl(photo.photo_path)}
-                                alt=""
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    objectFit: 'contain',
-                                }}
-                            />
-                        )}
-                    </Box>
-                ))}
-            </InfiniteScroll>
-        </Box>
-    );
-};
-
-export default AlbumDetail;
+                                <source src={getFullImageUrl(photo.photo_path)} type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`}
