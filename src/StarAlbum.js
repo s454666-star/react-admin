@@ -82,29 +82,33 @@ const StarAlbum = () => {
             navigate(`/star-album/actor/${actorId}`);
         }
         setSelectedAlbums([]); // 清空選取的相簿
-        setIsSelecting(false); // 退出選取模式
+        // 不再在這裡設置 isSelecting，將由 useEffect 管理
     };
 
     const toggleShowDeleted = () => {
         setShowDeleted(!showDeleted);
         setSelectedAlbums([]); // 清空選取的相簿
-        setIsSelecting(false); // 退出選取模式
+        // 不再在這裡設置 isSelecting，將由 useEffect 管理
     };
 
     const handleLongPress = (albumId) => {
         setSelectedAlbums((prevSelected) => {
             if (prevSelected.includes(albumId)) {
-                const newSelected = prevSelected.filter((id) => id !== albumId);
-                if (newSelected.length === 0) {
-                    setIsSelecting(false);
-                }
-                return newSelected;
+                return prevSelected.filter((id) => id !== albumId);
             } else {
-                setIsSelecting(true);
                 return [...prevSelected, albumId];
             }
         });
     };
+
+    // 使用 useEffect 監控 selectedAlbums 來設置 isSelecting
+    useEffect(() => {
+        if (selectedAlbums.length > 0) {
+            setIsSelecting(true);
+        } else {
+            setIsSelecting(false);
+        }
+    }, [selectedAlbums]);
 
     const handleDeleteAlbums = async () => {
         try {
@@ -113,7 +117,7 @@ const StarAlbum = () => {
                 deleted: 1, // 更新 deleted 狀態為 1
             });
             setSelectedAlbums([]);
-            setIsSelecting(false);
+            // 不再在這裡設置 isSelecting，將由 useEffect 管理
             // 重新載入相簿列表
             setReload((prev) => !prev);
         } catch (error) {
