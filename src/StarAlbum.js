@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams, BrowserRouter as Router } from 'react-router-dom';
 import AlbumDetail from './AlbumDetail';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
@@ -189,10 +189,16 @@ const StarAlbum = () => {
                         <Box sx={{ flexGrow: 1 }} /> {/* 佔位元素，使選單居中 */}
                     </Toolbar>
                 </MyAppBar>
-                {/* 其餘代碼 */}
+                <Main>
+                    <Toolbar />
+                    <Routes>
+                        <Route path="/" element={<AlbumsList actorId="all" />} />
+                        <Route path="actor/:actorId" element={<AlbumsListWrapper />} />
+                        <Route path="album/:albumId" element={<AlbumDetail />} />
+                    </Routes>
+                </Main>
             </Box>
         </ThemeProvider>
-
     );
 };
 
@@ -337,4 +343,12 @@ const AlbumsList = ({ actorId }) => {
     );
 };
 
-export default StarAlbum;
+const App = () => (
+    <Router>
+        <Routes>
+            <Route path="/*" element={<StarAlbum />} />
+        </Routes>
+    </Router>
+);
+
+export default App;
