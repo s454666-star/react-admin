@@ -72,6 +72,9 @@ const StarAlbum = () => {
         setSelectedActor(actorId);
         if (actorId === 'all') {
             navigate(`/star-album`);
+        } else if (actorId === 'main') {
+            // 當選擇主演員時，不傳遞 'actor' 參數以撈取所有資料
+            navigate(`/star-album`);
         } else {
             navigate(`/star-album/actor/${actorId}`);
         }
@@ -87,14 +90,10 @@ const StarAlbum = () => {
                             星空相簿
                         </Typography>
                         <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
-                            <InputLabel id="actor-select-label" sx={{ color: 'white' }}>
-                                選擇Coser
-                            </InputLabel>
                             <Select
-                                labelId="actor-select-label"
                                 value={selectedActor}
                                 onChange={(event) => handleActorSelect(event.target.value)}
-                                label="選擇Coser"
+                                displayEmpty
                                 sx={{ color: 'white' }} // 調整選單文字顏色
                                 MenuProps={{
                                     PaperProps: {
@@ -106,10 +105,13 @@ const StarAlbum = () => {
                                 }}
                             >
                                 <MenuItem value="all">全部Coser</MenuItem>
+                                <MenuItem value="main">紧急企划</MenuItem> {/* 新增選項選擇主演員 */}
                                 {actors.map((actor) => (
-                                    <MenuItem key={actor.id} value={actor.id}>
-                                        {actor.actor_name}
-                                    </MenuItem>
+                                    actor.secondary_actor_name && (
+                                        <MenuItem key={actor.id} value={actor.id}>
+                                            {actor.secondary_actor_name}
+                                        </MenuItem>
+                                    )
                                 ))}
                             </Select>
                         </FormControl>
