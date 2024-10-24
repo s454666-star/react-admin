@@ -7,7 +7,6 @@ import {
     AppBar,
     Toolbar,
     FormControl,
-    InputLabel,
     Select,
     MenuItem,
     Button,
@@ -94,7 +93,7 @@ const StarAlbum = () => {
         setShowDeleted(!showDeleted);
         setAlbums([]);
         setPage(1);
-        fetchAlbums(1, selectedActor, !showDeleted, true);
+        fetchAlbums(1, selectedActor, !showDeleted, true); // 重打 API 並更新畫面
     };
 
     const fetchAlbums = async (pageNumber, actorId, showDeleted, reset = false) => {
@@ -167,14 +166,9 @@ const StarAlbum = () => {
                             星空相簿
                         </Typography>
                         <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
-                            <InputLabel id="actor-select-label" sx={{ color: 'white' }}>
-                                選擇Coser
-                            </InputLabel>
                             <Select
-                                labelId="actor-select-label"
                                 value={selectedActor}
                                 onChange={(event) => handleActorSelect(event.target.value)}
-                                label="選擇Coser"
                                 sx={{ color: 'white' }}
                                 MenuProps={{
                                     PaperProps: {
@@ -188,7 +182,9 @@ const StarAlbum = () => {
                                 <MenuItem value="all">全部Coser</MenuItem>
                                 {actors.map((actor) => (
                                     <MenuItem key={actor.id} value={actor.id}>
-                                        {actor.actor_name}
+                                        {actor.secondary_actor_name
+                                            ? `${actor.actor_name} - ${actor.secondary_actor_name}`
+                                            : actor.actor_name}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -204,7 +200,9 @@ const StarAlbum = () => {
                                     color="secondary"
                                 />
                             }
-                            label="顯示已刪除"
+                            label={
+                                <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>已刪除</Typography> // 改小字體
+                            }
                         />
                     </Toolbar>
 
