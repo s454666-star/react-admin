@@ -254,7 +254,6 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
         setPage(1);
         setHasMore(true);
         fetchAlbums(1, actorId, showDeleted, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [actorId, showDeleted, reload]);
 
     const fetchAlbums = async (pageNumber, actorId, showDeleted, reset = false) => {
