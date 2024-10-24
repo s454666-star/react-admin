@@ -245,6 +245,7 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
     const timerRef = useRef(null);
+    const isLongPress = useRef(false);
 
     useEffect(() => {
         setAlbums([]);
@@ -295,7 +296,9 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
     };
 
     const handleLongPressStart = (albumId) => {
+        isLongPress.current = false;
         timerRef.current = setTimeout(() => {
+            isLongPress.current = true;
             onLongPress(albumId);
         }, 3000);
     };
@@ -305,6 +308,19 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
             clearTimeout(timerRef.current);
             timerRef.current = null;
         }
+        if (isLongPress.current) {
+            // 防止觸發點擊事件
+            isLongPress.current = false;
+        }
+    };
+
+    const handleClick = (album) => {
+        if (isLongPress.current) {
+            // 阻止點擊事件
+            isLongPress.current = false;
+            return;
+        }
+        handleAlbumClick(album);
     };
 
     return (
@@ -353,12 +369,12 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
                             cursor: 'pointer',
                             position: 'relative',
                         }}
-                        onClick={() => handleAlbumClick(album)}
                         onMouseDown={() => handleLongPressStart(album.id)}
                         onMouseUp={handleLongPressEnd}
                         onMouseLeave={handleLongPressEnd}
                         onTouchStart={() => handleLongPressStart(album.id)}
                         onTouchEnd={handleLongPressEnd}
+                        onClick={() => handleClick(album)}
                     >
                         {isSelecting && selectedAlbums.includes(album.id) && (
                             <Box
