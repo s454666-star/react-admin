@@ -104,7 +104,7 @@ const StarAlbum = () => {
 
     const handleDeleteAlbums = async () => {
         try {
-            await axios.put(`${API_BASE_URL}albums/update-deleted`, {
+            await axios.put(`${API_BASE_URL}albums/updateDeleted`, {
                 album_ids: selectedAlbums,
                 deleted: 1, // 更新 deleted 狀態為 1
             });
