@@ -10,13 +10,14 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    ListSubheader,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
+import AlbumDetail from './AlbumDetail';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { getFullImageUrl } from './utils'; // 引入輔助函數
+import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
 // 定義星夜主題
 const starryNightTheme = createTheme({
@@ -73,45 +74,83 @@ const StarAlbum = () => {
         if (actorId === 'all') {
             navigate(`/star-album`);
         } else if (actorId === 'main') {
-            // 當選擇主演員時，不傳遞 'actor' 參數以撈取所有資料
             navigate(`/star-album`);
         } else {
             navigate(`/star-album/actor/${actorId}`);
         }
     };
 
+    const groupedActors = actors.reduce((groups, actor) => {
+        const { actor_name, secondary_actor_name } = actor;
+        if (!groups[actor_name]) {
+            groups[actor_name] = [];
+        }
+        groups[actor_name].push(actor);
+        return groups;
+    }, {});
+
     return (
         <ThemeProvider theme={starryNightTheme}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                             星空相簿
                         </Typography>
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+                            <InputLabel sx={{ color: 'white' }}>選擇演員</InputLabel>
                             <Select
                                 value={selectedActor}
                                 onChange={(event) => handleActorSelect(event.target.value)}
                                 displayEmpty
-                                sx={{ color: 'white' }} // 調整選單文字顏色
+                                sx={{
+                                    color: 'white',
+                                    '.MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'white',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'white',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'white',
+                                    },
+                                }}
                                 MenuProps={{
                                     PaperProps: {
                                         sx: {
-                                            backgroundColor: '#3f51b5', // 調整下拉選單背景色
-                                            color: 'white', // 調整下拉選單文字顏色
+                                            backgroundColor: '#3f51b5',
+                                            color: 'white',
                                         },
                                     },
                                 }}
+                                renderValue={(selected) => {
+                                    if (selected === 'all') {
+                                        return '全部Coser';
+                                    }
+                                    if (selected === 'main') {
+                                        return '紧急企划';
+                                    }
+                                    const selectedActor = actors.find((actor) => actor.id === selected);
+                                    return selectedActor ? selectedActor.secondary_actor_name || selectedActor.actor_name : '';
+                                }}
                             >
+                                {/* 全部和緊急企劃選項 */}
                                 <MenuItem value="all">全部Coser</MenuItem>
-                                <MenuItem value="main">紧急企划</MenuItem> {/* 新增選項選擇主演員 */}
-                                {actors.map((actor) => (
-                                    actor.secondary_actor_name && (
-                                        <MenuItem key={actor.id} value={actor.id}>
-                                            {actor.secondary_actor_name}
-                                        </MenuItem>
-                                    )
+                                <MenuItem value="main">紧急企划</MenuItem>
+
+                                {/* 分組顯示演員 */}
+                                {Object.keys(groupedActors).map((actorName) => (
+                                    <React.Fragment key={actorName}>
+                                        <ListSubheader sx={{ backgroundColor: '#3f51b5', color: 'white' }}>
+                                            {actorName}
+                                        </ListSubheader>
+                                        {groupedActors[actorName].map((actor) => (
+                                            <MenuItem key={actor.id} value={actor.id}>
+                                                {actor.secondary_actor_name ? actor.secondary_actor_name : actor.actor_name}
+                                            </MenuItem>
+                                        ))}
+                                    </React.Fragment>
                                 ))}
                             </Select>
                         </FormControl>
