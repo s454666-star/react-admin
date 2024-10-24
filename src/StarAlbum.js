@@ -19,6 +19,8 @@ import AlbumDetail from './AlbumDetail';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
+import { Autocomplete, TextField } from '@mui/material';
+
 // 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
@@ -53,8 +55,17 @@ const MyAppBar = styled(AppBar)(({ theme }) => ({
 
 const StarAlbum = () => {
     const [actors, setActors] = useState([]);
+    const [groupedActors, setGroupedActors] = useState({});
     const [selectedActor, setSelectedActor] = useState('all');
     const navigate = useNavigate();
+    const actorOptions = [
+        { id: 'all', label: '全部Coser', group: '全部' },
+        ...actors.map((actor) => ({
+            id: actor.id,
+            label: actor.secondary_actor_name || actor.actor_name,
+            group: actor.secondary_actor_name ? actor.actor_name : '主演員',
+        })),
+    ];
 
     useEffect(() => {
         fetchActors();
@@ -63,7 +74,28 @@ const StarAlbum = () => {
     const fetchActors = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}actors`);
-            setActors(response.data);
+            const actorsData = response.data;
+            setActors(actorsData);
+
+            // 根據演員資料動態分組
+            const groups = {};
+            actorsData.forEach((actor) => {
+                if (actor.secondary_actor_name) {
+                    // 次演員
+                    if (!groups[actor.actor_name]) {
+                        groups[actor.actor_name] = [];
+                    }
+                    groups[actor.actor_name].push(actor);
+                } else {
+                    // 主演員
+                    if (!groups['主演員']) {
+                        groups['主演員'] = [];
+                    }
+                    groups['主演員'].push(actor);
+                }
+            });
+            setGroupedActors(groups);
+
         } catch (error) {
             console.error('Error fetching actors:', error);
         }
@@ -73,21 +105,10 @@ const StarAlbum = () => {
         setSelectedActor(actorId);
         if (actorId === 'all') {
             navigate(`/star-album`);
-        } else if (actorId === 'main') {
-            navigate(`/star-album`);
         } else {
             navigate(`/star-album/actor/${actorId}`);
         }
     };
-
-    const groupedActors = actors.reduce((groups, actor) => {
-        const { actor_name, secondary_actor_name } = actor;
-        if (!groups[actor_name]) {
-            groups[actor_name] = [];
-        }
-        groups[actor_name].push(actor);
-        return groups;
-    }, {});
 
     return (
         <ThemeProvider theme={starryNightTheme}>
@@ -128,26 +149,37 @@ const StarAlbum = () => {
                                     if (selected === 'all') {
                                         return '全部Coser';
                                     }
-                                    if (selected === 'main') {
-                                        return '紧急企划';
-                                    }
                                     const selectedActor = actors.find((actor) => actor.id === selected);
-                                    return selectedActor ? selectedActor.secondary_actor_name || selectedActor.actor_name : '';
+                                    return selectedActor ? (selectedActor.secondary_actor_name || selectedActor.actor_name) : '';
                                 }}
                             >
-                                {/* 全部和緊急企劃選項 */}
-                                <MenuItem value="all">全部Coser</MenuItem>
-                                <MenuItem value="main">紧急企划</MenuItem>
+                                {/* 全部選項 */}
+                                <MenuItem value="all" sx={{ fontWeight: 'bold' }}>全部Coser</MenuItem>
 
                                 {/* 分組顯示演員 */}
-                                {Object.keys(groupedActors).map((actorName) => (
-                                    <React.Fragment key={actorName}>
-                                        <ListSubheader sx={{ backgroundColor: '#3f51b5', color: 'white' }}>
-                                            {actorName}
+                                {Object.keys(groupedActors).map((groupName) => (
+                                    <React.Fragment key={groupName}>
+                                        <ListSubheader
+                                            sx={{
+                                                backgroundColor: '#3f51b5',
+                                                color: 'white',
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            {groupName}
                                         </ListSubheader>
-                                        {groupedActors[actorName].map((actor) => (
-                                            <MenuItem key={actor.id} value={actor.id}>
-                                                {actor.secondary_actor_name ? actor.secondary_actor_name : actor.actor_name}
+                                        {groupedActors[groupName].map((actor) => (
+                                            <MenuItem
+                                                key={actor.id}
+                                                value={actor.id}
+                                                sx={{
+                                                    pl: actor.secondary_actor_name ? 4 : 2, // 次演員縮進
+                                                    fontSize: actor.secondary_actor_name ? '0.9rem' : '1rem',
+                                                    fontWeight: actor.secondary_actor_name ? 'normal' : 'bold',
+                                                }}
+                                            >
+                                                {actor.secondary_actor_name || actor.actor_name}
                                             </MenuItem>
                                         ))}
                                     </React.Fragment>
@@ -157,16 +189,10 @@ const StarAlbum = () => {
                         <Box sx={{ flexGrow: 1 }} /> {/* 佔位元素，使選單居中 */}
                     </Toolbar>
                 </MyAppBar>
-                <Main>
-                    <Toolbar />
-                    <Routes>
-                        <Route path="/" element={<AlbumsList actorId="all" />} />
-                        <Route path="actor/:actorId" element={<AlbumsListWrapper />} />
-                        <Route path="album/:albumId" element={<AlbumDetail />} />
-                    </Routes>
-                </Main>
+                {/* 其餘代碼 */}
             </Box>
         </ThemeProvider>
+
     );
 };
 
@@ -194,9 +220,9 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 確保每頁 20 條
+                per_page: 20,
             };
-            if (actorId !== 'all') {
+            if (actorId && actorId !== 'all') {
                 params.actor = actorId;
             }
             const response = await axios.get(`${API_BASE_URL}albums`, { params });
