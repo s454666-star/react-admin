@@ -16,16 +16,16 @@ import {
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
+import AlbumDetail from './AlbumDetail';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { getFullImageUrl } from './utils'; // 引入輔助函數
+import { getFullImageUrl } from './utils';
 import { API_BASE_URL } from './config';
 
 // 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星空藍色
+            main: '#3f51b5',
         },
         secondary: {
             main: '#7986cb',
@@ -56,9 +56,10 @@ const MyAppBar = styled(AppBar)(({ theme }) => ({
 const StarAlbum = () => {
     const [actors, setActors] = useState([]);
     const [selectedActor, setSelectedActor] = useState('all');
-    const [selectedAlbums, setSelectedAlbums] = useState([]); // 用來追蹤被選中的相簿
-    const [showDeleted, setShowDeleted] = useState(false); // 是否顯示已刪除
-    const [isSelecting, setIsSelecting] = useState(false); // 是否處於多選模式
+    const [selectedAlbums, setSelectedAlbums] = useState([]);
+    const [showDeleted, setShowDeleted] = useState(false);
+    const [isSelecting, setIsSelecting] = useState(false);
+    const [reload, setReload] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -81,14 +82,12 @@ const StarAlbum = () => {
         } else {
             navigate(`/star-album/actor/${actorId}`);
         }
-        setSelectedAlbums([]); // 清空選取的相簿
-        // 不再在這裡設置 isSelecting，將由 useEffect 管理
+        setSelectedAlbums([]);
     };
 
     const toggleShowDeleted = () => {
         setShowDeleted(!showDeleted);
-        setSelectedAlbums([]); // 清空選取的相簿
-        // 不再在這裡設置 isSelecting，將由 useEffect 管理
+        setSelectedAlbums([]);
     };
 
     const handleLongPress = (albumId) => {
@@ -101,7 +100,6 @@ const StarAlbum = () => {
         });
     };
 
-    // 使用 useEffect 監控 selectedAlbums 來設置 isSelecting
     useEffect(() => {
         if (selectedAlbums.length > 0) {
             setIsSelecting(true);
@@ -114,19 +112,14 @@ const StarAlbum = () => {
         try {
             await axios.put(`${API_BASE_URL}albums/updateDeleted`, {
                 album_ids: selectedAlbums,
-                deleted: 1, // 更新 deleted 狀態為 1
+                deleted: 1,
             });
             setSelectedAlbums([]);
-            // 不再在這裡設置 isSelecting，將由 useEffect 管理
-            // 重新載入相簿列表
             setReload((prev) => !prev);
         } catch (error) {
             console.error('刪除相簿時發生錯誤:', error);
         }
     };
-
-    // 用於觸發重新抓取相簿
-    const [reload, setReload] = useState(false);
 
     return (
         <ThemeProvider theme={starryNightTheme}>
@@ -163,7 +156,6 @@ const StarAlbum = () => {
                                 </Select>
                             </FormControl>
 
-                            {/* 顯示已刪除的開關 */}
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -176,13 +168,12 @@ const StarAlbum = () => {
                                 label={
                                     <Typography variant="body2" sx={{ fontSize: '0.875rem', color: 'white' }}>
                                         已刪除
-                                    </Typography> {/* 改小字體並調整顏色 */}
+                                    </Typography>
                                 }
                             />
                         </Box>
                     </Toolbar>
 
-                    {/* 刪除按鈕 (僅在有選中相簿時顯示) */}
                     {selectedAlbums.length > 0 && (
                         <Box sx={{ textAlign: 'center', mt: 1 }}>
                             <Button
@@ -266,8 +257,8 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20, // 每頁顯示 20 筆
-                deleted: showDeleted ? 1 : 0, // 根據開關決定是否顯示已刪除
+                per_page: 20,
+                deleted: showDeleted ? 1 : 0,
             };
             if (actorId !== 'all') {
                 params.actor = actorId;
@@ -297,7 +288,6 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
 
     const handleAlbumClick = (album) => {
         if (isSelecting) {
-            // 如果處於選取模式，點擊相簿即選取或取消選取
             onLongPress(album.id);
         } else {
             navigate(`/star-album/album/${album.id}`);
@@ -307,7 +297,7 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
     const handleLongPressStart = (albumId) => {
         timerRef.current = setTimeout(() => {
             onLongPress(albumId);
-        }, 3000); // 3 秒後觸發長按
+        }, 3000);
     };
 
     const handleLongPressEnd = () => {
@@ -332,7 +322,7 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
                     已顯示所有相簿
                 </Typography>
             }
-            style={{ overflow: 'visible' }} // 防止產生內部滾動條
+            style={{ overflow: 'visible' }}
         >
             <Box
                 sx={{
