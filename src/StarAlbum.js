@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Typography,
@@ -59,9 +59,6 @@ const StarAlbum = () => {
     const [selectedAlbums, setSelectedAlbums] = useState([]); // 用來追蹤被選中的相簿
     const [showDeleted, setShowDeleted] = useState(false); // 是否顯示已刪除
     const [isSelecting, setIsSelecting] = useState(false); // 是否處於多選模式
-    const [page, setPage] = useState(1);
-    const [albums, setAlbums] = useState([]);
-    const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -73,7 +70,7 @@ const StarAlbum = () => {
             const response = await axios.get(`${API_BASE_URL}actors`);
             setActors(response.data);
         } catch (error) {
-            console.error('Error fetching actors:', error);
+            console.error('取得 Coser 列表時發生錯誤:', error);
         }
     };
 
@@ -84,17 +81,181 @@ const StarAlbum = () => {
         } else {
             navigate(`/star-album/actor/${actorId}`);
         }
-        setAlbums([]); // 清空相簿列表以加載新數據
-        setPage(1);
-        fetchAlbums(1, actorId, showDeleted, true);
+        setSelectedAlbums([]); // 清空選取的相簿
+        setIsSelecting(false); // 退出選取模式
     };
 
     const toggleShowDeleted = () => {
         setShowDeleted(!showDeleted);
+        setSelectedAlbums([]); // 清空選取的相簿
+        setIsSelecting(false); // 退出選取模式
+    };
+
+    const handleLongPress = (albumId) => {
+        setIsSelecting(true);
+        setSelectedAlbums((prevSelected) => {
+            if (prevSelected.includes(albumId)) {
+                return prevSelected.filter((id) => id !== albumId);
+            } else {
+                return [...prevSelected, albumId];
+            }
+        });
+    };
+
+    const handleDeleteAlbums = async () => {
+        try {
+            await axios.put(`${API_BASE_URL}albums/update-deleted`, {
+                album_ids: selectedAlbums,
+                deleted: 1, // 更新 deleted 狀態為 1
+            });
+            setSelectedAlbums([]);
+            setIsSelecting(false);
+            // 重新載入相簿列表
+            // 可以使用一個狀態來觸發 AlbumsList 重新抓取資料
+            setReload((prev) => !prev);
+        } catch (error) {
+            console.error('刪除相簿時發生錯誤:', error);
+        }
+    };
+
+    // 用於觸發重新抓取相簿
+    const [reload, setReload] = useState(false);
+
+    return (
+        <ThemeProvider theme={starryNightTheme}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <CssBaseline />
+                <MyAppBar position="fixed">
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h6" noWrap component="div">
+                            星空相簿
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
+                                <Select
+                                    value={selectedActor}
+                                    onChange={(event) => handleActorSelect(event.target.value)}
+                                    sx={{ color: 'white' }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: '#3f51b5',
+                                                color: 'white',
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="all">全部 Coser</MenuItem>
+                                    {actors.map((actor) => (
+                                        <MenuItem key={actor.id} value={actor.id}>
+                                            {actor.secondary_actor_name
+                                                ? `${actor.actor_name} - ${actor.secondary_actor_name}`
+                                                : actor.actor_name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/* 顯示已刪除的開關 */}
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={showDeleted}
+                                        onChange={toggleShowDeleted}
+                                        name="showDeletedSwitch"
+                                        color="secondary"
+                                    />
+                                }
+                                label={
+                                    <Typography variant="body2" sx={{ fontSize: '0.875rem', color: 'white' }}>
+                                        已刪除
+                                    </Typography> // 改小字體並調整顏色
+                                }
+                            />
+                        </Box>
+                    </Toolbar>
+
+                    {/* 刪除按鈕 (僅在多選模式下顯示) */}
+                    {isSelecting && (
+                        <Box sx={{ textAlign: 'center', mt: 1 }}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleDeleteAlbums}
+                                disabled={selectedAlbums.length === 0}
+                            >
+                                刪除選中的相簿
+                            </Button>
+                        </Box>
+                    )}
+                </MyAppBar>
+
+                <Main>
+                    <Toolbar />
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <AlbumsList
+                                    actorId="all"
+                                    showDeleted={showDeleted}
+                                    isSelecting={isSelecting}
+                                    selectedAlbums={selectedAlbums}
+                                    onLongPress={handleLongPress}
+                                    reload={reload}
+                                />
+                            }
+                        />
+                        <Route
+                            path="actor/:actorId"
+                            element={
+                                <AlbumsListWrapper
+                                    showDeleted={showDeleted}
+                                    isSelecting={isSelecting}
+                                    selectedAlbums={selectedAlbums}
+                                    onLongPress={handleLongPress}
+                                    reload={reload}
+                                />
+                            }
+                        />
+                        <Route path="album/:albumId" element={<AlbumDetail />} />
+                    </Routes>
+                </Main>
+            </Box>
+        </ThemeProvider>
+    );
+};
+
+// 包裝組件，用於從 URL 參數獲取 actorId
+const AlbumsListWrapper = ({ showDeleted, isSelecting, selectedAlbums, onLongPress, reload }) => {
+    const { actorId } = useParams();
+    return (
+        <AlbumsList
+            actorId={actorId}
+            showDeleted={showDeleted}
+            isSelecting={isSelecting}
+            selectedAlbums={selectedAlbums}
+            onLongPress={onLongPress}
+            reload={reload}
+        />
+    );
+};
+
+// AlbumsList 組件
+const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongPress, reload }) => {
+    const [albums, setAlbums] = useState([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const navigate = useNavigate();
+    const timerRef = useRef(null);
+
+    useEffect(() => {
         setAlbums([]);
         setPage(1);
-        fetchAlbums(1, selectedActor, !showDeleted, true); // 重打 API 並更新畫面
-    };
+        setHasMore(true);
+        fetchAlbums(1, actorId, showDeleted, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [actorId, showDeleted, reload]);
 
     const fetchAlbums = async (pageNumber, actorId, showDeleted, reset = false) => {
         try {
@@ -119,179 +280,36 @@ const StarAlbum = () => {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error('Error fetching albums:', error);
+            console.error('取得相簿時發生錯誤:', error);
         }
     };
 
     const fetchMoreData = () => {
         const nextPage = page + 1;
-        fetchAlbums(nextPage, selectedActor, showDeleted);
-        setPage(nextPage);
-    };
-
-    const handleAlbumLongPress = (albumId) => {
-        setIsSelecting(true);
-        setSelectedAlbums((prevSelected) => {
-            if (prevSelected.includes(albumId)) {
-                return prevSelected.filter((id) => id !== albumId);
-            } else {
-                return [...prevSelected, albumId];
-            }
-        });
-    };
-
-    const handleDeleteAlbums = async () => {
-        try {
-            await axios.put(`${API_BASE_URL}albums/update-deleted`, {
-                album_ids: selectedAlbums,
-                deleted: 1, // 更新 deleted 狀態為 1
-            });
-            setSelectedAlbums([]);
-            setIsSelecting(false);
-            setAlbums([]); // 清空相簿列表並重新加載
-            setPage(1);
-            fetchAlbums(1, selectedActor, showDeleted, true);
-        } catch (error) {
-            console.error('Error deleting albums:', error);
-        }
-    };
-
-    return (
-        <ThemeProvider theme={starryNightTheme}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <CssBaseline />
-                <MyAppBar position="fixed">
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="h6" noWrap component="div">
-                            星空相簿
-                        </Typography>
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150, color: 'white' }}>
-                            <Select
-                                value={selectedActor}
-                                onChange={(event) => handleActorSelect(event.target.value)}
-                                sx={{ color: 'white' }}
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            backgroundColor: '#3f51b5',
-                                            color: 'white',
-                                        },
-                                    },
-                                }}
-                            >
-                                <MenuItem value="all">全部Coser</MenuItem>
-                                {actors.map((actor) => (
-                                    <MenuItem key={actor.id} value={actor.id}>
-                                        {actor.secondary_actor_name
-                                            ? `${actor.actor_name} - ${actor.secondary_actor_name}`
-                                            : actor.actor_name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        {/* 顯示已刪除的開關 */}
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={showDeleted}
-                                    onChange={toggleShowDeleted}
-                                    name="showDeletedSwitch"
-                                    color="secondary"
-                                />
-                            }
-                            label={
-                                <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>已刪除</Typography> // 改小字體
-                            }
-                        />
-                    </Toolbar>
-
-                    {/* 刪除按鈕 (僅在多選模式下顯示) */}
-                    {isSelecting && (
-                        <Box sx={{ textAlign: 'center', mt: 1 }}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={handleDeleteAlbums}
-                                disabled={selectedAlbums.length === 0}
-                            >
-                                刪除選中的相簿
-                            </Button>
-                        </Box>
-                    )}
-                </MyAppBar>
-
-                <Main>
-                    <Toolbar />
-                    <Routes>
-                        <Route path="/" element={<AlbumsList actorId="all" onLongPress={handleAlbumLongPress} isSelecting={isSelecting} />} />
-                        <Route path="actor/:actorId" element={<AlbumsListWrapper onLongPress={handleAlbumLongPress} isSelecting={isSelecting} />} />
-                        <Route path="album/:albumId" element={<AlbumDetail />} />
-                    </Routes>
-                </Main>
-            </Box>
-        </ThemeProvider>
-    );
-};
-
-// 包裝組件，用於從 URL 參數獲取 actorId
-const AlbumsListWrapper = ({ onLongPress, isSelecting }) => {
-    const { actorId } = useParams();
-    return <AlbumsList actorId={actorId} onLongPress={onLongPress} isSelecting={isSelecting} />;
-};
-
-// AlbumsList 組件
-const AlbumsList = ({ actorId, onLongPress, isSelecting }) => {
-    const [albums, setAlbums] = useState([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        setAlbums([]);
-        setPage(1);
-        setHasMore(true);
-        fetchAlbums(1, actorId, true);
-    }, [actorId]);
-
-    const fetchAlbums = async (pageNumber, actorId, reset = false) => {
-        try {
-            const params = {
-                page: pageNumber,
-                per_page: 20,
-            };
-            if (actorId !== 'all') {
-                params.actor = actorId;
-            }
-            const response = await axios.get(`${API_BASE_URL}albums`, { params });
-            const newAlbums = response.data;
-
-            if (reset) {
-                setAlbums(newAlbums);
-            } else {
-                setAlbums((prev) => [...prev, ...newAlbums]);
-            }
-
-            if (newAlbums.length < 20) {
-                setHasMore(false);
-            }
-        } catch (error) {
-            console.error('Error fetching albums:', error);
-        }
-    };
-
-    const fetchMoreData = () => {
-        const nextPage = page + 1;
-        fetchAlbums(nextPage, actorId);
+        fetchAlbums(nextPage, actorId, showDeleted);
         setPage(nextPage);
     };
 
     const handleAlbumClick = (album) => {
-        navigate(`/star-album/album/${album.id}`);
+        if (isSelecting) {
+            // 如果處於選取模式，點擊相簿即選取或取消選取
+            onLongPress(album.id);
+        } else {
+            navigate(`/star-album/album/${album.id}`);
+        }
     };
 
-    const handleLongPress = (albumId) => {
-        onLongPress(albumId); // 觸發父組件的長按處理函數
+    const handleLongPressStart = (albumId) => {
+        timerRef.current = setTimeout(() => {
+            onLongPress(albumId);
+        }, 3000); // 3 秒後觸發長按
+    };
+
+    const handleLongPressEnd = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
     };
 
     return (
@@ -338,13 +356,35 @@ const AlbumsList = ({ actorId, onLongPress, isSelecting }) => {
                                 boxShadow: 6,
                             },
                             cursor: 'pointer',
+                            position: 'relative',
                         }}
                         onClick={() => handleAlbumClick(album)}
-                        onContextMenu={(e) => {
-                            e.preventDefault();
-                            handleLongPress(album.id);
-                        }}
+                        onMouseDown={() => handleLongPressStart(album.id)}
+                        onMouseUp={handleLongPressEnd}
+                        onMouseLeave={handleLongPressEnd}
+                        onTouchStart={() => handleLongPressStart(album.id)}
+                        onTouchEnd={handleLongPressEnd}
                     >
+                        {isSelecting && selectedAlbums.includes(album.id) && (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    top: 8,
+                                    right: 8,
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: '50%',
+                                    backgroundColor: 'red',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                ✓
+                            </Box>
+                        )}
                         <img
                             src={getFullImageUrl(album.cover_path)}
                             alt={album.title}
