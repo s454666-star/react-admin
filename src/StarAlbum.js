@@ -10,22 +10,20 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    ListSubheader,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { Routes, Route, useNavigate, useParams, BrowserRouter as Router } from 'react-router-dom';
-import AlbumDetail from './AlbumDetail';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import AlbumDetail from './AlbumDetail'; // 相簿詳情頁面組件
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { getFullImageUrl } from './utils';
+import { getFullImageUrl } from './utils'; // 引入輔助函數
 import { API_BASE_URL } from './config';
-import { Autocomplete, TextField } from '@mui/material';
 
 // 定義星夜主題
 const starryNightTheme = createTheme({
     palette: {
         primary: {
-            main: '#3f51b5', // 星空藍色
+            main: '#3f51b5', // 星夜藍色
         },
         secondary: {
             main: '#7986cb',
@@ -55,17 +53,8 @@ const MyAppBar = styled(AppBar)(({ theme }) => ({
 
 const StarAlbum = () => {
     const [actors, setActors] = useState([]);
-    const [groupedActors, setGroupedActors] = useState({});
     const [selectedActor, setSelectedActor] = useState('all');
     const navigate = useNavigate();
-    const actorOptions = [
-        { id: 'all', label: '全部Coser', group: '全部' },
-        ...actors.map((actor) => ({
-            id: actor.id,
-            label: actor.secondary_actor_name || actor.actor_name,
-            group: actor.secondary_actor_name ? actor.actor_name : '主演員',
-        })),
-    ];
 
     useEffect(() => {
         fetchActors();
@@ -74,28 +63,7 @@ const StarAlbum = () => {
     const fetchActors = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}actors`);
-            const actorsData = response.data;
-            setActors(actorsData);
-
-            // 根據演員資料動態分組
-            const groups = {};
-            actorsData.forEach((actor) => {
-                if (actor.secondary_actor_name) {
-                    // 次演員
-                    if (!groups[actor.actor_name]) {
-                        groups[actor.actor_name] = [];
-                    }
-                    groups[actor.actor_name].push(actor);
-                } else {
-                    // 主演員
-                    if (!groups['主演員']) {
-                        groups['主演員'] = [];
-                    }
-                    groups['主演員'].push(actor);
-                }
-            });
-            setGroupedActors(groups);
-
+            setActors(response.data);
         } catch (error) {
             console.error('Error fetching actors:', error);
         }
@@ -115,78 +83,26 @@ const StarAlbum = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                            星空相簿
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="h6" noWrap component="div">
+                            星夜相簿
                         </Typography>
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
-                            <InputLabel sx={{ color: 'white' }}>選擇演員</InputLabel>
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
+                            <InputLabel id="actor-select-label">選擇演員</InputLabel>
                             <Select
+                                labelId="actor-select-label"
                                 value={selectedActor}
                                 onChange={(event) => handleActorSelect(event.target.value)}
-                                displayEmpty
-                                sx={{
-                                    color: 'white',
-                                    '.MuiOutlinedInput-notchedOutline': {
-                                        borderColor: 'white',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: 'white',
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: 'white',
-                                    },
-                                }}
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            backgroundColor: '#3f51b5',
-                                            color: 'white',
-                                        },
-                                    },
-                                }}
-                                renderValue={(selected) => {
-                                    if (selected === 'all') {
-                                        return '全部Coser';
-                                    }
-                                    const selectedActor = actors.find((actor) => actor.id === selected);
-                                    return selectedActor ? (selectedActor.secondary_actor_name || selectedActor.actor_name) : '';
-                                }}
+                                label="選擇演員"
                             >
-                                {/* 全部選項 */}
-                                <MenuItem value="all" sx={{ fontWeight: 'bold' }}>全部Coser</MenuItem>
-
-                                {/* 分組顯示演員 */}
-                                {Object.keys(groupedActors).map((groupName) => (
-                                    <React.Fragment key={groupName}>
-                                        <ListSubheader
-                                            sx={{
-                                                backgroundColor: '#3f51b5',
-                                                color: 'white',
-                                                fontSize: '1rem',
-                                                fontWeight: 'bold',
-                                            }}
-                                        >
-                                            {groupName}
-                                        </ListSubheader>
-                                        {groupedActors[groupName].map((actor) => (
-                                            <MenuItem
-                                                key={actor.id}
-                                                value={actor.id}
-                                                sx={{
-                                                    pl: actor.secondary_actor_name ? 4 : 2, // 次演員縮進
-                                                    fontSize: actor.secondary_actor_name ? '0.9rem' : '1rem',
-                                                    fontWeight: actor.secondary_actor_name ? 'normal' : 'bold',
-                                                }}
-                                            >
-                                                {actor.secondary_actor_name || actor.actor_name}
-                                            </MenuItem>
-                                        ))}
-                                    </React.Fragment>
+                                <MenuItem value="all">全部演員</MenuItem>
+                                {actors.map((actor) => (
+                                    <MenuItem key={actor.id} value={actor.id}>
+                                        {actor.actor_name}
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
-                        <Box sx={{ flexGrow: 1 }} /> {/* 佔位元素，使選單居中 */}
                     </Toolbar>
                 </MyAppBar>
                 <Main>
@@ -226,9 +142,9 @@ const AlbumsList = ({ actorId }) => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 20,
+                per_page: 20, // 確保每頁 20 條
             };
-            if (actorId && actorId !== 'all') {
+            if (actorId !== 'all') {
                 params.actor = actorId;
             }
             const response = await axios.get(`${API_BASE_URL}albums`, { params });
@@ -320,16 +236,7 @@ const AlbumsList = ({ actorId }) => {
                             }}
                         />
                         <Box sx={{ p: 2 }}>
-                            <Typography
-                                component="div"
-                                gutterBottom
-                                sx={{
-                                    fontSize: {
-                                        xs: '1rem',   // 手機版字體大小
-                                        md: '1.5rem', // 電腦版字體大小
-                                    },
-                                }}
-                            >
+                            <Typography variant="h6" component="div" gutterBottom>
                                 {album.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -343,12 +250,4 @@ const AlbumsList = ({ actorId }) => {
     );
 };
 
-const App = () => (
-    <Router>
-        <Routes>
-            <Route path="/*" element={<StarAlbum />} />
-        </Routes>
-    </Router>
-);
-
-export default App;
+export default StarAlbum;
