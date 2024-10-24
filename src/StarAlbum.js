@@ -92,11 +92,15 @@ const StarAlbum = () => {
     };
 
     const handleLongPress = (albumId) => {
-        setIsSelecting(true);
         setSelectedAlbums((prevSelected) => {
             if (prevSelected.includes(albumId)) {
-                return prevSelected.filter((id) => id !== albumId);
+                const newSelected = prevSelected.filter((id) => id !== albumId);
+                if (newSelected.length === 0) {
+                    setIsSelecting(false);
+                }
+                return newSelected;
             } else {
+                setIsSelecting(true);
                 return [...prevSelected, albumId];
             }
         });
@@ -111,7 +115,6 @@ const StarAlbum = () => {
             setSelectedAlbums([]);
             setIsSelecting(false);
             // 重新載入相簿列表
-            // 可以使用一個狀態來觸發 AlbumsList 重新抓取資料
             setReload((prev) => !prev);
         } catch (error) {
             console.error('刪除相簿時發生錯誤:', error);
@@ -169,20 +172,19 @@ const StarAlbum = () => {
                                 label={
                                     <Typography variant="body2" sx={{ fontSize: '0.875rem', color: 'white' }}>
                                         已刪除
-                                    </Typography> // 改小字體並調整顏色
+                                    </Typography> {/* 改小字體並調整顏色 */}
                                 }
                             />
                         </Box>
                     </Toolbar>
 
-                    {/* 刪除按鈕 (僅在多選模式下顯示) */}
-                    {isSelecting && (
+                    {/* 刪除按鈕 (僅在有選中相簿時顯示) */}
+                    {selectedAlbums.length > 0 && (
                         <Box sx={{ textAlign: 'center', mt: 1 }}>
                             <Button
                                 variant="contained"
                                 color="secondary"
                                 onClick={handleDeleteAlbums}
-                                disabled={selectedAlbums.length === 0}
                             >
                                 刪除選中的相簿
                             </Button>
