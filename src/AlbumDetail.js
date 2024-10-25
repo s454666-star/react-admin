@@ -94,8 +94,8 @@ const AlbumDetail = () => {
             sx={{
                 padding: 2,
                 marginX: {
-                    xs: '5%', // 手機版左右各留5%
-                    md: '5%', // 電腦版也左右各留5%，保持一致
+                    xs: '0%',    // 手機版不留邊距
+                    md: '20%',   // 電腦版左右各留20%
                 },
             }}
         >
@@ -129,7 +129,7 @@ const AlbumDetail = () => {
                     color: 'text.secondary',
                     fontSize: {
                         xs: '1.2rem', // 手機版
-                        md: '2rem',   // 電腦版
+                        md: '2rem',    // 電腦版
                     },
                 }}
             >
@@ -164,8 +164,11 @@ const AlbumDetail = () => {
                             key={photo.id}
                             sx={{
                                 width: '100%',
-                                maxWidth: '800px', // 設定圖片最大寬度
-                                marginBottom: 2, // 留出圖片之間的距離
+                                maxWidth: {
+                                    xs: '100%',   // 手機版全寬
+                                    md: '100%',   // 電腦版在父容器控制下也為全寬
+                                },
+                                marginBottom: 2,
                                 overflow: 'hidden',
                                 boxShadow: 3,
                                 borderRadius: 2,
