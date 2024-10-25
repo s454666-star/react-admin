@@ -16,7 +16,7 @@ const AlbumDetail = () => {
     const { albumId } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
-    const { albumTitleFromMain, albumThemeFromMain } = location.state || {}; // 從主頁面獲取傳遞的相簿名稱和主題
+    const { albumTitleFromMain, albumThemeFromMain } = location.state || {};
     const [photos, setPhotos] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -46,7 +46,7 @@ const AlbumDetail = () => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 10, // 每頁 10 張
+                per_page: 10,
                 album_id: albumId,
             };
             const response = await axios.get(`${API_BASE_URL}album-photos`, { params });
@@ -60,9 +60,22 @@ const AlbumDetail = () => {
 
             if (newPhotos.length < 10) {
                 setHasMore(false);
+                // 在所有相片加載完畢後，更新 is_viewed 狀態
+                updateIsViewedStatus();
             }
         } catch (error) {
             console.error('取得相片時發生錯誤:', error);
+        }
+    };
+
+    const updateIsViewedStatus = async () => {
+        try {
+            await axios.put(`${API_BASE_URL}albums/${albumId}/updateIsViewed`, {
+                is_viewed: true,
+            });
+            console.log('相簿已更新為已瀏覽');
+        } catch (error) {
+            console.error('更新相簿狀態時發生錯誤:', error);
         }
     };
 
@@ -94,8 +107,8 @@ const AlbumDetail = () => {
             sx={{
                 padding: 2,
                 marginX: {
-                    xs: '0%',    // 手機版不留邊距
-                    md: '20%',   // 電腦版左右各留20%
+                    xs: '0%',
+                    md: '20%',
                 },
             }}
         >
@@ -113,8 +126,8 @@ const AlbumDetail = () => {
                     gutterBottom
                     sx={{
                         fontSize: {
-                            xs: '1.5rem', // 手機版
-                            md: '2.5rem', // 電腦版
+                            xs: '1.5rem',
+                            md: '2.5rem',
                         },
                     }}
                 >
@@ -128,8 +141,8 @@ const AlbumDetail = () => {
                     fontWeight: 'bold',
                     color: 'text.secondary',
                     fontSize: {
-                        xs: '1.2rem', // 手機版
-                        md: '2rem',    // 電腦版
+                        xs: '1.2rem',
+                        md: '2rem',
                     },
                 }}
             >
@@ -149,7 +162,7 @@ const AlbumDetail = () => {
                         已顯示所有相片
                     </Typography>
                 }
-                style={{ overflow: 'visible' }} // 防止產生內部滾動條
+                style={{ overflow: 'visible' }}
             >
                 <Box
                     sx={{
@@ -165,8 +178,8 @@ const AlbumDetail = () => {
                             sx={{
                                 width: '100%',
                                 maxWidth: {
-                                    xs: '100%',   // 手機版全寬
-                                    md: '100%',   // 電腦版在父容器控制下也為全寬
+                                    xs: '100%',
+                                    md: '100%',
                                 },
                                 marginBottom: 2,
                                 overflow: 'hidden',
@@ -194,7 +207,7 @@ const AlbumDetail = () => {
                                 <img
                                     src={getFullImageUrl(photo.photo_path)}
                                     alt=""
-                                    loading="lazy" // 延遲載入
+                                    loading="lazy"
                                     style={{
                                         width: '100%',
                                         height: 'auto',
@@ -209,7 +222,6 @@ const AlbumDetail = () => {
             </InfiniteScroll>
         </Box>
     );
-
 };
 
 export default AlbumDetail;
