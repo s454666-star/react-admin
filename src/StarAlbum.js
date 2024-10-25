@@ -300,7 +300,7 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
         timerRef.current = setTimeout(() => {
             isLongPress.current = true;
             onLongPress(albumId);
-        }, 3000);
+        }, 1000);
     };
 
     const handleLongPressEnd = () => {
