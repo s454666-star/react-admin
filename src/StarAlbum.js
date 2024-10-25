@@ -14,6 +14,7 @@ import {
     FormControlLabel,
 } from '@mui/material';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { Helmet } from 'react-helmet'; // 新增這行
 import axios from 'axios';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import AlbumDetail from './AlbumDetail';
@@ -123,6 +124,9 @@ const StarAlbum = () => {
 
     return (
         <ThemeProvider theme={starryNightTheme}>
+            <Helmet>
+                <title>星夜相簿</title>
+            </Helmet>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
