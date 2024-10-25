@@ -420,6 +420,25 @@ const AlbumsList = ({ actorId, showDeleted, isSelecting, selectedAlbums, onLongP
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {album.name}
+                                {album.is_viewed === 1 && (
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            display: 'inline-block',
+                                            marginLeft: 1,
+                                            padding: '2px 6px',
+                                            backgroundColor: '#ffe082',
+                                            color: '#ef6c00',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 'bold',
+                                            borderRadius: '4px',
+                                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                            animation: 'blink 1s infinite',
+                                        }}
+                                    >
+                                        已瀏覽
+                                    </Box>
+                                )}
                             </Typography>
                         </Box>
                     </Box>
