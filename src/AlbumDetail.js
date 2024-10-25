@@ -94,8 +94,8 @@ const AlbumDetail = () => {
             sx={{
                 padding: 2,
                 marginX: {
-                    xs: 0,
-                    md: '15%',
+                    xs: '5%', // 手機版左右各留5%
+                    md: '5%', // 電腦版也左右各留5%，保持一致
                 },
             }}
         >
@@ -140,7 +140,7 @@ const AlbumDetail = () => {
                 next={fetchMoreData}
                 hasMore={hasMore}
                 loader={
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
                         <CircularProgress />
                     </Box>
                 }
@@ -153,14 +153,10 @@ const AlbumDetail = () => {
             >
                 <Box
                     sx={{
-                        display: 'grid',
-                        gridTemplateColumns: {
-                            xs: 'repeat(1, 1fr)',
-                            sm: 'repeat(2, 1fr)',
-                            md: 'repeat(3, 1fr)',
-                            lg: 'repeat(4, 1fr)',
-                        },
-                        gap: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 4,
                     }}
                 >
                     {sortedPhotos.map((photo) => (
@@ -168,9 +164,11 @@ const AlbumDetail = () => {
                             key={photo.id}
                             sx={{
                                 width: '100%',
-                                maxWidth: '100%',
+                                maxWidth: '800px', // 設定圖片最大寬度
                                 marginBottom: 2, // 留出圖片之間的距離
                                 overflow: 'hidden',
+                                boxShadow: 3,
+                                borderRadius: 2,
                             }}
                         >
                             {isVideo(photo.photo_path) ? (
@@ -180,6 +178,7 @@ const AlbumDetail = () => {
                                         width: '100%',
                                         height: 'auto',
                                         objectFit: 'contain',
+                                        borderRadius: '8px',
                                     }}
                                 >
                                     <source
@@ -197,6 +196,7 @@ const AlbumDetail = () => {
                                         width: '100%',
                                         height: 'auto',
                                         objectFit: 'contain',
+                                        borderRadius: '8px',
                                     }}
                                 />
                             )}
@@ -206,6 +206,7 @@ const AlbumDetail = () => {
             </InfiniteScroll>
         </Box>
     );
+
 };
 
 export default AlbumDetail;
