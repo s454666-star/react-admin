@@ -1,5 +1,3 @@
-// AlbumDetail.js
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -40,7 +38,7 @@ const AlbumDetail = () => {
             const response = await axios.get(`${API_BASE_URL}albums/${albumId}`);
             setAlbum(response.data);
         } catch (error) {
-            console.error('Error fetching album details:', error);
+            console.error('取得相簿詳情時發生錯誤:', error);
         }
     };
 
@@ -48,7 +46,7 @@ const AlbumDetail = () => {
         try {
             const params = {
                 page: pageNumber,
-                per_page: 10, // 每頁 10 條
+                per_page: 10, // 每頁 10 張
                 album_id: albumId,
             };
             const response = await axios.get(`${API_BASE_URL}album-photos`, { params });
@@ -64,7 +62,7 @@ const AlbumDetail = () => {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error('Error fetching photos:', error);
+            console.error('取得相片時發生錯誤:', error);
         }
     };
 
@@ -92,7 +90,15 @@ const AlbumDetail = () => {
     });
 
     return (
-        <Box sx={{ padding: 0, margin: 0 }}>
+        <Box
+            sx={{
+                padding: 2,
+                marginX: {
+                    xs: 0,
+                    md: '15%',
+                },
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
                 <Button
                     variant="contained"
@@ -145,45 +151,58 @@ const AlbumDetail = () => {
                 }
                 style={{ overflow: 'visible' }} // 防止產生內部滾動條
             >
-                {sortedPhotos.map((photo) => (
-                    <Box
-                        key={photo.id}
-                        sx={{
-                            width: '100%',
-                            maxWidth: '100%',
-                            marginBottom: 2, // 留出圖片之間的距離
-                            overflow: 'hidden',
-                        }}
-                    >
-                        {isVideo(photo.photo_path) ? (
-                            <video
-                                controls
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    objectFit: 'contain',
-                                }}
-                            >
-                                <source
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            xs: 'repeat(1, 1fr)',
+                            sm: 'repeat(2, 1fr)',
+                            md: 'repeat(3, 1fr)',
+                            lg: 'repeat(4, 1fr)',
+                        },
+                        gap: 2,
+                    }}
+                >
+                    {sortedPhotos.map((photo) => (
+                        <Box
+                            key={photo.id}
+                            sx={{
+                                width: '100%',
+                                maxWidth: '100%',
+                                marginBottom: 2, // 留出圖片之間的距離
+                                overflow: 'hidden',
+                            }}
+                        >
+                            {isVideo(photo.photo_path) ? (
+                                <video
+                                    controls
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                    }}
+                                >
+                                    <source
+                                        src={getFullImageUrl(photo.photo_path)}
+                                        type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`}
+                                    />
+                                    您的瀏覽器不支援視頻標籤。
+                                </video>
+                            ) : (
+                                <img
                                     src={getFullImageUrl(photo.photo_path)}
-                                    type={`video/${photo.photo_path.split('.').pop().toLowerCase()}`}
+                                    alt=""
+                                    loading="lazy" // 延遲載入
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                    }}
                                 />
-                                您的瀏覽器不支援視頻標籤。
-                            </video>
-                        ) : (
-                            <img
-                                src={getFullImageUrl(photo.photo_path)}
-                                alt=""
-                                loading="lazy" // 延遲載入
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    objectFit: 'contain',
-                                }}
-                            />
-                        )}
-                    </Box>
-                ))}
+                            )}
+                        </Box>
+                    ))}
+                </Box>
             </InfiniteScroll>
         </Box>
     );
