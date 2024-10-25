@@ -126,8 +126,9 @@ const StarAlbum = () => {
         <ThemeProvider theme={starryNightTheme}>
             <Helmet>
                 <title>星夜相簿</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png"/>
             </Helmet>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{display: 'flex', flexDirection: 'column' }}>
                 <CssBaseline />
                 <MyAppBar position="fixed">
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
