@@ -79,7 +79,7 @@ const FileScreenshotList = () => {
                                         <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold">
                                             {album.file_name}
                                         </Typography>
-                                        {album.is_view && (
+                                        {album.is_view === 1 && ( // 確保只有當 is_view 為 1 時顯示
                                             <Chip
                                                 label="已觀看"
                                                 size="small"
