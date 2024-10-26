@@ -34,7 +34,7 @@ const FileScreenshotDetail = () => {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
                 const data = await response.json();
                 setAlbum(data);
-                setRating(data.rating || 0); // 初始化評分狀態
+                setRating(Number(data.rating) === 1 ? 1 : 0); // 將 rating 轉為數字並初始化評分狀態
             } catch (error) {
                 console.error("Error fetching album:", error);
             }
