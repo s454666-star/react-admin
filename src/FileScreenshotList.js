@@ -1,16 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
-    Container,
-    Typography,
-    Card,
-    CardMedia,
-    Grid,
-    AppBar,
-    Toolbar,
-    IconButton,
-    Snackbar,
-    Alert,
-    useMediaQuery
+    Container, Typography, Card, CardMedia, Grid, AppBar, Toolbar, IconButton, Snackbar, Alert, useMediaQuery
 } from '@mui/material';
 import {ToggleButton} from '@mui/lab';
 import {useParams, useNavigate} from 'react-router-dom';
@@ -18,6 +8,7 @@ import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {API_BASE_URL} from './config';
+import {useTheme} from '@mui/material/styles';
 
 const FileScreenshotDetail = () => {
     const {id} = useParams();
@@ -27,7 +18,10 @@ const FileScreenshotDetail = () => {
     const [holdStart, setHoldStart] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [rating, setRating] = useState(0);
-    const isMobile = useMediaQuery('(max-width:600px)'); // 判斷是否為手機
+
+    // Theme and media query for responsive adjustments
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         const fetchAlbum = async () => {
@@ -44,11 +38,9 @@ const FileScreenshotDetail = () => {
         const updateIsViewStatus = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
-                    method: 'PUT',
-                    headers: {
+                    method: 'PUT', headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({is_view: true}),
+                    }, body: JSON.stringify({is_view: true}),
                 });
 
                 if (!response.ok) {
@@ -74,11 +66,9 @@ const FileScreenshotDetail = () => {
         if (holdDuration >= 500) {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/cover-image`, {
-                    method: 'PUT',
-                    headers: {
+                    method: 'PUT', headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({cover_image: url}),
+                    }, body: JSON.stringify({cover_image: url}),
                 });
 
                 if (response.ok) {
@@ -98,11 +88,9 @@ const FileScreenshotDetail = () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/rating`, {
-                method: 'PUT',
-                headers: {
+                method: 'PUT', headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({rating: newRating}),
+                }, body: JSON.stringify({rating: newRating}),
             });
 
             if (!response.ok) {
@@ -117,8 +105,7 @@ const FileScreenshotDetail = () => {
 
     const screenshotUrls = album.screenshot_paths ? album.screenshot_paths.split(',') : [];
 
-    return (
-        <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
+    return (<div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
             <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" onClick={() => navigate(-1)}>
@@ -132,38 +119,35 @@ const FileScreenshotDetail = () => {
             </AppBar>
 
             <Container sx={{paddingTop: '20px'}}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexDirection: isMobile ? 'column' : 'row', // 手機時垂直顯示
-                    textAlign: isMobile ? 'center' : 'left'
-                }}>
-                    <Typography
-                        variant={isMobile ? 'h5' : 'h4'} // 手機字體較小
-                        gutterBottom
-                        sx={{color: '#FF69B4', marginRight: isMobile ? '0' : '8px'}}
-                    >
-                        {album.file_name}
-                    </Typography>
+                <Grid container alignItems="center" spacing={1} sx={{textAlign: isMobile ? 'center' : 'left'}}>
+                    <Grid item>
+                        <Typography
+                            variant={isMobile ? 'h6' : 'h5'} // 在電腦上縮小一點，手機上更小
+                            sx={{color: '#FF69B4'}}
+                        >
+                            {album.file_name}
+                        </Typography>
+                    </Grid>
 
-                    {/* 精選 ToggleButton，縮小按鈕 */}
-                    <ToggleButton
-                        value="check"
-                        selected={rating === 1}
-                        onChange={handleRatingToggle}
-                        sx={{
-                            color: '#FF69B4',
-                            padding: isMobile ? '4px 8px' : '6px 12px', // 手機按鈕更小
-                            fontSize: isMobile ? '0.8rem' : '1rem', // 手機字體更小
-                            '&.Mui-selected': {
-                                backgroundColor: '#FF69B4',
-                                color: '#FFF',
-                            },
-                        }}
-                    >
-                        精選
-                    </ToggleButton>
-                </div>
+                    <Grid item>
+                        <ToggleButton
+                            value="check"
+                            selected={rating === 1}
+                            onChange={handleRatingToggle}
+                            sx={{
+                                color: '#FF69B4',
+                                padding: '4px 10px',
+                                fontSize: '0.8rem',
+                                minWidth: 'fit-content',
+                                '&.Mui-selected': {
+                                    backgroundColor: '#FF69B4', color: '#FFF',
+                                },
+                            }}
+                        >
+                            精選
+                        </ToggleButton>
+                    </Grid>
+                </Grid>
 
                 <div style={{marginBottom: '20px'}}>
                     <ReactPlayer
@@ -172,16 +156,13 @@ const FileScreenshotDetail = () => {
                         width="100%"
                         height="400px"
                         style={{
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                            boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
+                            borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
                         }}
                     />
                 </div>
 
                 <Grid container spacing={2}>
-                    {screenshotUrls.map((url, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
+                    {screenshotUrls.map((url, index) => (<Grid item xs={12} sm={6} md={4} key={index}>
                             <Card
                                 sx={{
                                     maxWidth: 345,
@@ -189,8 +170,7 @@ const FileScreenshotDetail = () => {
                                     backgroundColor: '#FFF0F5',
                                     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                                     '&:hover': {
-                                        transform: 'scale(1.05)',
-                                        boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
+                                        transform: 'scale(1.05)', boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
                                     },
                                 }}
                                 onMouseDown={() => handleLongPressStart(url)}
@@ -199,8 +179,7 @@ const FileScreenshotDetail = () => {
                             >
                                 <CardMedia component="img" height="200" image={url} alt={`Screenshot ${index + 1}`}/>
                             </Card>
-                        </Grid>
-                    ))}
+                        </Grid>))}
                 </Grid>
 
                 <Snackbar
@@ -214,8 +193,7 @@ const FileScreenshotDetail = () => {
                     </Alert>
                 </Snackbar>
             </Container>
-        </div>
-    );
+        </div>);
 };
 
 export default FileScreenshotDetail;
