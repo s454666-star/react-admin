@@ -30,7 +30,7 @@ const FileScreenshotDetail = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [rating, setRating] = useState(0);
 
-    // Theme and media query for responsive adjustments
+    // 使用 MUI 的主題和媒體查詢來處理響應式設計
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -137,7 +137,7 @@ const FileScreenshotDetail = () => {
             </AppBar>
 
             <Container sx={{paddingTop: '20px'}}>
-                {/* 使用 Box 取代 div，並使用 sx 進行樣式管理 */}
+                {/* 使用 Box 來控制布局 */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -147,47 +147,44 @@ const FileScreenshotDetail = () => {
                         flexDirection: isMobile ? 'column' : 'row',
                         textAlign: isMobile ? 'center' : 'left',
                         paddingBottom: isMobile ? '10px' : '20px',
-                        flexWrap: 'nowrap' // 防止換行
+                        flexWrap: 'nowrap', // 防止換行
+                        width: '100%', // 確保容器佔滿父元素寬度
                     }}
                 >
                     <Typography
-                        variant={isMobile ? 'h6' : 'h5'} // 手機字體較小
+                        variant={isMobile ? 'h6' : 'h5'}
                         sx={{
                             color: '#FF69B4',
                             fontSize: isMobile ? '1rem' : '1.2rem',
                             whiteSpace: 'nowrap', // 防止換行
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            maxWidth: isMobile ? '100%' : '60%', // 根據需要調整最大寬度
+                            maxWidth: isMobile ? '100%' : '60%', // 限制最大寬度
                         }}
                         title={album.file_name} // 懸浮顯示完整文字
                     >
                         {album.file_name}
                     </Typography>
 
-                    {/* 精選 ToggleButton，縮小按鈕 */}
+                    {/* 精選 ToggleButton */}
                     <ToggleButton
                         value="check"
                         selected={rating === 1}
                         onChange={handleRatingToggle}
                         sx={{
                             color: '#FF69B4',
-                            padding: {
-                                xs: '3px 6px', // 手機
-                                sm: '2px 5px', // 桌面
-                            },
-                            fontSize: {
-                                xs: '0.7rem', // 手機字體更小
-                                sm: '0.52rem', // 桌面字體縮小至65%
-                            },
+                            padding: isMobile ? '4px 8px' : '2px 6px',
+                            fontSize: isMobile ? '0.7rem' : '0.52rem', // 手機與桌面不同字體大小
                             minWidth: 'fit-content',
-                            height: {
-                                xs: 'auto',
-                                sm: 'auto',
-                            },
-                            transform: {
-                                sm: 'scale(0.65)', // 桌面縮放至65%
-                            },
+                            height: 'auto',
+                            // 使用不同的樣式來縮小按鈕
+                            ...(isMobile
+                                ? {}
+                                : {
+                                    // 桌面端調整
+                                    padding: '2px 6px',
+                                    fontSize: '0.52rem',
+                                }),
                             '&.Mui-selected': {
                                 backgroundColor: '#FF69B4',
                                 color: '#FFF',
