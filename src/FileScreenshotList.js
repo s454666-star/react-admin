@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from 'react';
 import {useRedirect} from 'react-admin';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box} from '@mui/material';
+import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box, Chip} from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {API_BASE_URL} from './config';
 
@@ -75,10 +75,22 @@ const FileScreenshotList = () => {
                                         alt={album.file_name}
                                         sx={{width: '100%'}}
                                     />
-                                    <CardContent>
+                                    <CardContent sx={{display: 'flex', alignItems: 'center'}}>
                                         <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold">
                                             {album.file_name}
                                         </Typography>
+                                        {album.is_view && (
+                                            <Chip
+                                                label="已觀看"
+                                                size="small"
+                                                sx={{
+                                                    ml: 1,
+                                                    backgroundColor: '#FF69B4',
+                                                    color: '#FFF',
+                                                    fontWeight: 'bold',
+                                                }}
+                                            />
+                                        )}
                                     </CardContent>
                                 </Card>
                             </Grid>

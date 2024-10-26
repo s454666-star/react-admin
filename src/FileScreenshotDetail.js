@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
 import {
     Container,
     Typography,
@@ -12,6 +11,7 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
+import {useParams, useNavigate} from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
@@ -24,6 +24,7 @@ const FileScreenshotDetail = () => {
     const [isHolding, setIsHolding] = useState(false);
     const [holdStart, setHoldStart] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [isViewed, setIsViewed] = useState(false); // 狀態：是否已觀看
 
     useEffect(() => {
         const fetchAlbum = async () => {
@@ -36,7 +37,36 @@ const FileScreenshotDetail = () => {
             }
         };
         fetchAlbum();
-    }, [id]);
+
+        // 滾動監聽器，檢查是否到達頁面底部
+        const handleScroll = () => {
+            if (!isViewed && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
+                setIsViewed(true);
+                updateIsViewStatus();
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [id, isViewed]);
+
+    const updateIsViewStatus = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({is_view: true}),
+            });
+
+            if (!response.ok) {
+                console.error('Error updating is_view status');
+            }
+        } catch (error) {
+            console.error('Error updating is_view:', error);
+        }
+    };
 
     const handleLongPressStart = (url) => {
         setIsHolding(true);
