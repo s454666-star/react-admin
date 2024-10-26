@@ -53,7 +53,7 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{ textAlign: 'center', color: '#FF69B4' }}>載入中...</h4>}
                 endMessage={<p style={{ textAlign: 'center', color: '#FF69B4' }}>已無更多相簿</p>}
             >
-                <Container sx={{ paddingX: '24px' }}> {/* 增加左右的間距 */}
+                <Container sx={{ paddingX: '10px' }}> {/* 增加左右的間距 */}
                     <Grid container spacing={2} sx={{ padding: '16px' }}>
                         {albums.map((album) => (
                             <Grid item xs={12} sm={6} md={3} key={album.id} onClick={() => redirect(`/file-screenshots/${album.id}`)}>
