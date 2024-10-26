@@ -60,7 +60,9 @@ const FileScreenshotDetail = () => {
                 body: JSON.stringify({is_view: true}),
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                console.log('已更新為已觀看');
+            } else {
                 console.error('Error updating is_view status');
             }
         } catch (error) {
