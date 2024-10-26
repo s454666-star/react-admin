@@ -28,6 +28,7 @@ const FileScreenshotDetail = () => {
     const [rating, setRating] = useState(0); // 評分狀態
 
     useEffect(() => {
+        // Fetch album details
         const fetchAlbum = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
@@ -39,6 +40,7 @@ const FileScreenshotDetail = () => {
             }
         };
 
+        // Update is_view status on page load
         const updateIsViewStatus = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
@@ -61,12 +63,44 @@ const FileScreenshotDetail = () => {
         updateIsViewStatus();
     }, [id]);
 
+    // Handle long press start for cover image update
+    const handleLongPressStart = (url) => {
+        setIsHolding(true);
+        setHoldStart(Date.now());
+    };
+
+    // Handle long press end for cover image update
+    const handleLongPressEnd = async (url) => {
+        setIsHolding(false);
+        const holdDuration = Date.now() - holdStart;
+        if (holdDuration >= 500) { // 超過0.5秒
+            try {
+                const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/cover-image`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({cover_image: url}),
+                });
+
+                if (response.ok) {
+                    const updatedAlbum = await response.json();
+                    setAlbum((prev) => ({...prev, cover_image: updatedAlbum.cover_image}));
+                    setOpenSnackbar(true); // 開啟 Snackbar 成功訊息
+                }
+            } catch (error) {
+                console.error('Error updating cover image:', error);
+            }
+        }
+    };
+
+    // Toggle rating (1 or 0) and update API
     const handleRatingToggle = async () => {
         const newRating = rating === 1 ? 0 : 1; // 切換評分狀態
         setRating(newRating);
 
         try {
-            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`, {
+            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/rating`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,8 +131,16 @@ const FileScreenshotDetail = () => {
                     <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1}}>
                         星夜剪影
                     </Typography>
+                </Toolbar>
+            </AppBar>
 
-                    {/* 新增的 ToggleButton */}
+            <Container sx={{paddingTop: '20px'}}>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <Typography variant="h4" gutterBottom sx={{color: '#FF69B4', marginRight: '8px'}}>
+                        {album.file_name}
+                    </Typography>
+
+                    {/* 評分 ToggleButton 放置於標題旁邊 */}
                     <ToggleButton
                         value="check"
                         selected={rating === 1}
@@ -111,15 +153,9 @@ const FileScreenshotDetail = () => {
                             },
                         }}
                     >
-                        評分
+                        精選
                     </ToggleButton>
-                </Toolbar>
-            </AppBar>
-
-            <Container sx={{paddingTop: '20px'}}>
-                <Typography variant="h4" gutterBottom sx={{color: '#FF69B4'}}>
-                    {album.file_name}
-                </Typography>
+                </div>
 
                 <div style={{marginBottom: '20px'}}>
                     <ReactPlayer
@@ -159,6 +195,7 @@ const FileScreenshotDetail = () => {
                     ))}
                 </Grid>
 
+                {/* Snackbar for success message */}
                 <Snackbar
                     open={openSnackbar}
                     autoHideDuration={3000}
