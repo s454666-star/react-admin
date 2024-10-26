@@ -10,7 +10,8 @@ import {
     IconButton,
     Snackbar,
     Alert,
-    useMediaQuery
+    useMediaQuery,
+    Box
 } from '@mui/material';
 import {ToggleButton} from '@mui/lab';
 import {useParams, useNavigate} from 'react-router-dom';
@@ -136,20 +137,30 @@ const FileScreenshotDetail = () => {
             </AppBar>
 
             <Container sx={{paddingTop: '20px'}}>
-                <div
-                    style={{
+                {/* 使用 Box 取代 div，並使用 sx 進行樣式管理 */}
+                <Box
+                    sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: isMobile ? 'center' : 'flex-start',
                         gap: isMobile ? '4px' : '8px',
                         flexDirection: isMobile ? 'column' : 'row',
                         textAlign: isMobile ? 'center' : 'left',
-                        paddingBottom: isMobile ? '10px' : '20px'
+                        paddingBottom: isMobile ? '10px' : '20px',
+                        flexWrap: 'nowrap' // 防止換行
                     }}
                 >
                     <Typography
                         variant={isMobile ? 'h6' : 'h5'} // 手機字體較小
-                        sx={{color: '#FF69B4', fontSize: isMobile ? '1rem' : '1.2rem'}}
+                        sx={{
+                            color: '#FF69B4',
+                            fontSize: isMobile ? '1rem' : '1.2rem',
+                            whiteSpace: 'nowrap', // 防止換行
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: isMobile ? '100%' : '60%', // 根據需要調整最大寬度
+                        }}
+                        title={album.file_name} // 懸浮顯示完整文字
                     >
                         {album.file_name}
                     </Typography>
@@ -161,9 +172,22 @@ const FileScreenshotDetail = () => {
                         onChange={handleRatingToggle}
                         sx={{
                             color: '#FF69B4',
-                            padding: isMobile ? '3px 6px' : '4px 8px',
-                            fontSize: isMobile ? '0.7rem' : '0.8rem', // 手機字體更小
+                            padding: {
+                                xs: '3px 6px', // 手機
+                                sm: '2px 5px', // 桌面
+                            },
+                            fontSize: {
+                                xs: '0.7rem', // 手機字體更小
+                                sm: '0.52rem', // 桌面字體縮小至65%
+                            },
                             minWidth: 'fit-content',
+                            height: {
+                                xs: 'auto',
+                                sm: 'auto',
+                            },
+                            transform: {
+                                sm: 'scale(0.65)', // 桌面縮放至65%
+                            },
                             '&.Mui-selected': {
                                 backgroundColor: '#FF69B4',
                                 color: '#FFF',
@@ -172,7 +196,7 @@ const FileScreenshotDetail = () => {
                     >
                         精選
                     </ToggleButton>
-                </div>
+                </Box>
 
                 <div style={{marginBottom: '20px'}}>
                     <ReactPlayer
