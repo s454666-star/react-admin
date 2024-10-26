@@ -1,6 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
-import {Container, Typography, Card, CardMedia, Grid, AppBar, Toolbar, IconButton} from '@mui/material';
+import {
+    Container,
+    Typography,
+    Card,
+    CardMedia,
+    Grid,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Snackbar,
+    Alert
+} from '@mui/material';
 import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
@@ -12,6 +23,7 @@ const FileScreenshotDetail = () => {
     const [album, setAlbum] = useState(null);
     const [isHolding, setIsHolding] = useState(false);
     const [holdStart, setHoldStart] = useState(null);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     useEffect(() => {
         const fetchAlbum = async () => {
@@ -47,13 +59,10 @@ const FileScreenshotDetail = () => {
                 if (response.ok) {
                     const updatedAlbum = await response.json();
                     setAlbum((prev) => ({...prev, cover_image: updatedAlbum.cover_image}));
-                    alert('封面圖片已更新');
-                } else {
-                    alert('更新失敗');
+                    setOpenSnackbar(true); // 開啟 Snackbar 成功訊息
                 }
             } catch (error) {
                 console.error('Error updating cover image:', error);
-                alert('更新失敗');
             }
         }
     };
@@ -118,6 +127,18 @@ const FileScreenshotDetail = () => {
                         </Grid>
                     ))}
                 </Grid>
+
+                {/* Snackbar for success message */}
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={3000}
+                    onClose={() => setOpenSnackbar(false)}
+                    anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                >
+                    <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{width: '100%'}}>
+                        封面圖片已更新
+                    </Alert>
+                </Snackbar>
             </Container>
         </div>
     );
