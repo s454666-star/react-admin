@@ -13,7 +13,7 @@ import {
     useMediaQuery,
     Box
 } from '@mui/material';
-import {ToggleButton} from '@mui/lab';
+import {ToggleButton} from '@mui/material'; // 修正匯入路徑
 import {useParams, useNavigate} from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -142,13 +142,13 @@ const FileScreenshotDetail = () => {
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: isMobile ? 'center' : 'flex-start',
-                        gap: isMobile ? '4px' : '8px',
+                        justifyContent: isMobile ? 'center' : 'space-between',
+                        gap: isMobile ? '8px' : '16px',
                         flexDirection: isMobile ? 'column' : 'row',
                         textAlign: isMobile ? 'center' : 'left',
                         paddingBottom: isMobile ? '10px' : '20px',
-                        flexWrap: 'nowrap', // 防止換行
-                        width: '100%', // 確保容器佔滿父元素寬度
+                        flexWrap: 'nowrap',
+                        width: '100%',
                     }}
                 >
                     <Typography
@@ -156,12 +156,12 @@ const FileScreenshotDetail = () => {
                         sx={{
                             color: '#FF69B4',
                             fontSize: isMobile ? '1rem' : '1.2rem',
-                            whiteSpace: 'nowrap', // 防止換行
+                            whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            maxWidth: isMobile ? '100%' : '60%', // 限制最大寬度
+                            maxWidth: isMobile ? '100%' : '70%',
                         }}
-                        title={album.file_name} // 懸浮顯示完整文字
+                        title={album.file_name}
                     >
                         {album.file_name}
                     </Typography>
@@ -173,18 +173,11 @@ const FileScreenshotDetail = () => {
                         onChange={handleRatingToggle}
                         sx={{
                             color: '#FF69B4',
-                            padding: isMobile ? '4px 8px' : '2px 6px',
-                            fontSize: isMobile ? '0.7rem' : '0.52rem', // 手機與桌面不同字體大小
+                            padding: isMobile ? '4px 8px' : '3px 6px',
+                            fontSize: isMobile ? '0.7rem' : '0.52rem',
                             minWidth: 'fit-content',
                             height: 'auto',
-                            // 使用不同的樣式來縮小按鈕
-                            ...(isMobile
-                                ? {}
-                                : {
-                                    // 桌面端調整
-                                    padding: '2px 6px',
-                                    fontSize: '0.52rem',
-                                }),
+                            transform: isMobile ? 'none' : 'scale(0.65)', // 桌面端縮小至65%
                             '&.Mui-selected': {
                                 backgroundColor: '#FF69B4',
                                 color: '#FFF',
@@ -195,19 +188,19 @@ const FileScreenshotDetail = () => {
                     </ToggleButton>
                 </Box>
 
-                <div style={{marginBottom: '20px'}}>
+                <Box sx={{marginBottom: '20px'}}>
                     <ReactPlayer
                         url={album.file_path}
                         controls
                         width="100%"
-                        height="400px"
+                        height={isMobile ? '200px' : '400px'}
                         style={{
                             borderRadius: '8px',
                             overflow: 'hidden',
                             boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
                         }}
                     />
-                </div>
+                </Box>
 
                 <Grid container spacing={2}>
                     {screenshotUrls.map((url, index) => (
