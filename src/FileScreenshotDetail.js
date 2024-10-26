@@ -24,9 +24,9 @@ const FileScreenshotDetail = () => {
     const [isHolding, setIsHolding] = useState(false);
     const [holdStart, setHoldStart] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [isViewed, setIsViewed] = useState(false); // 狀態：是否已觀看
 
     useEffect(() => {
+        // Fetch album details
         const fetchAlbum = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
@@ -36,39 +36,29 @@ const FileScreenshotDetail = () => {
                 console.error("Error fetching album:", error);
             }
         };
-        fetchAlbum();
 
-        // 滾動監聽器，檢查是否到達頁面底部
-        const handleScroll = () => {
-            if (!isViewed && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
-                setIsViewed(true);
-                updateIsViewStatus();
+        // Update is_view status on page load
+        const updateIsViewStatus = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({is_view: true}),
+                });
+
+                if (!response.ok) {
+                    console.error('Error updating is_view status');
+                }
+            } catch (error) {
+                console.error('Error updating is_view:', error);
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [id, isViewed]);
-
-    const updateIsViewStatus = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({is_view: true}),
-            });
-
-            if (response.ok) {
-                console.log('已更新為已觀看');
-            } else {
-                console.error('Error updating is_view status');
-            }
-        } catch (error) {
-            console.error('Error updating is_view:', error);
-        }
-    };
+        fetchAlbum();
+        updateIsViewStatus(); // Update is_view status immediately on page load
+    }, [id]);
 
     const handleLongPressStart = (url) => {
         setIsHolding(true);
