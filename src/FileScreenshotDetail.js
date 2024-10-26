@@ -15,9 +15,13 @@ const FileScreenshotDetail = () => {
 
     useEffect(() => {
         const fetchAlbum = async () => {
-            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
-            const data = await response.json();
-            setAlbum(data);
+            try {
+                const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
+                const data = await response.json();
+                setAlbum(data);
+            } catch (error) {
+                console.error("Error fetching album:", error);
+            }
         };
         fetchAlbum();
     }, [id]);
@@ -41,7 +45,8 @@ const FileScreenshotDetail = () => {
                 });
 
                 if (response.ok) {
-                    setAlbum((prev) => ({...prev, cover_image: url}));
+                    const updatedAlbum = await response.json();
+                    setAlbum((prev) => ({...prev, cover_image: updatedAlbum.cover_image}));
                     alert('封面圖片已更新');
                 } else {
                     alert('更新失敗');
@@ -102,7 +107,7 @@ const FileScreenshotDetail = () => {
                                     '&:hover': {
                                         transform: 'scale(1.05)',
                                         boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
-                                    }
+                                    },
                                 }}
                                 onMouseDown={() => handleLongPressStart(url)}
                                 onMouseUp={() => handleLongPressEnd(url)}
