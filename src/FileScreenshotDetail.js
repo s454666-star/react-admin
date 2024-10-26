@@ -11,6 +11,7 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
+import {ToggleButton} from '@mui/lab'; // Import ToggleButton
 import {useParams, useNavigate} from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -24,20 +25,20 @@ const FileScreenshotDetail = () => {
     const [isHolding, setIsHolding] = useState(false);
     const [holdStart, setHoldStart] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [rating, setRating] = useState(0); // 評分狀態
 
     useEffect(() => {
-        // Fetch album details
         const fetchAlbum = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`);
                 const data = await response.json();
                 setAlbum(data);
+                setRating(data.rating || 0); // 初始化評分狀態
             } catch (error) {
                 console.error("Error fetching album:", error);
             }
         };
 
-        // Update is_view status on page load
         const updateIsViewStatus = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
@@ -57,35 +58,27 @@ const FileScreenshotDetail = () => {
         };
 
         fetchAlbum();
-        updateIsViewStatus(); // Update is_view status immediately on page load
+        updateIsViewStatus();
     }, [id]);
 
-    const handleLongPressStart = (url) => {
-        setIsHolding(true);
-        setHoldStart(Date.now());
-    };
+    const handleRatingToggle = async () => {
+        const newRating = rating === 1 ? 0 : 1; // 切換評分狀態
+        setRating(newRating);
 
-    const handleLongPressEnd = async (url) => {
-        setIsHolding(false);
-        const holdDuration = Date.now() - holdStart;
-        if (holdDuration >= 500) { // 超過0.5秒
-            try {
-                const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/cover-image`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({cover_image: url}),
-                });
+        try {
+            const response = await fetch(`${API_BASE_URL}file-screenshots/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({rating: newRating}),
+            });
 
-                if (response.ok) {
-                    const updatedAlbum = await response.json();
-                    setAlbum((prev) => ({...prev, cover_image: updatedAlbum.cover_image}));
-                    setOpenSnackbar(true); // 開啟 Snackbar 成功訊息
-                }
-            } catch (error) {
-                console.error('Error updating cover image:', error);
+            if (!response.ok) {
+                console.error('Error updating rating');
             }
+        } catch (error) {
+            console.error('Error updating rating:', error);
         }
     };
 
@@ -104,6 +97,22 @@ const FileScreenshotDetail = () => {
                     <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1}}>
                         星夜剪影
                     </Typography>
+
+                    {/* 新增的 ToggleButton */}
+                    <ToggleButton
+                        value="check"
+                        selected={rating === 1}
+                        onChange={handleRatingToggle}
+                        sx={{
+                            color: '#FF69B4',
+                            '&.Mui-selected': {
+                                backgroundColor: '#FF69B4',
+                                color: '#FFF',
+                            },
+                        }}
+                    >
+                        評分
+                    </ToggleButton>
                 </Toolbar>
             </AppBar>
 
@@ -150,7 +159,6 @@ const FileScreenshotDetail = () => {
                     ))}
                 </Grid>
 
-                {/* Snackbar for success message */}
                 <Snackbar
                     open={openSnackbar}
                     autoHideDuration={3000}
