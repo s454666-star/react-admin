@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from 'react';
 import {useRedirect} from 'react-admin';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Container} from '@mui/material';
+import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Container, Box} from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {API_BASE_URL} from './config';
 
@@ -46,6 +46,21 @@ const FileScreenshotList = () => {
                 </Toolbar>
             </AppBar>
 
+            {/* 主頁面大圖 */}
+            <Container sx={{marginX: '10%', paddingTop: '16px'}}>
+                <Box
+                    component="img"
+                    src="/path-to-banner-image.jpg" // 請替換為實際圖片路徑
+                    alt="主頁面圖"
+                    sx={{
+                        width: '100%',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
+                        marginBottom: '24px',
+                    }}
+                />
+            </Container>
+
             <InfiniteScroll
                 dataLength={albums.length}
                 next={fetchAlbums}
@@ -53,7 +68,7 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
             >
-                <Container sx={{marginX: '10%'}}> {/* 調整左右的間距為10% */}
+                <Container sx={{marginX: '10%'}}>
                     <Grid container spacing={2} sx={{padding: '16px'}}>
                         {albums.map((album) => (
                             <Grid item xs={12} sm={6} md={3} key={album.id}
