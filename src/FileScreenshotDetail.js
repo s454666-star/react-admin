@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Card, CardMedia, Grid, AppBar, Toolbar, IconButton } from '@mui/material';
+import React, {useState, useEffect} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import {Container, Typography, Card, CardMedia, Grid, AppBar, Toolbar, IconButton} from '@mui/material';
 import ReactPlayer from 'react-player';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
-import { API_BASE_URL } from './config';
+import {API_BASE_URL} from './config';
 
 const FileScreenshotDetail = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
     const [album, setAlbum] = useState(null);
     const [isHolding, setIsHolding] = useState(false);
@@ -37,11 +37,11 @@ const FileScreenshotDetail = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ cover_image: url }),
+                    body: JSON.stringify({cover_image: url}),
                 });
 
                 if (response.ok) {
-                    setAlbum((prev) => ({ ...prev, cover_image: url }));
+                    setAlbum((prev) => ({...prev, cover_image: url}));
                     alert('封面圖片已更新');
                 } else {
                     alert('更新失敗');
@@ -58,25 +58,25 @@ const FileScreenshotDetail = () => {
     const screenshotUrls = album.screenshot_paths ? album.screenshot_paths.split(',') : [];
 
     return (
-        <div style={{ backgroundColor: '#FFE6F1', minHeight: '100vh' }}>
-            <AppBar position="sticky" sx={{ backgroundColor: '#FFD0FF' }}>
+        <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
+            <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" onClick={() => navigate(-1)}>
-                        <ArrowBackIcon />
+                        <ArrowBackIcon/>
                     </IconButton>
-                    <StarOutlineIcon sx={{ color: '#FF69B4', marginRight: '8px' }} />
-                    <Typography variant="h6" component="div" sx={{ color: '#FF69B4', flexGrow: 1 }}>
+                    <StarOutlineIcon sx={{color: '#FF69B4', marginRight: '8px'}}/>
+                    <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1}}>
                         星夜剪影
                     </Typography>
                 </Toolbar>
             </AppBar>
 
-            <Container sx={{ paddingTop: '20px' }}>
-                <Typography variant="h4" gutterBottom sx={{ color: '#FF69B4' }}>
+            <Container sx={{paddingTop: '20px'}}>
+                <Typography variant="h4" gutterBottom sx={{color: '#FF69B4'}}>
                     {album.file_name}
                 </Typography>
 
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{marginBottom: '20px'}}>
                     <ReactPlayer
                         url={album.file_path}
                         controls
@@ -108,7 +108,7 @@ const FileScreenshotDetail = () => {
                                 onMouseUp={() => handleLongPressEnd(url)}
                                 onMouseLeave={() => setIsHolding(false)}
                             >
-                                <CardMedia component="img" height="200" image={url} alt={`Screenshot ${index + 1}`} />
+                                <CardMedia component="img" height="200" image={url} alt={`Screenshot ${index + 1}`}/>
                             </Card>
                         </Grid>
                     ))}
