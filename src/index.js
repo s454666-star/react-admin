@@ -17,6 +17,7 @@ import VideosList from './VideosList'; // 保留 videos-list 功能
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
+import FileScreenshotDetail from "./FileScreenshotDetail";
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -163,6 +164,7 @@ const App = () => (
                 <Route exact path="/videos-list" element={<VideosList/>}/>
                 <Route exact path="/star-album/*" element={<StarAlbum/>}/>
                 <Route exact path="/star-video/*" element={<FileScreenshotList/>}/>
+                <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
                 <Route
                     path="*"
                     element={(
