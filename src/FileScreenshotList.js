@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from 'react';
 import {useRedirect} from 'react-admin';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Container} from '@mui/material';
+import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box} from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {API_BASE_URL} from './config';
 
@@ -53,10 +53,10 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
             >
-                <Container sx={{maxWidth: '98%', paddingX: '4px'}}>
+                <Box sx={{paddingX: '8px'}}>  {/* 移除 maxWidth 限制，縮小左右留白 */}
                     <Grid container spacing={1} justifyContent="center">
                         {albums.map((album) => (
-                            <Grid item xs={6} sm={4} md={3} key={album.id}
+                            <Grid item xs={12} sm={6} md={3} lg={2} key={album.id}  // 設置為更大的寬度比例
                                   onClick={() => redirect(`/file-screenshots/${album.id}`)}>
                                 <Card sx={{
                                     width: '100%',
@@ -70,10 +70,10 @@ const FileScreenshotList = () => {
                                 }}>
                                     <CardMedia
                                         component="img"
-                                        height="200"  // 保持高度
+                                        height="200"
                                         image={album.cover_image || '/default-cover.jpg'}
                                         alt={album.file_name}
-                                        sx={{width: '100%'}}  // 圖片寬度設置為 100%
+                                        sx={{width: '100%'}}
                                     />
                                     <CardContent>
                                         <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold">
@@ -84,7 +84,7 @@ const FileScreenshotList = () => {
                             </Grid>
                         ))}
                     </Grid>
-                </Container>
+                </Box>
             </InfiniteScroll>
         </div>
     );
