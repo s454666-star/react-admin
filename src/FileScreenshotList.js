@@ -1,9 +1,9 @@
-// FileScreenshotList.js
 import React, {useState, useEffect} from 'react';
 import {useRedirect} from 'react-admin';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box, Chip} from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import {Helmet} from 'react-helmet';
 import {API_BASE_URL} from './config';
 
 const FileScreenshotList = () => {
@@ -37,10 +37,15 @@ const FileScreenshotList = () => {
 
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
+            {/* 設置頁面標題 */}
+            <Helmet>
+                <title>星夜剪影</title>
+            </Helmet>
+
             <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
-                <Toolbar>
-                    <StarOutlineIcon sx={{color: '#FF69B4', marginRight: '8px'}}/>
-                    <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1}}>
+                <Toolbar sx={{display: 'flex', justifyContent: 'center'}}>
+                    <StarOutlineIcon sx={{color: '#FF69B4', mr: 1}}/>
+                    <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1, textAlign: 'center'}}>
                         星夜剪影
                     </Typography>
                 </Toolbar>
@@ -53,10 +58,10 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
             >
-                <Box sx={{marginX: '10%'}}>  {/* 設置 10% 的左右留白 */}
+                <Box sx={{px: {xs: 2, sm: 5, md: '10%'}}}>  {/* 設置不同裝置的左右留白 */}
                     <Grid container spacing={2} justifyContent="center">
                         {albums.map((album) => (
-                            <Grid item xs={6} sm={4} md={3} key={album.id}  // 電腦版四張，手機版兩張
+                            <Grid item xs={12} sm={6} md={4} key={album.id}
                                   onClick={() => redirect(`/file-screenshots/${album.id}`)}>
                                 <Card sx={{
                                     width: '100%',
@@ -75,19 +80,26 @@ const FileScreenshotList = () => {
                                         alt={album.file_name}
                                         sx={{width: '100%'}}
                                     />
-                                    <CardContent sx={{display: 'flex', alignItems: 'center'}}>
-                                        <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold">
+                                    <CardContent sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold"
+                                                    sx={{flexGrow: 1, textAlign: 'center'}}>
                                             {album.file_name}
                                         </Typography>
-                                        {album.is_view === 1 && ( // 確保只有當 is_view 為 1 時顯示
+                                        {album.is_view === 1 && (
                                             <Chip
                                                 label="已觀看"
                                                 size="small"
                                                 sx={{
-                                                    ml: 1,
+                                                    mt: {xs: 1, sm: 0},
                                                     backgroundColor: '#FF69B4',
                                                     color: '#FFF',
                                                     fontWeight: 'bold',
+                                                    textAlign: 'center',
                                                 }}
                                             />
                                         )}
