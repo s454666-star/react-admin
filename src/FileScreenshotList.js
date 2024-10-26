@@ -53,10 +53,10 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
             >
-                <Box sx={{paddingX: '8px'}}>  {/* 移除 maxWidth 限制，縮小左右留白 */}
-                    <Grid container spacing={1} justifyContent="center">
+                <Box sx={{marginX: '10%'}}>  {/* 設置 10% 的左右留白 */}
+                    <Grid container spacing={2} justifyContent="center">
                         {albums.map((album) => (
-                            <Grid item xs={12} sm={6} md={3} lg={2} key={album.id}  // 設置為更大的寬度比例
+                            <Grid item xs={6} sm={4} md={3} key={album.id}  // 電腦版四張，手機版兩張
                                   onClick={() => redirect(`/file-screenshots/${album.id}`)}>
                                 <Card sx={{
                                     width: '100%',
