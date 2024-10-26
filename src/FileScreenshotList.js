@@ -53,13 +53,13 @@ const FileScreenshotList = () => {
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
             >
-                <Container sx={{maxWidth: '95%', paddingX: '8px'}}>
-                    <Grid container spacing={2} justifyContent="center">
+                <Container sx={{maxWidth: '98%', paddingX: '4px'}}>
+                    <Grid container spacing={1} justifyContent="center">
                         {albums.map((album) => (
                             <Grid item xs={6} sm={4} md={3} key={album.id}
                                   onClick={() => redirect(`/file-screenshots/${album.id}`)}>
                                 <Card sx={{
-                                    maxWidth: '100%',
+                                    width: '100%',
                                     borderRadius: '8px',
                                     backgroundColor: '#FFF0F5',
                                     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
@@ -70,9 +70,10 @@ const FileScreenshotList = () => {
                                 }}>
                                     <CardMedia
                                         component="img"
-                                        height="250"  // 增大封面圖片高度
+                                        height="200"  // 保持高度
                                         image={album.cover_image || '/default-cover.jpg'}
                                         alt={album.file_name}
+                                        sx={{width: '100%'}}  // 圖片寬度設置為 100%
                                     />
                                     <CardContent>
                                         <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold">
