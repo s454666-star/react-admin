@@ -16,7 +16,8 @@ const FileScreenshotList = () => {
     const fetchAlbums = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}file-screenshots?page=${page}&perPage=20`);
-            const data = await response.json();
+            const result = await response.json();
+            const { data, total } = result;
 
             if (!Array.isArray(data) || data.length === 0) {
                 setHasMore(false);
@@ -29,6 +30,7 @@ const FileScreenshotList = () => {
             setHasMore(false);
         }
     };
+
 
     useEffect(() => {
         fetchAlbums();
