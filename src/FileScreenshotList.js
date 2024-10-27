@@ -90,7 +90,6 @@ const FileScreenshotList = () => {
         setHasMore(true);
         // 抓取第一頁數據
         fetchAlbums(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [featuredOnly, viewedOnly]);
 
     // 不再依賴 page 來自動抓取，改由 InfiniteScroll 控制抓取
