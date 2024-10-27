@@ -1,7 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {useRedirect} from 'react-admin';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box, Chip} from '@mui/material';
+import {
+    Card,
+    CardMedia,
+    CardContent,
+    Typography,
+    Grid,
+    AppBar,
+    Toolbar,
+    Box,
+    Chip,
+    Switch,
+    FormControlLabel,
+    FormGroup
+} from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {Helmet} from 'react-helmet';
 import {API_BASE_URL} from './config';
@@ -13,28 +26,8 @@ const FileScreenshotList = () => {
     const [albums, setAlbums] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-
-    const fetchAlbums = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}file-screenshots?page=${page}&perPage=20`);
-            const result = await response.json();
-            const {data} = result;
-
-            if (!Array.isArray(data) || data.length === 0) {
-                setHasMore(false);
-            } else {
-                setAlbums((prev) => [...prev, ...data]);
-                setPage((prev) => prev + 1);
-            }
-        } catch (error) {
-            console.error("Failed to fetch albums:", error);
-            setHasMore(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchAlbums();
-    }, []);
+    const [featuredOnly, setFeaturedOnly] = useState(false); // 「精選」開關狀態
+    const [viewedOnly, setViewedOnly] = useState(false); // 「已觀看」開關狀態
 
     // 定義脈動動畫
     const pulse = keyframes`
@@ -52,6 +45,46 @@ const FileScreenshotList = () => {
         }
     `;
 
+    const fetchAlbums = async () => {
+        try {
+            // 構建查詢參數
+            let query = `page=${page}&perPage=20`;
+            if (featuredOnly) {
+                query += `&rating=1.00`;
+            }
+            if (viewedOnly) {
+                query += `&is_view=1`;
+            }
+
+            const response = await fetch(`${API_BASE_URL}file-screenshots?${query}`);
+            const result = await response.json();
+            const {data} = result;
+
+            if (!Array.isArray(data) || data.length === 0) {
+                setHasMore(false);
+            } else {
+                setAlbums((prev) => [...prev, ...data]);
+                setPage((prev) => prev + 1);
+            }
+        } catch (error) {
+            console.error("Failed to fetch albums:", error);
+            setHasMore(false);
+        }
+    };
+
+    // 當開關狀態改變時，重置相本列表並重新抓取數據
+    useEffect(() => {
+        // 重置狀態
+        setAlbums([]);
+        setPage(1);
+        setHasMore(true);
+    }, [featuredOnly, viewedOnly]);
+
+    useEffect(() => {
+        fetchAlbums();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [featuredOnly, viewedOnly, page]);
+
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
             {/* 設置頁面標題 */}
@@ -60,11 +93,58 @@ const FileScreenshotList = () => {
             </Helmet>
 
             <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
-                <Toolbar sx={{display: 'flex', justifyContent: 'center'}}>
-                    <StarOutlineIcon sx={{color: '#FF69B4', mr: 1}}/>
-                    <Typography variant="h6" component="div" sx={{color: '#FF69B4', flexGrow: 1, textAlign: 'center'}}>
-                        星夜剪影
-                    </Typography>
+                <Toolbar sx={{display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap'}}>
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <StarOutlineIcon sx={{color: '#FF69B4', mr: 1}}/>
+                        <Typography variant="h6" component="div"
+                                    sx={{color: '#FF69B4', flexGrow: 1, textAlign: 'center'}}>
+                            星夜剪影
+                        </Typography>
+                    </Box>
+                    {/* Toggle 開關區域 */}
+                    <FormGroup sx={{display: 'flex', flexDirection: 'row'}}>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={featuredOnly}
+                                    onChange={(e) => setFeaturedOnly(e.target.checked)}
+                                    color="secondary"
+                                />
+                            }
+                            label="精選"
+                            sx={{
+                                mr: 2,
+                                '& .MuiFormControlLabel-label': {
+                                    color: '#FF69B4',
+                                    fontWeight: 'bold',
+                                    fontSize: {
+                                        xs: '0.8rem',
+                                        sm: '1rem',
+                                    },
+                                },
+                            }}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={viewedOnly}
+                                    onChange={(e) => setViewedOnly(e.target.checked)}
+                                    color="secondary"
+                                />
+                            }
+                            label="已觀看"
+                            sx={{
+                                '& .MuiFormControlLabel-label': {
+                                    color: '#FF69B4',
+                                    fontWeight: 'bold',
+                                    fontSize: {
+                                        xs: '0.8rem',
+                                        sm: '1rem',
+                                    },
+                                },
+                            }}
+                        />
+                    </FormGroup>
                 </Toolbar>
             </AppBar>
 
@@ -104,7 +184,7 @@ const FileScreenshotList = () => {
                                         flexWrap: 'wrap'
                                     }}>
                                         <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap'}}>
-                                            {album.rating === "1.00" || album.rating === 1 ? (
+                                            {(album.rating === "1.00" || album.rating === 1) && (
                                                 <Chip
                                                     label="精選"
                                                     size="small"
@@ -114,11 +194,10 @@ const FileScreenshotList = () => {
                                                         color: '#FFF',
                                                         fontWeight: 'bold',
                                                         animation: `${pulse} 2s infinite`,
-                                                        // 添加其他視覺效果
                                                         boxShadow: `0 0 10px ${album.theme_color || '#FF69B4'}`,
                                                     }}
                                                 />
-                                            ) : null}
+                                            )}
                                             <Typography variant="body1" component="div" color="#880E4F"
                                                         fontWeight="bold"
                                                         sx={{
@@ -126,7 +205,12 @@ const FileScreenshotList = () => {
                                                             textAlign: 'center',
                                                             whiteSpace: 'nowrap',
                                                             overflow: 'hidden',
-                                                            textOverflow: 'ellipsis'
+                                                            textOverflow: 'ellipsis',
+                                                            fontSize: {
+                                                                xs: '0.9rem',
+                                                                sm: '1rem',
+                                                                md: '1.1rem',
+                                                            },
                                                         }}
                                                         title={album.file_name}>
                                                 {album.file_name}
