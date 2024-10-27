@@ -82,7 +82,6 @@ const FileScreenshotList = () => {
 
     useEffect(() => {
         fetchAlbums();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [featuredOnly, viewedOnly, page]);
 
     return (
