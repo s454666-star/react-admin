@@ -13,7 +13,11 @@ import {
     Chip,
     Switch,
     FormControlLabel,
-    FormGroup
+    FormGroup,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl
 } from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {Helmet} from 'react-helmet';
@@ -28,6 +32,7 @@ const FileScreenshotList = () => {
     const [hasMore, setHasMore] = useState(true);
     const [featuredOnly, setFeaturedOnly] = useState(false); // 「精選」開關狀態
     const [viewedOnly, setViewedOnly] = useState(false); // 「已觀看」開關狀態
+    const [selectedType, setSelectedType] = useState(''); // Dropdown 選擇的 type
     const [loading, setLoading] = useState(false); // 防止多次請求
 
     const PER_PAGE = 20; // 每頁數量
@@ -62,6 +67,9 @@ const FileScreenshotList = () => {
             if (viewedOnly) {
                 query += `&is_view=1`;
             }
+            if (selectedType) {
+                query += `&type=${selectedType}`;
+            }
 
             const response = await fetch(`${API_BASE_URL}file-screenshots?${query}`);
             if (!response.ok) {
@@ -87,7 +95,7 @@ const FileScreenshotList = () => {
         }
     };
 
-    // 當開關狀態改變時，重置相本列表並重新抓取數據
+    // 當開關狀態或 dropdown 選擇改變時，重置相本列表並重新抓取數據
     useEffect(() => {
         // 重置狀態
         setAlbums([]);
@@ -95,7 +103,8 @@ const FileScreenshotList = () => {
         setHasMore(true);
         // 抓取第一頁數據
         fetchAlbums(1);
-    }, [featuredOnly, viewedOnly]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [featuredOnly, viewedOnly, selectedType]);
 
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
@@ -106,57 +115,90 @@ const FileScreenshotList = () => {
 
             <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
                 <Toolbar sx={{display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap'}}>
-                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                    <Box sx={{display: 'flex', alignItems: 'center', mb: {xs: 2, sm: 0}}}>
                         <StarOutlineIcon sx={{color: '#FF69B4', mr: 1}}/>
                         <Typography variant="h6" component="div"
                                     sx={{color: '#FF69B4', flexGrow: 1, textAlign: 'center'}}>
                             星夜剪影
                         </Typography>
                     </Box>
-                    {/* Toggle 開關區域 */}
-                    <FormGroup sx={{display: 'flex', flexDirection: 'row'}}>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={featuredOnly}
-                                    onChange={(e) => setFeaturedOnly(e.target.checked)}
-                                    color="secondary"
-                                />
-                            }
-                            label="精選"
-                            sx={{
-                                mr: 2,
-                                '& .MuiFormControlLabel-label': {
+                    {/* Dropdown 和 Toggle 開關區域 */}
+                    <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'wrap'}}>
+                        {/* Type Dropdown */}
+                        <FormControl variant="outlined" size="small" sx={{minWidth: 120, mr: 2}}>
+                            <InputLabel id="type-select-label" sx={{color: '#FF69B4'}}>年份</InputLabel>
+                            <Select
+                                labelId="type-select-label"
+                                id="type-select"
+                                value={selectedType}
+                                onChange={(e) => setSelectedType(e.target.value)}
+                                label="年份"
+                                sx={{
                                     color: '#FF69B4',
-                                    fontWeight: 'bold',
-                                    fontSize: {
-                                        xs: '0.8rem',
-                                        sm: '1rem',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#FF69B4',
                                     },
-                                },
-                            }}
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={viewedOnly}
-                                    onChange={(e) => setViewedOnly(e.target.checked)}
-                                    color="secondary"
-                                />
-                            }
-                            label="已觀看"
-                            sx={{
-                                '& .MuiFormControlLabel-label': {
-                                    color: '#FF69B4',
-                                    fontWeight: 'bold',
-                                    fontSize: {
-                                        xs: '0.8rem',
-                                        sm: '1rem',
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#FF69B4',
                                     },
-                                },
-                            }}
-                        />
-                    </FormGroup>
+                                    '& .MuiSvgIcon-root': {
+                                        color: '#FF69B4',
+                                    },
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>全部</em>
+                                </MenuItem>
+                                <MenuItem value="2024">2024</MenuItem>
+                                <MenuItem value="2023">2023</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        {/* Toggle 開關區域 */}
+                        <FormGroup sx={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={featuredOnly}
+                                        onChange={(e) => setFeaturedOnly(e.target.checked)}
+                                        color="secondary"
+                                    />
+                                }
+                                label="精選"
+                                sx={{
+                                    mr: 2,
+                                    '& .MuiFormControlLabel-label': {
+                                        color: '#FF69B4',
+                                        fontWeight: 'bold',
+                                        fontSize: {
+                                            xs: '0.8rem',
+                                            sm: '1rem',
+                                        },
+                                    },
+                                }}
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={viewedOnly}
+                                        onChange={(e) => setViewedOnly(e.target.checked)}
+                                        color="secondary"
+                                    />
+                                }
+                                label="已觀看"
+                                sx={{
+                                    '& .MuiFormControlLabel-label': {
+                                        color: '#FF69B4',
+                                        fontWeight: 'bold',
+                                        fontSize: {
+                                            xs: '0.8rem',
+                                            sm: '1rem',
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormGroup>
+                    </Box>
                 </Toolbar>
             </AppBar>
 
