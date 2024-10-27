@@ -103,7 +103,6 @@ const FileScreenshotList = () => {
         setHasMore(true);
         // 抓取第一頁數據
         fetchAlbums(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [featuredOnly, viewedOnly, selectedType]);
 
     return (
