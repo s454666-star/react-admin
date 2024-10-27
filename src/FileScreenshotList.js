@@ -30,6 +30,8 @@ const FileScreenshotList = () => {
     const [viewedOnly, setViewedOnly] = useState(false); // 「已觀看」開關狀態
     const [loading, setLoading] = useState(false); // 防止多次請求
 
+    const PER_PAGE = 20; // 每頁數量
+
     // 定義脈動動畫
     const pulse = keyframes`
         0% {
@@ -53,7 +55,7 @@ const FileScreenshotList = () => {
 
         try {
             // 構建查詢參數
-            let query = `page=${pageToFetch}&perPage=20`;
+            let query = `page=${pageToFetch}&perPage=${PER_PAGE}`;
             if (featuredOnly) {
                 query += `&rating=1.00`;
             }
@@ -68,11 +70,14 @@ const FileScreenshotList = () => {
             const result = await response.json();
             const {data} = result;
 
-            if (!Array.isArray(data) || data.length === 0) {
+            if (!Array.isArray(data)) {
                 setHasMore(false);
             } else {
                 setAlbums((prev) => [...prev, ...data]);
                 setPage((prev) => prev + 1);
+                if (data.length < PER_PAGE) {
+                    setHasMore(false);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch albums:", error);
@@ -91,12 +96,6 @@ const FileScreenshotList = () => {
         // 抓取第一頁數據
         fetchAlbums(1);
     }, [featuredOnly, viewedOnly]);
-
-    // 不再依賴 page 來自動抓取，改由 InfiniteScroll 控制抓取
-    // 移除以下 useEffect
-    // useEffect(() => {
-    //     fetchAlbums();
-    // }, [featuredOnly, viewedOnly, page]);
 
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
