@@ -5,6 +5,7 @@ import {Card, CardMedia, CardContent, Typography, Grid, AppBar, Toolbar, Box, Ch
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import {Helmet} from 'react-helmet';
 import {API_BASE_URL} from './config';
+import {keyframes} from '@mui/system';
 
 const FileScreenshotList = () => {
     const redirect = useRedirect();
@@ -34,6 +35,22 @@ const FileScreenshotList = () => {
     useEffect(() => {
         fetchAlbums();
     }, []);
+
+    // 定義脈動動畫
+    const pulse = keyframes`
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7);
+        }
+        70% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 10px rgba(255, 105, 180, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
+        }
+    `;
 
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
@@ -86,10 +103,35 @@ const FileScreenshotList = () => {
                                         justifyContent: 'space-between',
                                         flexWrap: 'wrap'
                                     }}>
-                                        <Typography variant="body1" component="div" color="#880E4F" fontWeight="bold"
-                                                    sx={{flexGrow: 1, textAlign: 'center'}}>
-                                            {album.file_name}
-                                        </Typography>
+                                        <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap'}}>
+                                            {album.rating === "1.00" || album.rating === 1 ? (
+                                                <Chip
+                                                    label="精選"
+                                                    size="small"
+                                                    sx={{
+                                                        mr: 1,
+                                                        backgroundColor: album.theme_color || '#FF69B4',
+                                                        color: '#FFF',
+                                                        fontWeight: 'bold',
+                                                        animation: `${pulse} 2s infinite`,
+                                                        // 添加其他視覺效果
+                                                        boxShadow: `0 0 10px ${album.theme_color || '#FF69B4'}`,
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <Typography variant="body1" component="div" color="#880E4F"
+                                                        fontWeight="bold"
+                                                        sx={{
+                                                            flexGrow: 1,
+                                                            textAlign: 'center',
+                                                            whiteSpace: 'nowrap',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis'
+                                                        }}
+                                                        title={album.file_name}>
+                                                {album.file_name}
+                                            </Typography>
+                                        </Box>
                                         {album.is_view === 1 && (
                                             <Chip
                                                 label="已觀看"
