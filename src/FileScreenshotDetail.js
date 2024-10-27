@@ -1,15 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
-    Container,
-    Typography,
-    Card,
-    CardMedia,
-    Grid,
-    AppBar,
-    Toolbar,
-    IconButton,
-    Snackbar,
-    Alert
+    Container, Typography, Card, CardMedia, Grid, AppBar, Toolbar, IconButton, Snackbar, Alert, Box
 } from '@mui/material';
 import {ToggleButton} from '@mui/lab'; // Import ToggleButton
 import {useParams, useNavigate} from 'react-router-dom';
@@ -44,11 +35,9 @@ const FileScreenshotDetail = () => {
         const updateIsViewStatus = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/is-view`, {
-                    method: 'PUT',
-                    headers: {
+                    method: 'PUT', headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({is_view: true}),
+                    }, body: JSON.stringify({is_view: true}),
                 });
 
                 if (!response.ok) {
@@ -76,11 +65,9 @@ const FileScreenshotDetail = () => {
         if (holdDuration >= 500) { // 超過0.5秒
             try {
                 const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/cover-image`, {
-                    method: 'PUT',
-                    headers: {
+                    method: 'PUT', headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({cover_image: url}),
+                    }, body: JSON.stringify({cover_image: url}),
                 });
 
                 if (response.ok) {
@@ -101,11 +88,9 @@ const FileScreenshotDetail = () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}file-screenshots/${id}/rating`, {
-                method: 'PUT',
-                headers: {
+                method: 'PUT', headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({rating: newRating}),
+                }, body: JSON.stringify({rating: newRating}),
             });
 
             if (!response.ok) {
@@ -120,8 +105,7 @@ const FileScreenshotDetail = () => {
 
     const screenshotUrls = album.screenshot_paths ? album.screenshot_paths.split(',') : [];
 
-    return (
-        <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
+    return (<div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
             <AppBar position="sticky" sx={{backgroundColor: '#FFD0FF'}}>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" onClick={() => navigate(-1)}>
@@ -135,8 +119,29 @@ const FileScreenshotDetail = () => {
             </AppBar>
 
             <Container sx={{paddingTop: '20px'}}>
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Typography variant="h4" gutterBottom sx={{color: '#FF69B4', marginRight: '8px'}}>
+                {/* 使用 Box 進行彈性布局 */}
+                <Box
+                    sx={{
+                        display: 'flex', alignItems: 'center', flexWrap: 'nowrap', overflow: 'hidden',
+                    }}
+                >
+                    <Typography
+                        variant="h4"
+                        gutterBottom
+                        sx={{
+                            color: '#FF69B4',
+                            marginRight: '8px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            flexGrow: 1,
+                            fontSize: {
+                                xs: '1.2rem', // 手機版字體縮小
+                                sm: '1.5rem', md: '2rem',
+                            },
+                        }}
+                        title={album.file_name} // 顯示完整名稱在懸浮提示中
+                    >
                         {album.file_name}
                     </Typography>
 
@@ -146,16 +151,23 @@ const FileScreenshotDetail = () => {
                         selected={rating === 1}
                         onChange={handleRatingToggle}
                         sx={{
-                            color: '#FF69B4',
-                            '&.Mui-selected': {
-                                backgroundColor: '#FF69B4',
-                                color: '#FFF',
+                            color: '#FF69B4', height: {
+                                xs: '30px', // 手機版高度縮小
+                                sm: '36px', md: '40px',
+                            }, padding: {
+                                xs: '0 8px', // 手機版內邊距縮小
+                                sm: '0 12px',
+                            }, fontSize: {
+                                xs: '0.75rem', // 手機版字體縮小
+                                sm: '0.875rem', md: '1rem',
+                            }, '&.Mui-selected': {
+                                backgroundColor: '#FF69B4', color: '#FFF',
                             },
                         }}
                     >
                         精選
                     </ToggleButton>
-                </div>
+                </Box>
 
                 <div style={{marginBottom: '20px'}}>
                     <ReactPlayer
@@ -164,16 +176,13 @@ const FileScreenshotDetail = () => {
                         width="100%"
                         height="400px"
                         style={{
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                            boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
+                            borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
                         }}
                     />
                 </div>
 
                 <Grid container spacing={2}>
-                    {screenshotUrls.map((url, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
+                    {screenshotUrls.map((url, index) => (<Grid item xs={12} sm={6} md={4} key={index}>
                             <Card
                                 sx={{
                                     maxWidth: 345,
@@ -181,8 +190,7 @@ const FileScreenshotDetail = () => {
                                     backgroundColor: '#FFF0F5',
                                     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                                     '&:hover': {
-                                        transform: 'scale(1.05)',
-                                        boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
+                                        transform: 'scale(1.05)', boxShadow: '0 4px 20px rgba(255, 105, 180, 0.4)',
                                     },
                                 }}
                                 onMouseDown={() => handleLongPressStart(url)}
@@ -191,8 +199,7 @@ const FileScreenshotDetail = () => {
                             >
                                 <CardMedia component="img" height="200" image={url} alt={`Screenshot ${index + 1}`}/>
                             </Card>
-                        </Grid>
-                    ))}
+                        </Grid>))}
                 </Grid>
 
                 {/* Snackbar for success message */}
@@ -207,8 +214,7 @@ const FileScreenshotDetail = () => {
                     </Alert>
                 </Snackbar>
             </Container>
-        </div>
-    );
+        </div>);
 };
 
 export default FileScreenshotDetail;
