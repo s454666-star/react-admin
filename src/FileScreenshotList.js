@@ -125,7 +125,6 @@ const FileScreenshotList = () => {
                     <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'wrap'}}>
                         {/* Type Dropdown */}
                         <FormControl variant="outlined" size="small" sx={{minWidth: 120, mr: 2}}>
-                            <InputLabel id="type-select-label" sx={{color: '#FF69B4'}}>年份</InputLabel>
                             <Select
                                 labelId="type-select-label"
                                 id="type-select"
@@ -148,8 +147,8 @@ const FileScreenshotList = () => {
                                 <MenuItem value="">
                                     <em>全部</em>
                                 </MenuItem>
-                                <MenuItem value="2024">2024</MenuItem>
-                                <MenuItem value="2023">2023</MenuItem>
+                                <MenuItem value="1">2024</MenuItem>
+                                <MenuItem value="2">2023</MenuItem>
                             </Select>
                         </FormControl>
 
