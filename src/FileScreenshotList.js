@@ -28,6 +28,7 @@ const FileScreenshotList = () => {
     const [hasMore, setHasMore] = useState(true);
     const [featuredOnly, setFeaturedOnly] = useState(false); // 「精選」開關狀態
     const [viewedOnly, setViewedOnly] = useState(false); // 「已觀看」開關狀態
+    const [loading, setLoading] = useState(false); // 防止多次請求
 
     // 定義脈動動畫
     const pulse = keyframes`
@@ -45,10 +46,14 @@ const FileScreenshotList = () => {
         }
     `;
 
-    const fetchAlbums = async () => {
+    const fetchAlbums = async (pageToFetch) => {
+        // 防止重複請求
+        if (loading) return;
+        setLoading(true);
+
         try {
             // 構建查詢參數
-            let query = `page=${page}&perPage=20`;
+            let query = `page=${pageToFetch}&perPage=20`;
             if (featuredOnly) {
                 query += `&rating=1.00`;
             }
@@ -57,6 +62,9 @@ const FileScreenshotList = () => {
             }
 
             const response = await fetch(`${API_BASE_URL}file-screenshots?${query}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const result = await response.json();
             const {data} = result;
 
@@ -69,6 +77,8 @@ const FileScreenshotList = () => {
         } catch (error) {
             console.error("Failed to fetch albums:", error);
             setHasMore(false);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,11 +88,16 @@ const FileScreenshotList = () => {
         setAlbums([]);
         setPage(1);
         setHasMore(true);
+        // 抓取第一頁數據
+        fetchAlbums(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [featuredOnly, viewedOnly]);
 
-    useEffect(() => {
-        fetchAlbums();
-    }, [featuredOnly, viewedOnly, page]);
+    // 不再依賴 page 來自動抓取，改由 InfiniteScroll 控制抓取
+    // 移除以下 useEffect
+    // useEffect(() => {
+    //     fetchAlbums();
+    // }, [featuredOnly, viewedOnly, page]);
 
     return (
         <div style={{backgroundColor: '#FFE6F1', minHeight: '100vh'}}>
@@ -149,7 +164,7 @@ const FileScreenshotList = () => {
 
             <InfiniteScroll
                 dataLength={albums.length}
-                next={fetchAlbums}
+                next={() => fetchAlbums(page)}
                 hasMore={hasMore}
                 loader={<h4 style={{textAlign: 'center', color: '#FF69B4'}}>載入中...</h4>}
                 endMessage={<p style={{textAlign: 'center', color: '#FF69B4'}}>已無更多相簿</p>}
