@@ -125,6 +125,7 @@ const FileScreenshotList = () => {
                     <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'wrap'}}>
                         {/* Type Dropdown */}
                         <FormControl variant="outlined" size="small" sx={{minWidth: 120, mr: 2}}>
+                            <InputLabel id="type-select-label" sx={{color: '#FF69B4'}}>類型</InputLabel>
                             <Select
                                 labelId="type-select-label"
                                 id="type-select"
