@@ -22,12 +22,14 @@ import {
     useRecordContext,
     useInput,
     ImageField,
-    Responsive,
     SimpleList
 } from 'react-admin';
 import {Card, CardContent, CardHeader, Box, Typography} from '@mui/material';
 import {makeStyles} from '@mui/styles';
 import {useDropzone} from 'react-dropzone';
+import {Helmet} from 'react-helmet'; // 導入 Helmet
+import {useTheme} from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -135,11 +137,17 @@ const ImageBase64Input = (props) => {
 
 // 商品清單頁面
 export const ProductList = (props) => {
-    const classes = useStyles();
+    const theme = useTheme();
+    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
-        <List {...props} title="商品清單">
-            <Responsive
-                small={
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png"/>
+            </Helmet>
+            <List {...props} title="商品清單">
+                {isSmall ? (
                     <SimpleList
                         primaryText={record => record.product_name}
                         secondaryText={record => `$${record.price}`}
@@ -147,8 +155,7 @@ export const ProductList = (props) => {
                         leftAvatar={<ImageField source="image_base64"/>}
                         linkType="edit"
                     />
-                }
-                medium={
+                ) : (
                     <Datagrid rowClick="edit">
                         <TextField source="id" label="編號"/>
                         <ImageField
@@ -169,9 +176,9 @@ export const ProductList = (props) => {
                         <EditButton/>
                         <DeleteButton/>
                     </Datagrid>
-                }
-            />
-        </List>
+                )}
+            </List>
+        </>
     );
 };
 
@@ -189,36 +196,42 @@ export const ProductCreate = (props) => {
     };
 
     return (
-        <Create {...props} mutationOptions={{onSuccess}} title="新增商品">
-            <SimpleForm toolbar={<CustomToolbar/>} redirect="list">
-                <Card className={classes.card}>
-                    <CardHeader className={classes.header} title="新增商品"/>
-                    <CardContent>
-                        <ReferenceInput source="category_id" reference="product-categories" label="商品類別"
-                                        validate={required()}>
-                            <SelectInput optionText="category_name"/>
-                        </ReferenceInput>
-                        <TextInput source="product_name" label="商品名稱" validate={required()}/>
-                        <NumberInput source="price" label="價格" validate={required()}/>
-                        <NumberInput source="stock_quantity" label="庫存數量" validate={required()}/>
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png"/>
+            </Helmet>
+            <Create {...props} mutationOptions={{onSuccess}} title="新增商品">
+                <SimpleForm toolbar={<CustomToolbar/>} redirect="list">
+                    <Card className={classes.card}>
+                        <CardHeader className={classes.header} title="新增商品"/>
+                        <CardContent>
+                            <ReferenceInput source="category_id" reference="product-categories" label="商品類別"
+                                            validate={required()}>
+                                <SelectInput optionText="category_name"/>
+                            </ReferenceInput>
+                            <TextInput source="product_name" label="商品名稱" validate={required()}/>
+                            <NumberInput source="price" label="價格" validate={required()}/>
+                            <NumberInput source="stock_quantity" label="庫存數量" validate={required()}/>
 
-                        {/* 使用自定義的圖片輸入組件 */}
-                        <ImageBase64Input source="image_base64" validate={required()}/>
+                            {/* 使用自定義的圖片輸入組件 */}
+                            <ImageBase64Input source="image_base64" validate={required()}/>
 
-                        <SelectInput
-                            source="status"
-                            label="狀態"
-                            choices={[
-                                {id: 'available', name: '可用'},
-                                {id: 'out_of_stock', name: '缺貨'},
-                                {id: 'discontinued', name: '已停產'},
-                            ]}
-                            validate={required()}
-                        />
-                    </CardContent>
-                </Card>
-            </SimpleForm>
-        </Create>
+                            <SelectInput
+                                source="status"
+                                label="狀態"
+                                choices={[
+                                    {id: 'available', name: '可用'},
+                                    {id: 'out_of_stock', name: '缺貨'},
+                                    {id: 'discontinued', name: '已停產'},
+                                ]}
+                                validate={required()}
+                            />
+                        </CardContent>
+                    </Card>
+                </SimpleForm>
+            </Create>
+        </>
     );
 };
 
@@ -237,35 +250,41 @@ export const ProductEdit = (props) => {
     };
 
     return (
-        <Edit {...props} onSuccess={onSuccess} title="編輯商品">
-            <SimpleForm toolbar={<CustomToolbar/>}>
-                <Card className={classes.card}>
-                    <CardHeader className={classes.header} title="編輯商品"/>
-                    <CardContent>
-                        <ReferenceInput source="category_id" reference="product-categories" label="商品類別"
-                                        validate={required()}>
-                            <SelectInput optionText="category_name"/>
-                        </ReferenceInput>
-                        <TextInput source="product_name" label="商品名稱" validate={required()}/>
-                        <NumberInput source="price" label="價格" validate={required()}/>
-                        <NumberInput source="stock_quantity" label="庫存數量" validate={required()}/>
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png"/>
+            </Helmet>
+            <Edit {...props} onSuccess={onSuccess} title="編輯商品">
+                <SimpleForm toolbar={<CustomToolbar/>}>
+                    <Card className={classes.card}>
+                        <CardHeader className={classes.header} title="編輯商品"/>
+                        <CardContent>
+                            <ReferenceInput source="category_id" reference="product-categories" label="商品類別"
+                                            validate={required()}>
+                                <SelectInput optionText="category_name"/>
+                            </ReferenceInput>
+                            <TextInput source="product_name" label="商品名稱" validate={required()}/>
+                            <NumberInput source="price" label="價格" validate={required()}/>
+                            <NumberInput source="stock_quantity" label="庫存數量" validate={required()}/>
 
-                        {/* 使用自定義的圖片輸入組件 */}
-                        <ImageBase64Input source="image_base64" validate={required()}/>
+                            {/* 使用自定義的圖片輸入組件 */}
+                            <ImageBase64Input source="image_base64" validate={required()}/>
 
-                        <SelectInput
-                            source="status"
-                            label="狀態"
-                            choices={[
-                                {id: 'available', name: '可用'},
-                                {id: 'out_of_stock', name: '缺貨'},
-                                {id: 'discontinued', name: '已停產'},
-                            ]}
-                            validate={required()}
-                        />
-                    </CardContent>
-                </Card>
-            </SimpleForm>
-        </Edit>
+                            <SelectInput
+                                source="status"
+                                label="狀態"
+                                choices={[
+                                    {id: 'available', name: '可用'},
+                                    {id: 'out_of_stock', name: '缺貨'},
+                                    {id: 'discontinued', name: '已停產'},
+                                ]}
+                                validate={required()}
+                            />
+                        </CardContent>
+                    </Card>
+                </SimpleForm>
+            </Edit>
+        </>
     );
 };
