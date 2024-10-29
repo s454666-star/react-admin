@@ -4,11 +4,11 @@ import {Admin, Resource} from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
-import {ThemeProvider, createTheme} from '@mui/material/styles';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 import httpClient from './dataProvider';
-import {ProductList, ProductCreate, ProductEdit} from './Product';
-import {ProductCategoryList, ProductCategoryCreate, ProductCategoryEdit} from './ProductCategory';
+import {ProductCreate, ProductEdit, ProductList} from './Product';
+import {ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList} from './ProductCategory';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
@@ -18,6 +18,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
+import ProductFront from "./ProductFront";
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -165,6 +166,7 @@ const App = () => (
                 <Route exact path="/star-album/*" element={<StarAlbum/>}/>
                 <Route exact path="/star-video/*" element={<FileScreenshotList/>}/>
                 <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
+                <Route exact path="/product" element={<ProductFront/>}/>
                 <Route
                     path="*"
                     element={(
