@@ -166,7 +166,7 @@ const App = () => (
                 <Route exact path="/star-album/*" element={<StarAlbum/>}/>
                 <Route exact path="/star-video/*" element={<FileScreenshotList/>}/>
                 <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
-                <Route exact path="/product" element={<ProductFront/>}/>
+                <Route exact path="/star-mall" element={<ProductFront/>}/>
                 <Route
                     path="*"
                     element={(
