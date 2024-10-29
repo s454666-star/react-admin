@@ -25,6 +25,8 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
+import MemberRegister from './MemberRegister';
+import Modal from '@mui/material/Modal';
 
 const appTheme = createTheme({
     palette: {
@@ -132,6 +134,18 @@ const ProductFront = () => {
         setError('');
     };
 
+    const [openRegisterModal, setOpenRegisterModal] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 根據實際情況設定
+
+    const handleAddToCart = (product) => {
+        if (!isLoggedIn) {
+            setOpenRegisterModal(true);
+        } else {
+            // 加入購物車的邏輯
+        }
+    };
+
+
     return (
         <ThemeProvider theme={appTheme}>
             <div>
@@ -145,8 +159,17 @@ const ProductFront = () => {
                     sx={{ marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main }}
                 >
                     <Toolbar>
-                        <Typography variant="h6">星夜電商平台</Typography>
+                        <Typography variant="h6" sx={{ flexGrow: 1 }}>星夜電商</Typography>
+                        {!isLoggedIn ? (
+                            <>
+                                <Button color="inherit" onClick={() => setOpenRegisterModal(true)}>註冊</Button>
+                                {/* 登入按鈕 */}
+                            </>
+                        ) : (
+                            <Typography variant="body1">歡迎，{memberName}</Typography>
+                        )}
                     </Toolbar>
+
                 </AppBar>
 
                 <Container>
@@ -257,7 +280,7 @@ const ProductFront = () => {
                                                 </Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <Button size="small" color="primary">
+                                                <Button size="small" color="primary" onClick={() => handleAddToCart(product)}>
                                                     加入購物車
                                                 </Button>
                                                 <Button size="small" color="primary">
@@ -270,6 +293,12 @@ const ProductFront = () => {
                             })}
                         </Grid>
                     )}
+
+                    <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
+                        <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
+                            <MemberRegister onClose={() => setOpenRegisterModal(false)} />
+                        </Box>
+                    </Modal>
 
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
                         <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>

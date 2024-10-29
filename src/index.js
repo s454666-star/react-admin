@@ -167,6 +167,7 @@ const App = () => (
                 <Route exact path="/star-video/*" element={<FileScreenshotList/>}/>
                 <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
                 <Route exact path="/star-mall" element={<ProductFront/>}/>
+                <Route exact path="/member-register" element={<MemberRegister />} />
                 <Route
                     path="*"
                     element={(
