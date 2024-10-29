@@ -43,7 +43,7 @@ const ProductFront = () => {
     const theme = useTheme();
 
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(null); // 改為 null
     const [products, setProducts] = useState([]);
     const [totalProducts, setTotalProducts] = useState(0);
     const [sortField, setSortField] = useState('id');
@@ -81,7 +81,7 @@ const ProductFront = () => {
                 const sort = [sortField, sortDirection];
 
                 const filter = {};
-                if (selectedCategory) filter.category_id = selectedCategory;
+                if (selectedCategory !== null) filter.category_id = selectedCategory;
                 if (searchQuery) filter.q = searchQuery;
 
                 const params = {
@@ -90,8 +90,10 @@ const ProductFront = () => {
                 };
 
                 if (Object.keys(filter).length > 0) {
-                    params.filter = JSON.stringify(filter); // 繼續使用 JSON 字串傳遞
+                    params.filter = JSON.stringify(filter);
                 }
+
+                console.log('Fetching products with params:', params); // 添加日誌以便調試
 
                 const response = await axios.get(`${API_URL}/products`, { params });
 
@@ -108,9 +110,10 @@ const ProductFront = () => {
     }, [selectedCategory, sortField, sortDirection, searchQuery]);
 
     const handleCategorySelect = (categoryId) => {
-        // 確保 categoryId 為數字類型
         const numericCategoryId = Number(categoryId);
-        setSelectedCategory(numericCategoryId === selectedCategory ? '' : numericCategoryId);
+        setSelectedCategory((prevCategory) =>
+            prevCategory === numericCategoryId ? null : numericCategoryId
+        );
     };
 
     const handleSortFieldChange = (event) => {
