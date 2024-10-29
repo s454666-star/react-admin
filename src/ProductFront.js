@@ -108,7 +108,9 @@ const ProductFront = () => {
     }, [selectedCategory, sortField, sortDirection, searchQuery]);
 
     const handleCategorySelect = (categoryId) => {
-        setSelectedCategory(categoryId === selectedCategory ? '' : categoryId);
+        // 確保 categoryId 為數字類型
+        const numericCategoryId = Number(categoryId);
+        setSelectedCategory(numericCategoryId === selectedCategory ? '' : numericCategoryId);
     };
 
     const handleSortFieldChange = (event) => {
@@ -209,7 +211,7 @@ const ProductFront = () => {
                                     }
                                 } else {
                                     // 設定預設圖片（可選）
-                                    imageSrc = '/path/to/default/image.png';
+                                    imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
                                 }
 
                                 return (
@@ -223,13 +225,14 @@ const ProductFront = () => {
                                             }}
                                         >
                                             <CardMedia
+                                                component="img"
+                                                height="140"
+                                                src={imageSrc}
+                                                alt={product.product_name}
                                                 sx={{
-                                                    height: 140,
-                                                    backgroundSize: 'contain',
+                                                    objectFit: 'contain',
                                                     marginTop: theme.spacing(2),
                                                 }}
-                                                image={imageSrc}
-                                                title={product.product_name}
                                             />
                                             <CardContent>
                                                 <Typography gutterBottom variant="h6" component="div">
