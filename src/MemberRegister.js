@@ -25,7 +25,7 @@ const MemberRegister = ({ onClose }) => {
     const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value});
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
@@ -35,6 +35,7 @@ const MemberRegister = ({ onClose }) => {
             setSuccess(response.data.message);
             setError('');
             // 可在此處執行其他操作，例如自動登入或關閉註冊窗口
+            if (onClose) onClose();
         } catch (err) {
             setError(err.response.data.message || '註冊失敗');
             setSuccess('');
