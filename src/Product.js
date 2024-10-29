@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
     List,
     Datagrid,
@@ -21,7 +21,6 @@ import {
     ReferenceInput,
     useRecordContext,
     useInput,
-    SimpleList
 } from 'react-admin';
 import {
     Card,
@@ -29,7 +28,7 @@ import {
     CardHeader,
     Box,
     Typography,
-    Avatar
+    Avatar,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDropzone } from 'react-dropzone';
@@ -37,7 +36,7 @@ import { Helmet } from 'react-helmet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-// Custom styles
+// 自定義樣式
 const useStyles = makeStyles({
     card: {
         backgroundColor: '#f5f5f5',
@@ -68,14 +67,14 @@ const useStyles = makeStyles({
     },
 });
 
-// Custom Toolbar
+// 自定義 Toolbar
 const CustomToolbar = props => (
     <Toolbar {...props}>
         <SaveButton />
     </Toolbar>
 );
 
-// Custom ImageBase64Input component
+// 自定義的 ImageBase64Input 組件
 const ImageBase64Input = (props) => {
     const classes = useStyles();
     const {
@@ -99,7 +98,7 @@ const ImageBase64Input = (props) => {
             if (file) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    onChange(reader.result); // Update the image_base64 field
+                    onChange(reader.result); // 更新表單的 image_base64 欄位
                 };
                 reader.readAsDataURL(file);
             }
@@ -146,26 +145,27 @@ const ImageBase64Input = (props) => {
     );
 };
 
-// Custom Image Field for base64 images
-const MyImageField = ({ source, record = {} }) => (
-    <img
-        src={record[source]}
-        alt=""
-        style={{
-            maxWidth: 100,
-            height: 'auto',
-            objectFit: 'contain',
-            display: 'block',
-            margin: '0 auto',
-        }}
-    />
-);
+// 自定義圖片顯示組件
+const MyImageField = ({ source }) => {
+    const record = useRecordContext();
+    if (!record || !record[source]) return null;
+    return (
+        <img
+            src={record[source]}
+            alt="商品圖片"
+            style={{
+                maxWidth: 100,
+                height: 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                margin: '0 auto',
+            }}
+        />
+    );
+};
 
-// Product List Page
+// 商品清單頁面
 export const ProductList = (props) => {
-    const theme = useTheme();
-    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-
     return (
         <>
             <Helmet>
@@ -173,32 +173,22 @@ export const ProductList = (props) => {
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
             <List {...props} title="商品清單">
-                {isSmall ? (
-                    <SimpleList
-                        primaryText={record => record.product_name}
-                        secondaryText={record => `$${record.price}`}
-                        tertiaryText={record => record.status}
-                        leftAvatar={record => <Avatar src={record.image_base64} />}
-                        linkType="edit"
-                    />
-                ) : (
-                    <Datagrid rowClick="edit">
-                        <TextField source="id" label="編號" />
-                        <MyImageField source="image_base64" label="商品圖片" />
-                        <TextField source="product_name" label="商品名稱" />
-                        <NumberField source="price" label="價格" />
-                        <NumberField source="stock_quantity" label="庫存數量" />
-                        <TextField source="status" label="狀態" />
-                        <EditButton />
-                        <DeleteButton />
-                    </Datagrid>
-                )}
+                <Datagrid>
+                    <TextField source="id" label="編號" />
+                    <MyImageField source="image_base64" label="商品圖片" />
+                    <TextField source="product_name" label="商品名稱" />
+                    <NumberField source="price" label="價格" />
+                    <NumberField source="stock_quantity" label="庫存數量" />
+                    <TextField source="status" label="狀態" />
+                    <EditButton />
+                    <DeleteButton />
+                </Datagrid>
             </List>
         </>
     );
 };
 
-// Product Create Page
+// 商品新增頁面
 export const ProductCreate = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
@@ -234,7 +224,7 @@ export const ProductCreate = (props) => {
                             <NumberInput source="price" label="價格" validate={required()} />
                             <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
 
-                            {/* Use the custom image input component */}
+                            {/* 使用自定義的圖片輸入組件 */}
                             <ImageBase64Input source="image_base64" validate={required()} />
 
                             <SelectInput
@@ -255,7 +245,7 @@ export const ProductCreate = (props) => {
     );
 };
 
-// Product Edit Page
+// 商品編輯頁面
 export const ProductEdit = (props) => {
     const notify = useNotify();
     const redirect = useRedirect();
@@ -291,7 +281,7 @@ export const ProductEdit = (props) => {
                             <NumberInput source="price" label="價格" validate={required()} />
                             <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
 
-                            {/* Use the custom image input component */}
+                            {/* 使用自定義的圖片輸入組件 */}
                             <ImageBase64Input source="image_base64" validate={required()} />
 
                             <SelectInput
