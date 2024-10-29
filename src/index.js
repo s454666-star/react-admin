@@ -19,6 +19,7 @@ import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
+import MemberRegister from "./MemberRegister";
 
 const customTraditionalChineseMessages = {
     ra: {
