@@ -197,55 +197,71 @@ const ProductFront = () => {
                         </Box>
                     ) : (
                         <Grid container spacing={4}>
-                            {products.map((product) => (
-                                <Grid item key={product.id} xs={12} sm={6} md={4}>
-                                    <Card
-                                        sx={{
-                                            transition: 'transform 0.2s',
-                                            '&:hover': {
-                                                transform: 'scale(1.05)',
-                                            },
-                                        }}
-                                    >
-                                        <CardMedia
+                            {products.map((product) => {
+                                // 處理圖片來源
+                                let imageSrc = '';
+                                if (product.image_base64) {
+                                    if (product.image_base64.startsWith('data:image')) {
+                                        imageSrc = product.image_base64;
+                                    } else {
+                                        // 假設圖片格式為 PNG，如果有其他格式，請根據實際情況修改
+                                        imageSrc = `data:image/png;base64,${product.image_base64}`;
+                                    }
+                                } else {
+                                    // 設定預設圖片（可選）
+                                    imageSrc = '/path/to/default/image.png';
+                                }
+
+                                return (
+                                    <Grid item key={product.id} xs={12} sm={6} md={4}>
+                                        <Card
                                             sx={{
-                                                height: 140,
-                                                backgroundSize: 'contain',
-                                                marginTop: theme.spacing(2),
+                                                transition: 'transform 0.2s',
+                                                '&:hover': {
+                                                    transform: 'scale(1.05)',
+                                                },
                                             }}
-                                            image={`data:image/png;base64,${product.image_base64}`} // 根據實際圖片格式調整 MIME 類型
-                                            title={product.product_name}
-                                        />
-                                        <CardContent>
-                                            <Typography gutterBottom variant="h6" component="div">
-                                                {product.product_name}
-                                            </Typography>
-                                            <Typography variant="body2" color="textSecondary">
-                                                價格：${product.price}
-                                            </Typography>
-                                            <Typography variant="body2" color="textSecondary">
-                                                庫存：{product.stock_quantity}
-                                            </Typography>
-                                            <Typography variant="body2" color="textSecondary">
-                                                狀態：
-                                                {product.status === 'available'
-                                                    ? '可用'
-                                                    : product.status === 'out_of_stock'
-                                                        ? '缺貨'
-                                                        : '已停產'}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Button size="small" color="primary">
-                                                加入購物車
-                                            </Button>
-                                            <Button size="small" color="primary">
-                                                詳細資訊
-                                            </Button>
-                                        </CardActions>
-                                    </Card>
-                                </Grid>
-                            ))}
+                                        >
+                                            <CardMedia
+                                                sx={{
+                                                    height: 140,
+                                                    backgroundSize: 'contain',
+                                                    marginTop: theme.spacing(2),
+                                                }}
+                                                image={imageSrc}
+                                                title={product.product_name}
+                                            />
+                                            <CardContent>
+                                                <Typography gutterBottom variant="h6" component="div">
+                                                    {product.product_name}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    價格：${product.price}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    庫存：{product.stock_quantity}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    狀態：
+                                                    {product.status === 'available'
+                                                        ? '可用'
+                                                        : product.status === 'out_of_stock'
+                                                            ? '缺貨'
+                                                            : '已停產'}
+                                                </Typography>
+                                            </CardContent>
+                                            <CardActions>
+                                                <Button size="small" color="primary">
+                                                    加入購物車
+                                                </Button>
+                                                <Button size="small" color="primary">
+                                                    詳細資訊
+                                                </Button>
+                                            </CardActions>
+                                        </Card>
+                                    </Grid>
+                                );
+                            })}
                         </Grid>
                     )}
 
