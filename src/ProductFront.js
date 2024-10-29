@@ -1,9 +1,10 @@
 // src/ProductFront.js
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Alert,
     AppBar,
+    Box,
     Button,
     Card,
     CardActions,
@@ -11,6 +12,7 @@ import {
     CardMedia,
     CircularProgress,
     Container,
+    createTheme,
     FormControl,
     Grid,
     InputLabel,
@@ -18,66 +20,29 @@ import {
     Select,
     Snackbar,
     TextField,
+    ThemeProvider,
     Toolbar,
     Typography,
-    ThemeProvider,
-    createTheme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import {useTheme} from '@mui/material/styles';
+import {Helmet} from 'react-helmet';
 import axios from 'axios';
 
 // 自定義主題（黎明藍）
-const theme = createTheme({
+const appTheme = createTheme({
     palette: {
         primary: {
             main: '#87CEFA', // 黎明藍
-        },
-        background: {
+        }, background: {
             default: '#f4f6f8',
         },
     },
 });
 
-// 自定義樣式
-const useStyles = makeStyles((theme) => ({
-    appBar: {
-        marginBottom: theme.spacing(4),
-        backgroundColor: theme.palette.primary.main,
-    },
-    categoryBar: {
-        marginBottom: theme.spacing(4),
-        display: 'flex',
-        overflowX: 'auto',
-    },
-    categoryButton: {
-        marginRight: theme.spacing(2),
-        whiteSpace: 'nowrap',
-    },
-    productCard: {
-        transition: 'transform 0.2s',
-        '&:hover': {
-            transform: 'scale(1.05)',
-        },
-    },
-    media: {
-        height: 140,
-        backgroundSize: 'contain',
-        marginTop: theme.spacing(2),
-    },
-    filterSortContainer: {
-        marginBottom: theme.spacing(4),
-    },
-    loadingContainer: {
-        display: 'flex',
-        justifyContent: 'center',
-        marginTop: theme.spacing(4),
-    },
-}));
-
 const API_URL = 'https://mystar.monster/api';
 
 const ProductFront = () => {
-    const classes = useStyles();
+    const theme = useTheme();
 
     // 狀態管理
     const [categories, setCategories] = useState([]);
@@ -97,8 +62,7 @@ const ProductFront = () => {
                 setLoading(true);
                 const response = await axios.get(`${API_URL}/product-categories`, {
                     params: {
-                        range: JSON.stringify([0, 100]),
-                        sort: JSON.stringify(['category_name', 'asc']),
+                        range: JSON.stringify([0, 100]), sort: JSON.stringify(['category_name', 'asc']),
                     },
                 });
                 setCategories(response.data);
@@ -131,9 +95,7 @@ const ProductFront = () => {
 
                 const response = await axios.get(`${API_URL}/products`, {
                     params: {
-                        range: JSON.stringify(range),
-                        sort: JSON.stringify(sort),
-                        filter: JSON.stringify(filter),
+                        range: JSON.stringify(range), sort: JSON.stringify(sort), filter: JSON.stringify(filter),
                     },
                 });
 
@@ -175,11 +137,18 @@ const ProductFront = () => {
         setError('');
     };
 
-    return (
-        <ThemeProvider theme={theme}>
+    return (<ThemeProvider theme={appTheme}>
             <div>
+                <Helmet>
+                    <title>星夜商城</title>
+                    <link rel="icon" href="/icon_198x278.png" type="image/png"/>
+                </Helmet>
+
                 {/* 頁面頂部 AppBar */}
-                <AppBar position="static" className={classes.appBar}>
+                <AppBar
+                    position="static"
+                    sx={{marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main}}
+                >
                     <Toolbar>
                         <Typography variant="h6">星夜電商平台</Typography>
                     </Toolbar>
@@ -187,22 +156,20 @@ const ProductFront = () => {
 
                 <Container>
                     {/* 商品分類置於頁面頂部 */}
-                    <div className={classes.categoryBar}>
-                        {categories.map((category) => (
-                            <Button
+                    <Box sx={{marginBottom: theme.spacing(4), display: 'flex', overflowX: 'auto'}}>
+                        {categories.map((category) => (<Button
                                 key={category.id}
                                 variant={selectedCategory === category.id ? 'contained' : 'outlined'}
                                 color="primary"
-                                className={classes.categoryButton}
+                                sx={{marginRight: theme.spacing(2), whiteSpace: 'nowrap'}}
                                 onClick={() => handleCategorySelect(category.id)}
                             >
                                 {category.category_name}
-                            </Button>
-                        ))}
-                    </div>
+                            </Button>))}
+                    </Box>
 
                     {/* 篩選與排序 */}
-                    <Grid container spacing={2} className={classes.filterSortContainer}>
+                    <Grid container spacing={2} sx={{marginBottom: theme.spacing(4)}}>
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth
@@ -235,17 +202,21 @@ const ProductFront = () => {
                     </Grid>
 
                     {/* 商品列表 */}
-                    {loading ? (
-                        <div className={classes.loadingContainer}>
-                            <CircularProgress />
-                        </div>
-                    ) : (
-                        <Grid container spacing={4}>
-                            {products.map((product) => (
-                                <Grid item key={product.id} xs={12} sm={6} md={4}>
-                                    <Card className={classes.productCard}>
+                    {loading ? (<Box sx={{display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4)}}>
+                            <CircularProgress/>
+                        </Box>) : (<Grid container spacing={4}>
+                            {products.map((product) => (<Grid item key={product.id} xs={12} sm={6} md={4}>
+                                    <Card
+                                        sx={{
+                                            transition: 'transform 0.2s', '&:hover': {
+                                                transform: 'scale(1.05)',
+                                            },
+                                        }}
+                                    >
                                         <CardMedia
-                                            className={classes.media}
+                                            sx={{
+                                                height: 140, backgroundSize: 'contain', marginTop: theme.spacing(2),
+                                            }}
                                             image={product.image_base64}
                                             title={product.product_name}
                                         />
@@ -260,7 +231,8 @@ const ProductFront = () => {
                                                 庫存：{product.stock_quantity}
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
-                                                狀態：{product.status === 'available' ? '可用' : product.status === 'out_of_stock' ? '缺貨' : '已停產'}
+                                                狀態：
+                                                {product.status === 'available' ? '可用' : product.status === 'out_of_stock' ? '缺貨' : '已停產'}
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
@@ -272,21 +244,18 @@ const ProductFront = () => {
                                             </Button>
                                         </CardActions>
                                     </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    )}
+                                </Grid>))}
+                        </Grid>)}
 
                     {/* 錯誤訊息 */}
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
-                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+                        <Alert onClose={handleCloseError} severity="error" sx={{width: '100%'}}>
                             {error}
                         </Alert>
                     </Snackbar>
                 </Container>
             </div>
-        </ThemeProvider>
-    );
+        </ThemeProvider>);
 };
 
 export default ProductFront;
