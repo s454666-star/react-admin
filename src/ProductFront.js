@@ -90,7 +90,7 @@ const ProductFront = () => {
                 };
 
                 if (Object.keys(filter).length > 0) {
-                    params.filter = filter; // 直接傳遞物件而非 JSON 字串
+                    params.filter = JSON.stringify(filter); // 繼續使用 JSON 字串傳遞
                 }
 
                 const response = await axios.get(`${API_URL}/products`, { params });
@@ -213,7 +213,7 @@ const ProductFront = () => {
                                                 backgroundSize: 'contain',
                                                 marginTop: theme.spacing(2),
                                             }}
-                                            image={`data:image/png;base64,${product.image_base64}`}
+                                            image={`data:image/png;base64,${product.image_base64}`} // 根據實際圖片格式調整 MIME 類型
                                             title={product.product_name}
                                         />
                                         <CardContent>
