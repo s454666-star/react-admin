@@ -1,6 +1,6 @@
 // src/ProductFront.js
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     AppBar,
@@ -20,15 +20,29 @@ import {
     TextField,
     Toolbar,
     Typography,
+    ThemeProvider,
+    createTheme,
 } from '@mui/material';
-import {makeStyles} from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import axios from 'axios';
+
+// 自定義主題（黎明藍）
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#87CEFA', // 黎明藍
+        },
+        background: {
+            default: '#f4f6f8',
+        },
+    },
+});
 
 // 自定義樣式
 const useStyles = makeStyles((theme) => ({
     appBar: {
         marginBottom: theme.spacing(4),
-        backgroundColor: '#1976d2',
+        backgroundColor: theme.palette.primary.main,
     },
     categoryBar: {
         marginBottom: theme.spacing(4),
@@ -162,114 +176,116 @@ const ProductFront = () => {
     };
 
     return (
-        <div>
-            {/* 頁面頂部 AppBar */}
-            <AppBar position="static" className={classes.appBar}>
-                <Toolbar>
-                    <Typography variant="h6">星夜電商平台</Typography>
-                </Toolbar>
-            </AppBar>
+        <ThemeProvider theme={theme}>
+            <div>
+                {/* 頁面頂部 AppBar */}
+                <AppBar position="static" className={classes.appBar}>
+                    <Toolbar>
+                        <Typography variant="h6">星夜電商平台</Typography>
+                    </Toolbar>
+                </AppBar>
 
-            <Container>
-                {/* 商品分類置於頁面頂部 */}
-                <div className={classes.categoryBar}>
-                    {categories.map((category) => (
-                        <Button
-                            key={category.id}
-                            variant={selectedCategory === category.id ? 'contained' : 'outlined'}
-                            color="primary"
-                            className={classes.categoryButton}
-                            onClick={() => handleCategorySelect(category.id)}
-                        >
-                            {category.category_name}
-                        </Button>
-                    ))}
-                </div>
-
-                {/* 篩選與排序 */}
-                <Grid container spacing={2} className={classes.filterSortContainer}>
-                    <Grid item xs={12} md={4}>
-                        <TextField
-                            fullWidth
-                            label="搜尋商品名稱"
-                            variant="outlined"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                        />
-                    </Grid>
-                    <Grid item xs={6} md={4}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>排序欄位</InputLabel>
-                            <Select value={sortField} onChange={handleSortFieldChange} label="排序欄位">
-                                <MenuItem value="product_name">商品名稱</MenuItem>
-                                <MenuItem value="price">價格</MenuItem>
-                                <MenuItem value="stock_quantity">庫存數量</MenuItem>
-                                <MenuItem value="id">編號</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={6} md={4}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>排序方式</InputLabel>
-                            <Select value={sortDirection} onChange={handleSortDirectionChange} label="排序方式">
-                                <MenuItem value="asc">升冪</MenuItem>
-                                <MenuItem value="desc">降冪</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-
-                {/* 商品列表 */}
-                {loading ? (
-                    <div className={classes.loadingContainer}>
-                        <CircularProgress/>
-                    </div>
-                ) : (
-                    <Grid container spacing={4}>
-                        {products.map((product) => (
-                            <Grid item key={product.id} xs={12} sm={6} md={4}>
-                                <Card className={classes.productCard}>
-                                    <CardMedia
-                                        className={classes.media}
-                                        image={product.image_base64}
-                                        title={product.product_name}
-                                    />
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h6" component="div">
-                                            {product.product_name}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            價格：${product.price}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            庫存：{product.stock_quantity}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            狀態：{product.status === 'available' ? '可用' : product.status === 'out_of_stock' ? '缺貨' : '已停產'}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" color="primary">
-                                            加入購物車
-                                        </Button>
-                                        <Button size="small" color="primary">
-                                            詳細資訊
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
+                <Container>
+                    {/* 商品分類置於頁面頂部 */}
+                    <div className={classes.categoryBar}>
+                        {categories.map((category) => (
+                            <Button
+                                key={category.id}
+                                variant={selectedCategory === category.id ? 'contained' : 'outlined'}
+                                color="primary"
+                                className={classes.categoryButton}
+                                onClick={() => handleCategorySelect(category.id)}
+                            >
+                                {category.category_name}
+                            </Button>
                         ))}
-                    </Grid>
-                )}
+                    </div>
 
-                {/* 錯誤訊息 */}
-                <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
-                    <Alert onClose={handleCloseError} severity="error" sx={{width: '100%'}}>
-                        {error}
-                    </Alert>
-                </Snackbar>
-            </Container>
-        </div>
+                    {/* 篩選與排序 */}
+                    <Grid container spacing={2} className={classes.filterSortContainer}>
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="搜尋商品名稱"
+                                variant="outlined"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                            />
+                        </Grid>
+                        <Grid item xs={6} md={4}>
+                            <FormControl fullWidth variant="outlined">
+                                <InputLabel>排序欄位</InputLabel>
+                                <Select value={sortField} onChange={handleSortFieldChange} label="排序欄位">
+                                    <MenuItem value="product_name">商品名稱</MenuItem>
+                                    <MenuItem value="price">價格</MenuItem>
+                                    <MenuItem value="stock_quantity">庫存數量</MenuItem>
+                                    <MenuItem value="id">編號</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={6} md={4}>
+                            <FormControl fullWidth variant="outlined">
+                                <InputLabel>排序方式</InputLabel>
+                                <Select value={sortDirection} onChange={handleSortDirectionChange} label="排序方式">
+                                    <MenuItem value="asc">升冪</MenuItem>
+                                    <MenuItem value="desc">降冪</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+                    {/* 商品列表 */}
+                    {loading ? (
+                        <div className={classes.loadingContainer}>
+                            <CircularProgress />
+                        </div>
+                    ) : (
+                        <Grid container spacing={4}>
+                            {products.map((product) => (
+                                <Grid item key={product.id} xs={12} sm={6} md={4}>
+                                    <Card className={classes.productCard}>
+                                        <CardMedia
+                                            className={classes.media}
+                                            image={product.image_base64}
+                                            title={product.product_name}
+                                        />
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h6" component="div">
+                                                {product.product_name}
+                                            </Typography>
+                                            <Typography variant="body2" color="textSecondary">
+                                                價格：${product.price}
+                                            </Typography>
+                                            <Typography variant="body2" color="textSecondary">
+                                                庫存：{product.stock_quantity}
+                                            </Typography>
+                                            <Typography variant="body2" color="textSecondary">
+                                                狀態：{product.status === 'available' ? '可用' : product.status === 'out_of_stock' ? '缺貨' : '已停產'}
+                                            </Typography>
+                                        </CardContent>
+                                        <CardActions>
+                                            <Button size="small" color="primary">
+                                                加入購物車
+                                            </Button>
+                                            <Button size="small" color="primary">
+                                                詳細資訊
+                                            </Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
+
+                    {/* 錯誤訊息 */}
+                    <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+                            {error}
+                        </Alert>
+                    </Snackbar>
+                </Container>
+            </div>
+        </ThemeProvider>
     );
 };
 
