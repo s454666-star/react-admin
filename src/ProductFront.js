@@ -1,5 +1,3 @@
-// src/ProductFront.js
-
 import React, {useEffect, useState} from 'react';
 import {
     Alert,
@@ -28,11 +26,10 @@ import {useTheme} from '@mui/material/styles';
 import {Helmet} from 'react-helmet';
 import axios from 'axios';
 
-// 自定義主題（黎明藍）
 const appTheme = createTheme({
     palette: {
         primary: {
-            main: '#87CEFA', // 黎明藍
+            main: '#87CEFA',
         }, background: {
             default: '#f4f6f8',
         },
@@ -44,7 +41,6 @@ const API_URL = 'https://mystar.monster/api';
 const ProductFront = () => {
     const theme = useTheme();
 
-    // 狀態管理
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [products, setProducts] = useState([]);
@@ -55,7 +51,6 @@ const ProductFront = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // 取得商品類別
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -76,31 +71,26 @@ const ProductFront = () => {
         fetchCategories();
     }, []);
 
-    // 取得商品列表
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const range = [0, 100];
                 const sort = [sortField, sortDirection];
+
                 const filter = {};
-
-                if (selectedCategory) {
-                    filter.category_id = selectedCategory;
-                }
-
-                if (searchQuery) {
-                    filter.q = searchQuery;
-                }
+                if (selectedCategory) filter.category_id = selectedCategory;
+                if (searchQuery) filter.q = searchQuery;
 
                 const response = await axios.get(`${API_URL}/products`, {
                     params: {
-                        range: JSON.stringify(range), sort: JSON.stringify(sort), filter: JSON.stringify(filter),
+                        range: JSON.stringify(range),
+                        sort: JSON.stringify(sort),
+                        filter: Object.keys(filter).length > 0 ? JSON.stringify(filter) : undefined,
                     },
                 });
 
                 setProducts(response.data);
-                // 假設後端有回傳 X-Total-Count 標頭
                 setTotalProducts(parseInt(response.headers['x-total-count'], 10) || response.data.length);
                 setLoading(false);
             } catch (err) {
@@ -112,39 +102,34 @@ const ProductFront = () => {
         fetchProducts();
     }, [selectedCategory, sortField, sortDirection, searchQuery]);
 
-    // 處理分類選擇
     const handleCategorySelect = (categoryId) => {
         setSelectedCategory(categoryId === selectedCategory ? '' : categoryId);
     };
 
-    // 處理排序欄位變更
     const handleSortFieldChange = (event) => {
         setSortField(event.target.value);
     };
 
-    // 處理排序方向變更
     const handleSortDirectionChange = (event) => {
         setSortDirection(event.target.value);
     };
 
-    // 處理搜尋查詢
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
 
-    // 關閉錯誤訊息
     const handleCloseError = () => {
         setError('');
     };
 
-    return (<ThemeProvider theme={appTheme}>
+    return (
+        <ThemeProvider theme={appTheme}>
             <div>
                 <Helmet>
                     <title>星夜商城</title>
                     <link rel="icon" href="/icon_198x278.png" type="image/png"/>
                 </Helmet>
 
-                {/* 頁面頂部 AppBar */}
                 <AppBar
                     position="static"
                     sx={{marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main}}
@@ -155,9 +140,9 @@ const ProductFront = () => {
                 </AppBar>
 
                 <Container>
-                    {/* 商品分類置於頁面頂部 */}
                     <Box sx={{marginBottom: theme.spacing(4), display: 'flex', overflowX: 'auto'}}>
-                        {categories.map((category) => (<Button
+                        {categories.map((category) => (
+                            <Button
                                 key={category.id}
                                 variant={selectedCategory === category.id ? 'contained' : 'outlined'}
                                 color="primary"
@@ -165,10 +150,10 @@ const ProductFront = () => {
                                 onClick={() => handleCategorySelect(category.id)}
                             >
                                 {category.category_name}
-                            </Button>))}
+                            </Button>
+                        ))}
                     </Box>
 
-                    {/* 篩選與排序 */}
                     <Grid container spacing={2} sx={{marginBottom: theme.spacing(4)}}>
                         <Grid item xs={12} md={4}>
                             <TextField
@@ -201,11 +186,14 @@ const ProductFront = () => {
                         </Grid>
                     </Grid>
 
-                    {/* 商品列表 */}
-                    {loading ? (<Box sx={{display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4)}}>
+                    {loading ? (
+                        <Box sx={{display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4)}}>
                             <CircularProgress/>
-                        </Box>) : (<Grid container spacing={4}>
-                            {products.map((product) => (<Grid item key={product.id} xs={12} sm={6} md={4}>
+                        </Box>
+                    ) : (
+                        <Grid container spacing={4}>
+                            {products.map((product) => (
+                                <Grid item key={product.id} xs={12} sm={6} md={4}>
                                     <Card
                                         sx={{
                                             transition: 'transform 0.2s', '&:hover': {
@@ -244,10 +232,11 @@ const ProductFront = () => {
                                             </Button>
                                         </CardActions>
                                     </Card>
-                                </Grid>))}
-                        </Grid>)}
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
 
-                    {/* 錯誤訊息 */}
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
                         <Alert onClose={handleCloseError} severity="error" sx={{width: '100%'}}>
                             {error}
@@ -255,7 +244,8 @@ const ProductFront = () => {
                     </Snackbar>
                 </Container>
             </div>
-        </ThemeProvider>);
+        </ThemeProvider>
+    );
 };
 
 export default ProductFront;
