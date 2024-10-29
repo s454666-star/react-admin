@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     AppBar,
@@ -22,15 +22,16 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
-import {useTheme} from '@mui/material/styles';
-import {Helmet} from 'react-helmet';
+import { useTheme } from '@mui/material/styles';
+import { Helmet } from 'react-helmet';
 import axios from 'axios';
 
 const appTheme = createTheme({
     palette: {
         primary: {
             main: '#87CEFA',
-        }, background: {
+        },
+        background: {
             default: '#f4f6f8',
         },
     },
@@ -57,7 +58,8 @@ const ProductFront = () => {
                 setLoading(true);
                 const response = await axios.get(`${API_URL}/product-categories`, {
                     params: {
-                        range: JSON.stringify([0, 100]), sort: JSON.stringify(['category_name', 'asc']),
+                        range: JSON.stringify([0, 100]),
+                        sort: JSON.stringify(['category_name', 'asc']),
                     },
                 });
                 setCategories(response.data);
@@ -82,13 +84,16 @@ const ProductFront = () => {
                 if (selectedCategory) filter.category_id = selectedCategory;
                 if (searchQuery) filter.q = searchQuery;
 
-                const response = await axios.get(`${API_URL}/products`, {
-                    params: {
-                        range: JSON.stringify(range),
-                        sort: JSON.stringify(sort),
-                        filter: Object.keys(filter).length > 0 ? JSON.stringify(filter) : undefined,
-                    },
-                });
+                const params = {
+                    range: JSON.stringify(range),
+                    sort: JSON.stringify(sort),
+                };
+
+                if (Object.keys(filter).length > 0) {
+                    params.filter = filter; // 直接傳遞物件而非 JSON 字串
+                }
+
+                const response = await axios.get(`${API_URL}/products`, { params });
 
                 setProducts(response.data);
                 setTotalProducts(parseInt(response.headers['x-total-count'], 10) || response.data.length);
@@ -127,12 +132,12 @@ const ProductFront = () => {
             <div>
                 <Helmet>
                     <title>星夜商城</title>
-                    <link rel="icon" href="/icon_198x278.png" type="image/png"/>
+                    <link rel="icon" href="/icon_198x278.png" type="image/png" />
                 </Helmet>
 
                 <AppBar
                     position="static"
-                    sx={{marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main}}
+                    sx={{ marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main }}
                 >
                     <Toolbar>
                         <Typography variant="h6">星夜電商平台</Typography>
@@ -140,13 +145,13 @@ const ProductFront = () => {
                 </AppBar>
 
                 <Container>
-                    <Box sx={{marginBottom: theme.spacing(4), display: 'flex', overflowX: 'auto'}}>
+                    <Box sx={{ marginBottom: theme.spacing(4), display: 'flex', overflowX: 'auto' }}>
                         {categories.map((category) => (
                             <Button
                                 key={category.id}
                                 variant={selectedCategory === category.id ? 'contained' : 'outlined'}
                                 color="primary"
-                                sx={{marginRight: theme.spacing(2), whiteSpace: 'nowrap'}}
+                                sx={{ marginRight: theme.spacing(2), whiteSpace: 'nowrap' }}
                                 onClick={() => handleCategorySelect(category.id)}
                             >
                                 {category.category_name}
@@ -154,7 +159,7 @@ const ProductFront = () => {
                         ))}
                     </Box>
 
-                    <Grid container spacing={2} sx={{marginBottom: theme.spacing(4)}}>
+                    <Grid container spacing={2} sx={{ marginBottom: theme.spacing(4) }}>
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth
@@ -187,8 +192,8 @@ const ProductFront = () => {
                     </Grid>
 
                     {loading ? (
-                        <Box sx={{display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4)}}>
-                            <CircularProgress/>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4) }}>
+                            <CircularProgress />
                         </Box>
                     ) : (
                         <Grid container spacing={4}>
@@ -196,16 +201,19 @@ const ProductFront = () => {
                                 <Grid item key={product.id} xs={12} sm={6} md={4}>
                                     <Card
                                         sx={{
-                                            transition: 'transform 0.2s', '&:hover': {
+                                            transition: 'transform 0.2s',
+                                            '&:hover': {
                                                 transform: 'scale(1.05)',
                                             },
                                         }}
                                     >
                                         <CardMedia
                                             sx={{
-                                                height: 140, backgroundSize: 'contain', marginTop: theme.spacing(2),
+                                                height: 140,
+                                                backgroundSize: 'contain',
+                                                marginTop: theme.spacing(2),
                                             }}
-                                            image={product.image_base64}
+                                            image={`data:image/png;base64,${product.image_base64}`}
                                             title={product.product_name}
                                         />
                                         <CardContent>
@@ -220,7 +228,11 @@ const ProductFront = () => {
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
                                                 狀態：
-                                                {product.status === 'available' ? '可用' : product.status === 'out_of_stock' ? '缺貨' : '已停產'}
+                                                {product.status === 'available'
+                                                    ? '可用'
+                                                    : product.status === 'out_of_stock'
+                                                        ? '缺貨'
+                                                        : '已停產'}
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
@@ -238,7 +250,7 @@ const ProductFront = () => {
                     )}
 
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
-                        <Alert onClose={handleCloseError} severity="error" sx={{width: '100%'}}>
+                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
                             {error}
                         </Alert>
                     </Snackbar>
