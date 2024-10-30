@@ -293,7 +293,7 @@ const ProductFront = () => {
                                     variant="body1"
                                     sx={{
                                         marginRight: theme.spacing(2),
-                                        color: theme.palette.text.primary,
+                                        color: '#f7f8fa',
                                         fontWeight: 'bold',
                                     }}
                                 >
@@ -315,7 +315,7 @@ const ProductFront = () => {
                                     color="secondary"
                                     onClick={handleLogout}
                                     sx={{
-                                        color: '#003366',
+                                        color: '#f7f8fa',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                     }}
