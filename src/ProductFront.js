@@ -254,7 +254,7 @@ const ProductFront = () => {
                             variant={isSmallScreen ? 'h6' : 'h5'}
                             sx={{
                                 flexGrow: 1,
-                                color: theme.palette.text.primary,
+                                color: 'rgb(234 212 241)',
                                 fontFamily: 'Roboto Slab, serif',
                                 fontWeight: 'bold',
                             }}
@@ -267,7 +267,7 @@ const ProductFront = () => {
                                     color="secondary"
                                     onClick={() => setOpenLoginModal(true)}
                                     sx={{
-                                        color: '#003366',
+                                        color: '#c0f5dc',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                     }}
@@ -278,7 +278,7 @@ const ProductFront = () => {
                                     color="secondary"
                                     onClick={() => setOpenRegisterModal(true)}
                                     sx={{
-                                        color: '#003366',
+                                        color: '#c0f5dc',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                         marginLeft: theme.spacing(1),
