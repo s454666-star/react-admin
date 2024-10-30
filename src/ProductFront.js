@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Alert,
     AppBar,
@@ -23,8 +23,8 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { Helmet } from 'react-helmet';
+import {useTheme} from '@mui/material/styles';
+import {Helmet} from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
 
@@ -54,8 +54,40 @@ const ProductFront = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 根據實際情況設定
+    const [openLoginModal, setOpenLoginModal] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState({username: '', email_verified: false});
 
+    const [authLoading, setAuthLoading] = useState(false);
+    const [loginError, setLoginError] = useState('');
+
+    // 設定 axios 預設 headers
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setIsLoggedIn(true);
+            fetchUserInfo();
+        }
+    }, []);
+
+    // 獲取使用者資訊
+    const fetchUserInfo = async () => {
+        try {
+            setAuthLoading(true);
+            const response = await axios.get(`${API_URL}/me`);
+            setUser(response.data);
+            setIsLoggedIn(true);
+            setAuthLoading(false);
+        } catch (err) {
+            console.error('獲取使用者資訊失敗', err);
+            setIsLoggedIn(false);
+            setUser({username: '', email_verified: false});
+            setAuthLoading(false);
+        }
+    };
+
+    // 獲取商品類別
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -77,6 +109,7 @@ const ProductFront = () => {
         fetchCategories();
     }, []);
 
+    // 獲取商品列表
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -111,6 +144,7 @@ const ProductFront = () => {
         fetchProducts();
     }, [selectedCategory, sortField, sortDirection, searchQuery]);
 
+    // 選擇商品類別
     const handleCategorySelect = (categoryId) => {
         const numericCategoryId = Number(categoryId);
         setSelectedCategory((prevCategory) =>
@@ -118,27 +152,68 @@ const ProductFront = () => {
         );
     };
 
+    // 更改排序欄位
     const handleSortFieldChange = (event) => {
         setSortField(event.target.value);
     };
 
+    // 更改排序方式
     const handleSortDirectionChange = (event) => {
         setSortDirection(event.target.value);
     };
 
+    // 搜尋商品名稱
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
 
+    // 關閉錯誤訊息
     const handleCloseError = () => {
         setError('');
     };
 
+    // 加入購物車
     const handleAddToCart = (product) => {
         if (!isLoggedIn) {
-            setOpenRegisterModal(true);
+            setOpenLoginModal(true);
         } else {
             // 加入購物車的邏輯
+        }
+    };
+
+    // 處理登入
+    const handleLogin = async (email, password) => {
+        try {
+            setAuthLoading(true);
+            const response = await axios.post(`${API_URL}/login`, {email, password});
+            const {access_token, user} = response.data;
+            localStorage.setItem('access_token', access_token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+            setUser(user);
+            setIsLoggedIn(true);
+            setAuthLoading(false);
+            setOpenLoginModal(false);
+        } catch (err) {
+            console.error('登入失敗', err);
+            setLoginError(err.response?.data?.message || '登入失敗，請稍後再試。');
+            setAuthLoading(false);
+        }
+    };
+
+    // 處理登出
+    const handleLogout = async () => {
+        try {
+            setAuthLoading(true);
+            await axios.post(`${API_URL}/logout`);
+            localStorage.removeItem('access_token');
+            delete axios.defaults.headers.common['Authorization'];
+            setIsLoggedIn(false);
+            setUser({username: '', email_verified: false});
+            setAuthLoading(false);
+        } catch (err) {
+            console.error('登出失敗', err);
+            setError('登出失敗，請稍後再試。');
+            setAuthLoading(false);
         }
     };
 
@@ -160,13 +235,27 @@ const ProductFront = () => {
                         </Typography>
                         {!isLoggedIn ? (
                             <>
+                                <Button color="inherit" onClick={() => setOpenLoginModal(true)}>
+                                    登入
+                                </Button>
                                 <Button color="inherit" onClick={() => setOpenRegisterModal(true)}>
                                     註冊
                                 </Button>
-                                {/* 登入按鈕，可自行添加 */}
                             </>
                         ) : (
-                            <Typography variant="body1">歡迎，會員</Typography>
+                            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                <Typography variant="body1" sx={{marginRight: theme.spacing(2)}}>
+                                    {user.username}
+                                </Typography>
+                                {!user.email_verified && (
+                                    <Typography variant="body2" sx={{color: 'red', marginRight: theme.spacing(2)}}>
+                                        未驗證
+                                    </Typography>
+                                )}
+                                <Button color="inherit" onClick={handleLogout}>
+                                    登出
+                                </Button>
+                            </Box>
                         )}
                     </Toolbar>
                 </AppBar>
@@ -316,8 +405,78 @@ const ProductFront = () => {
                         <MemberRegister onClose={() => setOpenRegisterModal(false)} />
                     </Box>
                 </Modal>
+
+                {/* 會員登入的 Modal */}
+                <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        bgcolor: 'background.paper',
+                        border: '2px solid #000',
+                        boxShadow: 24,
+                        p: 4,
+                    }}>
+                        <Typography variant="h6" component="h2" sx={{marginBottom: theme.spacing(2)}}>
+                            會員登入
+                        </Typography>
+                        <LoginForm onLogin={handleLogin} loading={authLoading} error={loginError}/>
+                    </Box>
+                </Modal>
             </div>
         </ThemeProvider>
+    );
+};
+
+// LoginForm 組件
+const LoginForm = ({onLogin, loading, error}) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        onLogin(email, password);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <TextField
+                label="電子郵件"
+                variant="outlined"
+                fullWidth
+                required
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+                label="密碼"
+                type="password"
+                variant="outlined"
+                fullWidth
+                required
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+            {error && (
+                <Alert severity="error" sx={{marginTop: theme => theme.spacing(2)}}>
+                    {error}
+                </Alert>
+            )}
+            <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{marginTop: theme => theme.spacing(2)}}
+                disabled={loading}
+            >
+                {loading ? <CircularProgress size={24}/> : '登入'}
+            </Button>
+        </form>
     );
 };
 
