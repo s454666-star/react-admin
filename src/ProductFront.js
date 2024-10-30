@@ -267,7 +267,7 @@ const ProductFront = () => {
                                     color="secondary"
                                     onClick={() => setOpenLoginModal(true)}
                                     sx={{
-                                        color: '#c0f5dc',
+                                        color: '#f5f6f6',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                     }}
@@ -278,7 +278,7 @@ const ProductFront = () => {
                                     color="secondary"
                                     onClick={() => setOpenRegisterModal(true)}
                                     sx={{
-                                        color: '#c0f5dc',
+                                        color: '#f1f6f4',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                         marginLeft: theme.spacing(1),
