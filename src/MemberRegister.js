@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import {Alert, Box, Button, CircularProgress, Container, Snackbar, TextField, Typography} from '@mui/material';
 
-const API_URL = 'https://mystar.monster/api'; // 根據您的實際 API URL
+const API_URL = 'https://mystar.monster/api';
 
 const MemberRegister = ({ onClose }) => {
     const [formData, setFormData] = useState({
@@ -28,7 +28,8 @@ const MemberRegister = ({ onClose }) => {
         setLoading(true);
         try {
             const response = await axios.post(`${API_URL}/register`, formData);
-            setSuccess(response.data.message);
+            console.log('註冊成功響應:', response); // 確認 API 響應結構
+            setSuccess(response.data.message); // 成功訊息
             setError('');
             setSnackbarOpen(true);
             if (onClose) onClose();
@@ -36,6 +37,7 @@ const MemberRegister = ({ onClose }) => {
             const errorMessage = err.response?.data?.errors
                 ? Object.values(err.response.data.errors).flat().join(' ')
                 : '註冊失敗';
+            console.log('註冊錯誤響應:', err.response); // 確認錯誤響應
             setError(errorMessage);
             setSuccess('');
             setSnackbarOpen(true);
@@ -46,6 +48,8 @@ const MemberRegister = ({ onClose }) => {
 
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
+        setError('');
+        setSuccess('');
     };
 
     return (
@@ -54,8 +58,6 @@ const MemberRegister = ({ onClose }) => {
                 <Typography variant="h4" gutterBottom>
                     會員註冊
                 </Typography>
-                {error && <Alert severity="error">{error}</Alert>}
-                {success && <Alert severity="success">{success}</Alert>}
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="帳號"
@@ -141,7 +143,11 @@ const MemberRegister = ({ onClose }) => {
                     onClose={handleCloseSnackbar}
                     anchorOrigin={{vertical: 'top', horizontal: 'center'}}
                 >
-                    <Alert onClose={handleCloseSnackbar} severity={success ? "success" : "error"}>
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity={success ? 'success' : 'error'}
+                        sx={{width: '100%'}}
+                    >
                         {success || error}
                     </Alert>
                 </Snackbar>
