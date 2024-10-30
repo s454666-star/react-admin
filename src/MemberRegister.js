@@ -1,10 +1,26 @@
-import React, {useState} from 'react';
+// MemberRegister.jsx
+
+import React, { useState } from 'react';
 import axios from 'axios';
-import {Alert, Box, Button, CircularProgress, Container, Snackbar, TextField, Typography} from '@mui/material';
+import {
+    Alert,
+    Box,
+    Button,
+    CircularProgress,
+    Container,
+    Snackbar,
+    TextField,
+    Typography,
+    useMediaQuery,
+    useTheme,
+} from '@mui/material';
 
 const API_URL = 'https://mystar.monster/api';
 
 const MemberRegister = ({ onClose }) => {
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -34,7 +50,7 @@ const MemberRegister = ({ onClose }) => {
             setSnackbarOpen(true);
             setTimeout(() => {
                 if (onClose) onClose();
-            }, 1000); // 延遲一秒關閉 Modal，以便顯示成功訊息
+            }, 1500); // 延遲一秒半關閉 Modal，以便顯示成功訊息
         } catch (err) {
             const errorMessage = err.response?.data?.errors
                 ? Object.values(err.response.data.errors).flat().join(' ')
@@ -48,7 +64,6 @@ const MemberRegister = ({ onClose }) => {
         }
     };
 
-
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
         setError('');
@@ -57,11 +72,26 @@ const MemberRegister = ({ onClose }) => {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{ mt: 4 }}>
-                <Typography variant="h4" gutterBottom>
+            <Box
+                sx={{
+                    mt: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography
+                    variant={isSmallScreen ? 'h5' : 'h4'}
+                    gutterBottom
+                    sx={{
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                        fontFamily: 'Roboto Slab, serif',
+                    }}
+                >
                     會員註冊
                 </Typography>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} style={{ width: '100%', marginTop: theme.spacing(1) }}>
                     <TextField
                         label="帳號"
                         name="username"
@@ -70,6 +100,27 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.username}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
                     <TextField
                         label="密碼"
@@ -80,6 +131,27 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.password}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
                     <TextField
                         label="姓名"
@@ -89,6 +161,27 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.name}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
                     <TextField
                         label="電子郵件"
@@ -99,6 +192,27 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.email}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
                     <TextField
                         label="電話號碼"
@@ -107,6 +221,27 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.phone}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
                     <TextField
                         label="地址"
@@ -115,14 +250,36 @@ const MemberRegister = ({ onClose }) => {
                         margin="normal"
                         value={formData.address}
                         onChange={handleChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: theme.palette.text.primary,
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: theme.palette.text.secondary,
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                color: theme.palette.text.primary,
+                                fontWeight: 'bold',
+                            },
+                        }}
                     />
-                    <Box sx={{position: 'relative', mt: 2}}>
+                    <Box sx={{ position: 'relative', mt: 2 }}>
                         <Button
                             type="submit"
                             variant="contained"
-                            color="primary"
+                            color="secondary"
                             fullWidth
                             disabled={loading}
+                            sx={{ fontWeight: 'bold', textTransform: 'none' }}
                         >
                             註冊
                         </Button>
@@ -144,12 +301,12 @@ const MemberRegister = ({ onClose }) => {
                     open={snackbarOpen}
                     autoHideDuration={6000}
                     onClose={handleCloseSnackbar}
-                    anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 >
                     <Alert
                         onClose={handleCloseSnackbar}
                         severity={success ? 'success' : 'error'}
-                        sx={{width: '100%'}}
+                        sx={{ width: '100%', fontWeight: 'bold' }}
                     >
                         {success || error}
                     </Alert>

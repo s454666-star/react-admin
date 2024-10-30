@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+// ProductFront.jsx
+
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     AppBar,
@@ -22,9 +24,10 @@ import {
     ThemeProvider,
     Toolbar,
     Typography,
+    useMediaQuery,
 } from '@mui/material';
-import {useTheme} from '@mui/material/styles';
-import {Helmet} from 'react-helmet';
+import { useTheme } from '@mui/material/styles';
+import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
 
@@ -36,6 +39,13 @@ const appTheme = createTheme({
         background: {
             default: '#f4f6f8',
         },
+        text: {
+            primary: '#003366', // 深藍色文字
+            secondary: '#00509e',
+        },
+    },
+    typography: {
+        fontFamily: 'Roboto Slab, serif',
     },
 });
 
@@ -43,6 +53,7 @@ const API_URL = 'https://mystar.monster/api';
 
 const ProductFront = () => {
     const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -56,7 +67,7 @@ const ProductFront = () => {
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
     const [openLoginModal, setOpenLoginModal] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState({username: '', email_verified: false});
+    const [user, setUser] = useState({ username: '', email_verified: false });
 
     const [authLoading, setAuthLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
@@ -82,7 +93,7 @@ const ProductFront = () => {
         } catch (err) {
             console.error('獲取使用者資訊失敗', err);
             setIsLoggedIn(false);
-            setUser({username: '', email_verified: false});
+            setUser({ username: '', email_verified: false });
             setAuthLoading(false);
         }
     };
@@ -185,8 +196,8 @@ const ProductFront = () => {
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/login`, {email, password});
-            const {access_token, user} = response.data;
+            const response = await axios.post(`${API_URL}/login`, { email, password });
+            const { access_token, user } = response.data;
             localStorage.setItem('access_token', access_token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
             setUser(user);
@@ -208,7 +219,7 @@ const ProductFront = () => {
             localStorage.removeItem('access_token');
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
-            setUser({username: '', email_verified: false});
+            setUser({ username: '', email_verified: false });
             setAuthLoading(false);
         } catch (err) {
             console.error('登出失敗', err);
@@ -223,36 +234,92 @@ const ProductFront = () => {
                 <Helmet>
                     <title>星夜商城</title>
                     <link rel="icon" href="/icon_198x278.png" type="image/png" />
+                    <link
+                        href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+                        rel="stylesheet"
+                    />
                 </Helmet>
 
                 <AppBar
                     position="static"
-                    sx={{ marginBottom: theme.spacing(4), backgroundColor: theme.palette.primary.main }}
+                    sx={{
+                        marginBottom: theme.spacing(4),
+                        backgroundColor: theme.palette.primary.main,
+                        boxShadow: 'none',
+                        borderBottom: '1px solid #e0e0e0',
+                    }}
                 >
                     <Toolbar>
-                        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                        <Typography
+                            variant={isSmallScreen ? 'h6' : 'h5'}
+                            sx={{
+                                flexGrow: 1,
+                                color: theme.palette.text.primary,
+                                fontFamily: 'Roboto Slab, serif',
+                                fontWeight: 'bold',
+                            }}
+                        >
                             星夜電商平台
                         </Typography>
                         {!isLoggedIn ? (
                             <>
-                                <Button color="inherit" onClick={() => setOpenLoginModal(true)}>
+                                <Button
+                                    color="secondary"
+                                    onClick={() => setOpenLoginModal(true)}
+                                    sx={{
+                                        color: '#003366',
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                    }}
+                                >
                                     登入
                                 </Button>
-                                <Button color="inherit" onClick={() => setOpenRegisterModal(true)}>
+                                <Button
+                                    color="secondary"
+                                    onClick={() => setOpenRegisterModal(true)}
+                                    sx={{
+                                        color: '#003366',
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                        marginLeft: theme.spacing(1),
+                                    }}
+                                >
                                     註冊
                                 </Button>
                             </>
                         ) : (
-                            <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                <Typography variant="body1" sx={{marginRight: theme.spacing(2)}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        marginRight: theme.spacing(2),
+                                        color: theme.palette.text.primary,
+                                        fontWeight: 'bold',
+                                    }}
+                                >
                                     {user.username}
                                 </Typography>
                                 {!user.email_verified && (
-                                    <Typography variant="body2" sx={{color: 'red', marginRight: theme.spacing(2)}}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            color: '#d32f2f', // 鮮豔紅色
+                                            marginRight: theme.spacing(2),
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
                                         未驗證
                                     </Typography>
                                 )}
-                                <Button color="inherit" onClick={handleLogout}>
+                                <Button
+                                    color="secondary"
+                                    onClick={handleLogout}
+                                    sx={{
+                                        color: '#003366',
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                    }}
+                                >
                                     登出
                                 </Button>
                             </Box>
@@ -267,7 +334,12 @@ const ProductFront = () => {
                                 key={category.id}
                                 variant={selectedCategory === category.id ? 'contained' : 'outlined'}
                                 color="primary"
-                                sx={{ marginRight: theme.spacing(2), whiteSpace: 'nowrap' }}
+                                sx={{
+                                    marginRight: theme.spacing(2),
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: 'bold',
+                                    textTransform: 'none',
+                                }}
                                 onClick={() => handleCategorySelect(category.id)}
                             >
                                 {category.category_name}
@@ -283,12 +355,55 @@ const ProductFront = () => {
                                 variant="outlined"
                                 value={searchQuery}
                                 onChange={handleSearchChange}
+                                sx={{
+                                    '& .MuiInputLabel-root': {
+                                        color: theme.palette.text.primary,
+                                        fontWeight: 'bold',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: theme.palette.text.primary,
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        color: theme.palette.text.primary,
+                                        fontWeight: 'bold',
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid item xs={6} md={4}>
                             <FormControl fullWidth variant="outlined">
-                                <InputLabel>排序欄位</InputLabel>
-                                <Select value={sortField} onChange={handleSortFieldChange} label="排序欄位">
+                                <InputLabel sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
+                                    排序欄位
+                                </InputLabel>
+                                <Select
+                                    value={sortField}
+                                    onChange={handleSortFieldChange}
+                                    label="排序欄位"
+                                    sx={{
+                                        '& .MuiSelect-icon': {
+                                            color: theme.palette.text.primary,
+                                        },
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.primary,
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                        color: theme.palette.text.primary,
+                                        fontWeight: 'bold',
+                                    }}
+                                >
                                     <MenuItem value="product_name">商品名稱</MenuItem>
                                     <MenuItem value="price">價格</MenuItem>
                                     <MenuItem value="stock_quantity">庫存數量</MenuItem>
@@ -298,8 +413,30 @@ const ProductFront = () => {
                         </Grid>
                         <Grid item xs={6} md={4}>
                             <FormControl fullWidth variant="outlined">
-                                <InputLabel>排序方式</InputLabel>
-                                <Select value={sortDirection} onChange={handleSortDirectionChange} label="排序方式">
+                                <InputLabel sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
+                                    排序方式
+                                </InputLabel>
+                                <Select
+                                    value={sortDirection}
+                                    onChange={handleSortDirectionChange}
+                                    label="排序方式"
+                                    sx={{
+                                        '& .MuiSelect-icon': {
+                                            color: theme.palette.text.primary,
+                                        },
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.primary,
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: theme.palette.text.secondary,
+                                        },
+                                        color: theme.palette.text.primary,
+                                        fontWeight: 'bold',
+                                    }}
+                                >
                                     <MenuItem value="asc">升冪</MenuItem>
                                     <MenuItem value="desc">降冪</MenuItem>
                                 </Select>
@@ -336,6 +473,9 @@ const ProductFront = () => {
                                                 '&:hover': {
                                                     transform: 'scale(1.05)',
                                                 },
+                                                height: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
                                             }}
                                         >
                                             <CardMedia
@@ -348,17 +488,17 @@ const ProductFront = () => {
                                                     marginTop: theme.spacing(2),
                                                 }}
                                             />
-                                            <CardContent>
-                                                <Typography gutterBottom variant="h6" component="div">
+                                            <CardContent sx={{ flexGrow: 1 }}>
+                                                <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
                                                     {product.product_name}
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                     價格：${product.price}
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                     庫存：{product.stock_quantity}
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                     狀態：
                                                     {product.status === 'available'
                                                         ? '可用'
@@ -368,10 +508,19 @@ const ProductFront = () => {
                                                 </Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <Button size="small" color="primary" onClick={() => handleAddToCart(product)}>
+                                                <Button
+                                                    size="small"
+                                                    color="secondary"
+                                                    onClick={() => handleAddToCart(product)}
+                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                >
                                                     加入購物車
                                                 </Button>
-                                                <Button size="small" color="primary">
+                                                <Button
+                                                    size="small"
+                                                    color="secondary"
+                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                >
                                                     詳細資訊
                                                 </Button>
                                             </CardActions>
@@ -383,7 +532,7 @@ const ProductFront = () => {
                     )}
 
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
-                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%', fontWeight: 'bold' }}>
                             {error}
                         </Alert>
                     </Snackbar>
@@ -391,38 +540,42 @@ const ProductFront = () => {
 
                 {/* 會員註冊的 Modal */}
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        border: '2px solid #000',
-                        boxShadow: 24,
-                        p: 4,
-                    }}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: { xs: '90%', sm: 400 },
+                            bgcolor: 'background.paper',
+                            border: '2px solid #000',
+                            boxShadow: 24,
+                            p: 4,
+                        }}
+                    >
                         <MemberRegister onClose={() => setOpenRegisterModal(false)} />
                     </Box>
                 </Modal>
 
                 {/* 會員登入的 Modal */}
                 <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        border: '2px solid #000',
-                        boxShadow: 24,
-                        p: 4,
-                    }}>
-                        <Typography variant="h6" component="h2" sx={{marginBottom: theme.spacing(2)}}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: { xs: '90%', sm: 400 },
+                            bgcolor: 'background.paper',
+                            border: '2px solid #000',
+                            boxShadow: 24,
+                            p: 4,
+                        }}
+                    >
+                        <Typography variant="h6" component="h2" sx={{ marginBottom: theme.spacing(2), color: theme.palette.text.primary, fontWeight: 'bold' }}>
                             會員登入
                         </Typography>
-                        <LoginForm onLogin={handleLogin} loading={authLoading} error={loginError}/>
+                        <LoginForm onLogin={handleLogin} loading={authLoading} error={loginError} />
                     </Box>
                 </Modal>
             </div>
@@ -431,7 +584,8 @@ const ProductFront = () => {
 };
 
 // LoginForm 組件
-const LoginForm = ({onLogin, loading, error}) => {
+const LoginForm = ({ onLogin, loading, error }) => {
+    const theme = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -450,6 +604,27 @@ const LoginForm = ({onLogin, loading, error}) => {
                 margin="normal"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: theme.palette.text.primary,
+                        },
+                        '&:hover fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                }}
             />
             <TextField
                 label="密碼"
@@ -460,21 +635,42 @@ const LoginForm = ({onLogin, loading, error}) => {
                 margin="normal"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: theme.palette.text.primary,
+                        },
+                        '&:hover fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                }}
             />
             {error && (
-                <Alert severity="error" sx={{marginTop: theme => theme.spacing(2)}}>
+                <Alert severity="error" sx={{ marginTop: theme.spacing(2), fontWeight: 'bold' }}>
                     {error}
                 </Alert>
             )}
             <Button
                 type="submit"
                 variant="contained"
-                color="primary"
+                color="secondary"
                 fullWidth
-                sx={{marginTop: theme => theme.spacing(2)}}
+                sx={{ marginTop: theme.spacing(2), fontWeight: 'bold', textTransform: 'none' }}
                 disabled={loading}
             >
-                {loading ? <CircularProgress size={24}/> : '登入'}
+                {loading ? <CircularProgress size={24} /> : '登入'}
             </Button>
         </form>
     );
