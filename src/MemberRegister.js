@@ -1,13 +1,6 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
-import {
-    Button,
-    TextField,
-    Container,
-    Typography,
-    Box,
-    Alert,
-} from '@mui/material';
+import {Alert, Box, Button, CircularProgress, Container, Snackbar, TextField, Typography} from '@mui/material';
 
 const API_URL = 'https://mystar.monster/api'; // 根據您的實際 API URL
 
@@ -23,6 +16,8 @@ const MemberRegister = ({ onClose }) => {
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,16 +25,27 @@ const MemberRegister = ({ onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const response = await axios.post(`${API_URL}/register`, formData);
             setSuccess(response.data.message);
             setError('');
-            // 可在此處執行其他操作，例如自動登入或關閉註冊窗口
+            setSnackbarOpen(true);
             if (onClose) onClose();
         } catch (err) {
-            setError(err.response.data.message || '註冊失敗');
+            const errorMessage = err.response?.data?.errors
+                ? Object.values(err.response.data.errors).flat().join(' ')
+                : '註冊失敗';
+            setError(errorMessage);
             setSuccess('');
+            setSnackbarOpen(true);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
     };
 
     return (
@@ -105,16 +111,40 @@ const MemberRegister = ({ onClose }) => {
                         value={formData.address}
                         onChange={handleChange}
                     />
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                    >
-                        註冊
-                    </Button>
+                    <Box sx={{position: 'relative', mt: 2}}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            disabled={loading}
+                        >
+                            註冊
+                        </Button>
+                        {loading && (
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    marginTop: '-12px',
+                                    marginLeft: '-12px',
+                                }}
+                            />
+                        )}
+                    </Box>
                 </form>
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+                >
+                    <Alert onClose={handleCloseSnackbar} severity={success ? "success" : "error"}>
+                        {success || error}
+                    </Alert>
+                </Snackbar>
             </Box>
         </Container>
     );
