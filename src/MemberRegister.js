@@ -32,7 +32,9 @@ const MemberRegister = ({ onClose }) => {
             setSuccess(response.data.message); // 成功訊息
             setError('');
             setSnackbarOpen(true);
-            if (onClose) onClose();
+            setTimeout(() => {
+                if (onClose) onClose();
+            }, 1000); // 延遲一秒關閉 Modal，以便顯示成功訊息
         } catch (err) {
             const errorMessage = err.response?.data?.errors
                 ? Object.values(err.response.data.errors).flat().join(' ')
@@ -45,6 +47,7 @@ const MemberRegister = ({ onClose }) => {
             setLoading(false);
         }
     };
+
 
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
