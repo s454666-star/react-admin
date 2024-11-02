@@ -20,6 +20,7 @@ import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
 import MemberRegister from "./MemberRegister";
+import OrderCart from "./OrderCart";
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -169,6 +170,7 @@ const App = () => (
                 <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
                 <Route exact path="/star-mall" element={<ProductFront/>}/>
                 <Route exact path="/member-register" element={<MemberRegister />} />
+                <Route exact path="/order-cart" element={<OrderCart />} />
                 <Route
                     path="*"
                     element={(

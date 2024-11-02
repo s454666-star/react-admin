@@ -1,6 +1,5 @@
-// ProductFront.jsx
-
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 引入 useNavigate
 import {
     Alert,
     AppBar,
@@ -54,6 +53,7 @@ const API_URL = 'https://mystar.monster/api';
 const ProductFront = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate(); // 使用 useNavigate 進行跳轉
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -184,11 +184,17 @@ const ProductFront = () => {
     };
 
     // 加入購物車
-    const handleAddToCart = (product) => {
+    const handleAddToCart = async (product) => {
         if (!isLoggedIn) {
             setOpenLoginModal(true);
         } else {
-            // 加入購物車的邏輯
+            try {
+                await axios.post(`${API_URL}/cart`, { product_id: product.id });
+                navigate('/order-cart'); // 加入購物車後跳轉到 /order-cart
+            } catch (err) {
+                setError('無法加入購物車，請稍後再試');
+                console.error('加入購物車失敗', err);
+            }
         }
     };
 
