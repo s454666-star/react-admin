@@ -32,6 +32,17 @@ const OrderCart = () => {
     });
     const [error, setError] = useState('');
 
+    // 設定 axios 預設 headers
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            fetchCartItems();
+            fetchAddresses();
+            fetchCreditCards();
+        }
+    }, []);
+
     // 獲取購物車項目
     const fetchCartItems = async () => {
         try {
@@ -40,10 +51,11 @@ const OrderCart = () => {
                     filter: JSON.stringify({ status: 'pending' }),
                 },
             });
-            if (response.data.length > 0) {
+            if (response.data && response.data.length > 0) {
                 const pendingOrder = response.data[0];
-                setCartItems(pendingOrder.orderItems);
-                setTotalAmount(pendingOrder.total_amount);
+                const items = Array.isArray(pendingOrder.orderItems) ? pendingOrder.orderItems : [];
+                setCartItems(items);
+                setTotalAmount(parseFloat(pendingOrder.total_amount) || 0);
             } else {
                 setCartItems([]);
                 setTotalAmount(0);
@@ -51,6 +63,8 @@ const OrderCart = () => {
         } catch (error) {
             console.error('Error fetching cart items:', error);
             setError('無法取得購物車項目');
+            setCartItems([]);
+            setTotalAmount(0);
         }
     };
 
@@ -79,9 +93,10 @@ const OrderCart = () => {
     const fetchAddresses = async () => {
         try {
             const response = await axios.get(`${API_URL}/delivery-addresses`);
-            setAddresses(response.data);
+            setAddresses(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching addresses:', error);
+            setAddresses([]);
         }
     };
 
@@ -89,17 +104,12 @@ const OrderCart = () => {
     const fetchCreditCards = async () => {
         try {
             const response = await axios.get(`${API_URL}/credit-cards`);
-            setCreditCards(response.data);
+            setCreditCards(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching credit cards:', error);
+            setCreditCards([]);
         }
     };
-
-    useEffect(() => {
-        fetchCartItems();
-        fetchAddresses();
-        fetchCreditCards();
-    }, []);
 
     const toggleSection = (section) => {
         if (section === 'items') setIsItemsOpen(!isItemsOpen);
@@ -163,41 +173,49 @@ const OrderCart = () => {
                 </Box>
                 {isItemsOpen && (
                     <Box>
-                        {cartItems.map((item) => (
-                            <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0' }}>
-                                <Grid container spacing={2} alignItems="center">
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            {item.product.product_name}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            單價：${item.price}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={3} display="flex" alignItems="center">
-                                        <IconButton onClick={() => handleQuantityChange(item, -1)}>
-                                            <Remove />
-                                        </IconButton>
-                                        <Typography>{item.quantity}</Typography>
-                                        <IconButton onClick={() => handleQuantityChange(item, 1)}>
-                                            <Add />
-                                        </IconButton>
-                                    </Grid>
-                                    <Grid item xs={3} display="flex" justifyContent="flex-end">
-                                        <Button
-                                            color="error"
-                                            onClick={() => handleRemoveItem(item.order_id, item.id)}
-                                            startIcon={<Delete />}
-                                        >
-                                            刪除
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </Box>
-                        ))}
-                        <Typography variant="h6" sx={{ paddingTop: 2 }}>
-                            小計金額：${totalAmount.toFixed(2)}
-                        </Typography>
+                        {cartItems && cartItems.length > 0 ? (
+                            <>
+                                {cartItems.map((item) => (
+                                    <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0' }}>
+                                        <Grid container spacing={2} alignItems="center">
+                                            <Grid item xs={6}>
+                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                    {item.product?.product_name || '產品名稱'}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    單價：${parseFloat(item.price).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={3} display="flex" alignItems="center">
+                                                <IconButton onClick={() => handleQuantityChange(item, -1)}>
+                                                    <Remove />
+                                                </IconButton>
+                                                <Typography>{item.quantity}</Typography>
+                                                <IconButton onClick={() => handleQuantityChange(item, 1)}>
+                                                    <Add />
+                                                </IconButton>
+                                            </Grid>
+                                            <Grid item xs={3} display="flex" justifyContent="flex-end">
+                                                <Button
+                                                    color="error"
+                                                    onClick={() => handleRemoveItem(item.order_id, item.id)}
+                                                    startIcon={<Delete />}
+                                                >
+                                                    刪除
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+                                ))}
+                                <Typography variant="h6" sx={{ paddingTop: 2 }}>
+                                    小計金額：${parseFloat(totalAmount).toFixed(2)}
+                                </Typography>
+                            </>
+                        ) : (
+                            <Typography variant="body1" sx={{ padding: 2 }}>
+                                購物車中沒有任何商品。
+                            </Typography>
+                        )}
                     </Box>
                 )}
             </Card>
@@ -211,22 +229,30 @@ const OrderCart = () => {
                 </Box>
                 {isAddressOpen && (
                     <Box>
-                        {addresses.map((address) => (
-                            <Box key={address.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                    {address.recipient}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    {address.address}, {address.city}, {address.country}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    電話：{address.phone}
-                                </Typography>
-                            </Box>
-                        ))}
-                        <Button variant="outlined" onClick={() => setOpenModal(true)}>
-                            新增/編輯地址
-                        </Button>
+                        {addresses && addresses.length > 0 ? (
+                            <>
+                                {addresses.map((address) => (
+                                    <Box key={address.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                            {address.recipient}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {address.address}, {address.city}, {address.country}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            電話：{address.phone}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                                <Button variant="outlined" onClick={() => setOpenModal(true)}>
+                                    新增/編輯地址
+                                </Button>
+                            </>
+                        ) : (
+                            <Typography variant="body1" sx={{ padding: 2 }}>
+                                尚無配送地址。
+                            </Typography>
+                        )}
                     </Box>
                 )}
             </Card>
@@ -240,25 +266,45 @@ const OrderCart = () => {
                 </Box>
                 {isCreditCardOpen && (
                     <Box>
-                        {creditCards.map((card) => (
-                            <Box key={card.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                    {card.cardholder_name} - {card.card_type}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    卡號：{card.card_number.slice(-4).padStart(card.card_number.length, '*')}
-                                </Typography>
-                            </Box>
-                        ))}
-                        <Button variant="outlined" onClick={() => setOpenModal(true)}>
-                            新增/編輯信用卡
-                        </Button>
+                        {creditCards && creditCards.length > 0 ? (
+                            <>
+                                {creditCards.map((card) => (
+                                    <Box key={card.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                            {card.cardholder_name} - {card.card_type}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            卡號：{'**** **** **** ' + card.card_number.slice(-4)}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                                <Button variant="outlined" onClick={() => setOpenModal(true)}>
+                                    新增/編輯信用卡
+                                </Button>
+                            </>
+                        ) : (
+                            <Typography variant="body1" sx={{ padding: 2 }}>
+                                尚無信用卡資料。
+                            </Typography>
+                        )}
                     </Box>
                 )}
             </Card>
 
             <Modal open={openModal} onClose={() => setOpenModal(false)}>
-                <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto' }}>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: '90%', sm: 400 },
+                        bgcolor: 'background.paper',
+                        border: '2px solid #000',
+                        boxShadow: 24,
+                        p: 4,
+                    }}
+                >
                     {/* 在這裡放置新增/編輯表單 */}
                     <Typography>表單待實作</Typography>
                 </Box>
@@ -287,6 +333,7 @@ const OrderCart = () => {
             )}
         </Container>
     );
+
 };
 
 export default OrderCart;
