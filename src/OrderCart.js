@@ -3,14 +3,15 @@ import {
     Button,
     Card,
     Container,
-    Divider,
     Typography,
     Box,
     Grid,
     IconButton,
     Modal,
+    Snackbar,
+    Alert,
 } from '@mui/material';
-import { Add, Remove, Delete, Edit } from '@mui/icons-material';
+import { Add, Remove, Delete } from '@mui/icons-material';
 import axios from 'axios';
 
 const API_URL = 'https://mystar.monster/api';
@@ -24,15 +25,53 @@ const OrderCart = () => {
     const [isAddressOpen, setIsAddressOpen] = useState(false);
     const [isCreditCardOpen, setIsCreditCardOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success',
+    });
+    const [error, setError] = useState('');
 
     // 獲取購物車項目
     const fetchCartItems = async () => {
         try {
-            const response = await axios.get(`${API_URL}/cart`);
-            setCartItems(response.data.items);
-            setTotalAmount(response.data.total_amount);
+            const response = await axios.get(`${API_URL}/orders`, {
+                params: {
+                    filter: JSON.stringify({ status: 'pending' }),
+                },
+            });
+            if (response.data.length > 0) {
+                const pendingOrder = response.data[0];
+                setCartItems(pendingOrder.orderItems);
+                setTotalAmount(pendingOrder.total_amount);
+            } else {
+                setCartItems([]);
+                setTotalAmount(0);
+            }
         } catch (error) {
             console.error('Error fetching cart items:', error);
+            setError('無法取得購物車項目');
+        }
+    };
+
+    const handleUpdateQuantity = async (orderId, itemId, newQuantity) => {
+        try {
+            await axios.put(`${API_URL}/orders/${orderId}/items/${itemId}`, {
+                quantity: newQuantity,
+            });
+            fetchCartItems(); // 重新獲取購物車資料以更新前端顯示
+            setSnackbar({
+                open: true,
+                message: '品項數量已更新！',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.error('Error updating item quantity:', error);
+            setSnackbar({
+                open: true,
+                message: '無法更新品項數量，請稍後再試。',
+                severity: 'error',
+            });
         }
     };
 
@@ -68,13 +107,45 @@ const OrderCart = () => {
         if (section === 'creditCard') setIsCreditCardOpen(!isCreditCardOpen);
     };
 
-    const handleQuantityChange = async (productId, change) => {
+    const handleQuantityChange = async (item, change) => {
+        const newQuantity = item.quantity + change;
+        if (newQuantity < 1) return; // 防止數量小於 1
+
         try {
-            await axios.post(`${API_URL}/cart/update`, { product_id: productId, change });
-            fetchCartItems();
+            await handleUpdateQuantity(item.order_id, item.id, newQuantity);
         } catch (error) {
             console.error('Error updating cart quantity:', error);
         }
+    };
+
+    const handleRemoveItem = async (orderId, itemId) => {
+        try {
+            // 假設有一個 API 來刪除訂單品項
+            await axios.delete(`${API_URL}/orders/${orderId}/items/${itemId}`);
+            fetchCartItems(); // 重新獲取購物車資料以更新前端顯示
+            setSnackbar({
+                open: true,
+                message: '品項已刪除！',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.error('Error removing cart item:', error);
+            setSnackbar({
+                open: true,
+                message: '無法刪除品項，請稍後再試。',
+                severity: 'error',
+            });
+        }
+    };
+
+    // 關閉錯誤訊息
+    const handleCloseError = () => {
+        setError('');
+    };
+
+    // 關閉 Snackbar
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
     };
 
     return (
@@ -97,25 +168,25 @@ const OrderCart = () => {
                                 <Grid container spacing={2} alignItems="center">
                                     <Grid item xs={6}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            {item.product_name}
+                                            {item.product.product_name}
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
                                             單價：${item.price}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={3} display="flex" alignItems="center">
-                                        <IconButton onClick={() => handleQuantityChange(item.id, -1)}>
+                                        <IconButton onClick={() => handleQuantityChange(item, -1)}>
                                             <Remove />
                                         </IconButton>
                                         <Typography>{item.quantity}</Typography>
-                                        <IconButton onClick={() => handleQuantityChange(item.id, 1)}>
+                                        <IconButton onClick={() => handleQuantityChange(item, 1)}>
                                             <Add />
                                         </IconButton>
                                     </Grid>
                                     <Grid item xs={3} display="flex" justifyContent="flex-end">
                                         <Button
                                             color="error"
-                                            onClick={() => handleQuantityChange(item.id, 0)}
+                                            onClick={() => handleRemoveItem(item.order_id, item.id)}
                                             startIcon={<Delete />}
                                         >
                                             刪除
@@ -125,7 +196,7 @@ const OrderCart = () => {
                             </Box>
                         ))}
                         <Typography variant="h6" sx={{ paddingTop: 2 }}>
-                            小計金額：${totalAmount}
+                            小計金額：${totalAmount.toFixed(2)}
                         </Typography>
                     </Box>
                 )}
@@ -192,6 +263,28 @@ const OrderCart = () => {
                     <Typography>表單待實作</Typography>
                 </Box>
             </Modal>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
+            {error && (
+                <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+                    <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%', fontWeight: 'bold' }}>
+                        {error}
+                    </Alert>
+                </Snackbar>
+            )}
         </Container>
     );
 };

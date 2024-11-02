@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 引入 useNavigate
+import { useNavigate } from 'react-router-dom';
 import {
     Alert,
     AppBar,
+    Badge,
     Box,
     Button,
     Card,
@@ -26,6 +27,7 @@ import {
     useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
@@ -67,10 +69,18 @@ const ProductFront = () => {
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
     const [openLoginModal, setOpenLoginModal] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState({ username: '', email_verified: false });
+    const [user, setUser] = useState({ id: null, username: '', email_verified: false });
 
     const [authLoading, setAuthLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
+
+    const [cartItems, setCartItems] = useState([]); // 新增 cartItems 狀態
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success',
+    });
 
     // 設定 axios 預設 headers
     useEffect(() => {
@@ -79,6 +89,7 @@ const ProductFront = () => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
             fetchUserInfo();
+            fetchCartItems(); // 獲取購物車數量
         }
     }, []);
 
@@ -93,8 +104,29 @@ const ProductFront = () => {
         } catch (err) {
             console.error('獲取使用者資訊失敗', err);
             setIsLoggedIn(false);
-            setUser({ username: '', email_verified: false });
+            setUser({ id: null, username: '', email_verified: false });
             setAuthLoading(false);
+        }
+    };
+
+    // 獲取購物車品項數量
+    const fetchCartItems = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/orders`, {
+                params: {
+                    filter: JSON.stringify({ status: 'pending' }),
+                },
+            });
+            if (response.data.length > 0) {
+                const pendingOrder = response.data[0];
+                setCartItems(pendingOrder.orderItems);
+                setTotalProducts(pendingOrder.orderItems.length);
+            } else {
+                setCartItems([]);
+                setTotalProducts(0);
+            }
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
         }
     };
 
@@ -189,8 +221,19 @@ const ProductFront = () => {
             setOpenLoginModal(true);
         } else {
             try {
-                await axios.post(`${API_URL}/cart`, { product_id: product.id });
-                navigate('/order-cart'); // 加入購物車後跳轉到 /order-cart
+                await axios.post(`${API_URL}/orders`, {
+                    member_id: user.id, // 確保 `user` 包含 `id`
+                    product_id: product.id,
+                    quantity: 1,
+                    price: product.price,
+                });
+                fetchCartItems(); // 更新購物車數量
+                // 顯示加入購物車成功的通知
+                setSnackbar({
+                    open: true,
+                    message: '商品已成功加入購物車！',
+                    severity: 'success',
+                });
             } catch (err) {
                 setError('無法加入購物車，請稍後再試');
                 console.error('加入購物車失敗', err);
@@ -210,6 +253,7 @@ const ProductFront = () => {
             setIsLoggedIn(true);
             setAuthLoading(false);
             setOpenLoginModal(false);
+            fetchCartItems(); // 獲取登入後的購物車數據
         } catch (err) {
             console.error('登入失敗', err);
             setLoginError(err.response?.data?.message || '登入失敗，請稍後再試。');
@@ -225,7 +269,9 @@ const ProductFront = () => {
             localStorage.removeItem('access_token');
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
-            setUser({ username: '', email_verified: false });
+            setUser({ id: null, username: '', email_verified: false });
+            setCartItems([]); // 清空購物車
+            setTotalProducts(0);
             setAuthLoading(false);
         } catch (err) {
             console.error('登出失敗', err);
@@ -267,6 +313,26 @@ const ProductFront = () => {
                         >
                             星夜電商平台
                         </Typography>
+                        {/* 新增購物車按鈕 */}
+                        <Button
+                            color="secondary"
+                            onClick={() => navigate('/order-cart')}
+                            sx={{
+                                color: '#f5f6f6',
+                                fontWeight: 'bold',
+                                textTransform: 'none',
+                                marginRight: theme.spacing(2),
+                                display: 'flex',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Badge badgeContent={cartItems.length} color="error">
+                                <ShoppingCartIcon />
+                            </Badge>
+                            <Typography variant="body1" sx={{ marginLeft: 1 }}>
+                                購物車
+                            </Typography>
+                        </Button>
                         {!isLoggedIn ? (
                             <>
                                 <Button
@@ -536,6 +602,20 @@ const ProductFront = () => {
                             })}
                         </Grid>
                     )}
+
+                    <Snackbar
+                        open={snackbar.open}
+                        autoHideDuration={6000}
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    >
+                        <Alert
+                            onClose={() => setSnackbar({ ...snackbar, open: false })}
+                            severity={snackbar.severity}
+                            sx={{ width: '100%' }}
+                        >
+                            {snackbar.message}
+                        </Alert>
+                    </Snackbar>
 
                     <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
                         <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%', fontWeight: 'bold' }}>
