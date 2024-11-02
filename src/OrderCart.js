@@ -32,7 +32,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Add, Remove, Delete } from '@mui/icons-material';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
-import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
+import MemberRegister from './MemberRegister';
 
 const appTheme = createTheme({
     palette: {
@@ -43,7 +43,7 @@ const appTheme = createTheme({
             default: '#f4f6f8',
         },
         text: {
-            primary: '#003366', // 深藍色文字
+            primary: '#003366',
             secondary: '#00509e',
         },
     },
@@ -57,7 +57,7 @@ const API_URL = 'https://mystar.monster/api';
 const OrderCart = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-    const navigate = useNavigate(); // 使用 useNavigate 進行跳轉
+    const navigate = useNavigate();
 
     const [user, setUser] = useState({ id: null, username: '', email_verified: false });
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -80,7 +80,6 @@ const OrderCart = () => {
     const [authLoading, setAuthLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
 
-    // 設定 axios 預設 headers
     useEffect(() => {
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -93,7 +92,6 @@ const OrderCart = () => {
         }
     }, []);
 
-    // 獲取使用者資訊
     const fetchUserInfo = async () => {
         try {
             setAuthLoading(true);
@@ -109,7 +107,6 @@ const OrderCart = () => {
         }
     };
 
-    // 獲取購物車品項
     const fetchCartItems = async () => {
         try {
             const response = await axios.get(`${API_URL}/orders`, {
@@ -120,12 +117,12 @@ const OrderCart = () => {
             if (response.data && response.data.length > 0) {
                 const pendingOrder = response.data[0];
                 const orderId = pendingOrder.id;
-                // Fetch order details with orderItems and products
                 const orderResponse = await axios.get(`${API_URL}/orders/${orderId}`);
                 const order = orderResponse.data;
                 const items = Array.isArray(order.orderItems) ? order.orderItems : [];
+                const calculatedTotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
                 setCartItems(items);
-                setTotalAmount(parseFloat(order.total_amount) || 0);
+                setTotalAmount(calculatedTotalAmount);
             } else {
                 setCartItems([]);
                 setTotalAmount(0);
@@ -143,7 +140,7 @@ const OrderCart = () => {
             await axios.put(`${API_URL}/orders/${orderId}/items/${itemId}`, {
                 quantity: newQuantity,
             });
-            fetchCartItems(); // 重新獲取購物車資料以更新前端顯示
+            fetchCartItems();
             setSnackbar({
                 open: true,
                 message: '品項數量已更新！',
@@ -159,7 +156,6 @@ const OrderCart = () => {
         }
     };
 
-    // 獲取地址
     const fetchAddresses = async () => {
         try {
             const response = await axios.get(`${API_URL}/delivery-addresses`);
@@ -170,7 +166,6 @@ const OrderCart = () => {
         }
     };
 
-    // 獲取信用卡
     const fetchCreditCards = async () => {
         try {
             const response = await axios.get(`${API_URL}/credit-cards`);
@@ -189,7 +184,7 @@ const OrderCart = () => {
 
     const handleQuantityChange = async (item, change) => {
         const newQuantity = item.quantity + change;
-        if (newQuantity < 1) return; // 防止數量小於 1
+        if (newQuantity < 1) return;
 
         try {
             await handleUpdateQuantity(item.order_id, item.id, newQuantity);
@@ -200,9 +195,8 @@ const OrderCart = () => {
 
     const handleRemoveItem = async (orderId, itemId) => {
         try {
-            // 假設有一個 API 來刪除訂單品項
             await axios.delete(`${API_URL}/orders/${orderId}/items/${itemId}`);
-            fetchCartItems(); // 重新獲取購物車資料以更新前端顯示
+            fetchCartItems();
             setSnackbar({
                 open: true,
                 message: '品項已刪除！',
@@ -218,7 +212,6 @@ const OrderCart = () => {
         }
     };
 
-    // 處理會員登入
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
@@ -263,7 +256,6 @@ const OrderCart = () => {
         }
     };
 
-    // 處理登出
     const handleLogout = async () => {
         try {
             setAuthLoading(true);
@@ -274,7 +266,7 @@ const OrderCart = () => {
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
             setUser({ id: null, username: '', email_verified: false });
-            setCartItems([]); // 清空購物車
+            setCartItems([]);
             setTotalAmount(0);
             setSnackbar({
                 open: true,
@@ -295,12 +287,10 @@ const OrderCart = () => {
         }
     };
 
-    // 關閉錯誤訊息
     const handleCloseError = () => {
         setError('');
     };
 
-    // 關閉 Snackbar
     const handleCloseSnackbar = () => {
         setSnackbar({ ...snackbar, open: false });
     };
@@ -338,7 +328,6 @@ const OrderCart = () => {
                         >
                             星夜電商平台
                         </Typography>
-                        {/* 新增購物車按鈕 */}
                         <Button
                             color="secondary"
                             onClick={() => navigate('/order-cart')}
@@ -400,7 +389,7 @@ const OrderCart = () => {
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#d32f2f', // 鮮豔紅色
+                                            color: '#d32f2f',
                                             marginRight: theme.spacing(2),
                                             fontWeight: 'bold',
                                         }}
@@ -426,7 +415,7 @@ const OrderCart = () => {
 
                 <Box
                     sx={{
-                        backgroundImage: 'url(/path/to/background/image.jpg)', // 替換為實際背景圖片路徑
+                        backgroundImage: 'url(/path/to/background/image.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         paddingY: 5,
@@ -590,7 +579,6 @@ const OrderCart = () => {
                                     p: 4,
                                 }}
                             >
-                                {/* 在這裡放置新增/編輯表單 */}
                                 <Typography>表單待實作</Typography>
                             </Box>
                         </Modal>
@@ -619,7 +607,6 @@ const OrderCart = () => {
                     </Container>
                 </Box>
 
-                {/* 一般新增/編輯表單的 Modal */}
                 <Modal open={openModal} onClose={() => setOpenModal(false)}>
                     <Box
                         sx={{
@@ -637,12 +624,10 @@ const OrderCart = () => {
                         <Typography variant="h6" sx={{ marginBottom: 2 }}>
                             新增/編輯表單
                         </Typography>
-                        {/* 在這裡放置新增/編輯表單的組件 */}
                         <Typography>表單待實作</Typography>
                     </Box>
                 </Modal>
 
-                {/* 會員註冊的 Modal */}
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                     <Box
                         sx={{
@@ -661,7 +646,6 @@ const OrderCart = () => {
                     </Box>
                 </Modal>
 
-                {/* 會員登入的 Modal */}
                 <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
                     <Box
                         sx={{
@@ -687,7 +671,6 @@ const OrderCart = () => {
     );
 };
 
-// LoginForm 組件
 const LoginForm = ({ onLogin, loading, error }) => {
     const theme = useTheme();
     const [email, setEmail] = useState('');
