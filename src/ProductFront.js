@@ -89,7 +89,7 @@ const ProductFront = () => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
             fetchUserInfo();
-            fetchCartItems(); // 獲取購物車數量
+            fetchCartItems();
         }
     }, []);
 
@@ -223,7 +223,6 @@ const ProductFront = () => {
             console.log('User ID:', user.id); // 調試輸出
             try {
                 await axios.post(`${API_URL}/orders`, {
-                    // 移除 member_id
                     product_id: product.id,
                     quantity: 1,
                     price: product.price,
@@ -264,6 +263,12 @@ const ProductFront = () => {
             setAuthLoading(false);
             setOpenLoginModal(false);
             fetchCartItems(); // 獲取登入後的購物車數據
+            // 顯示登入成功的通知
+            setSnackbar({
+                open: true,
+                message: '登入成功！',
+                severity: 'success',
+            });
         } catch (err) {
             console.error('登入失敗', err);
             setLoginError(err.response?.data?.message || '登入失敗，請稍後再試。');
@@ -283,6 +288,12 @@ const ProductFront = () => {
             setCartItems([]); // 清空購物車
             setTotalProducts(0);
             setAuthLoading(false);
+            // 顯示登出成功的通知
+            setSnackbar({
+                open: true,
+                message: '登出成功！',
+                severity: 'success',
+            });
         } catch (err) {
             console.error('登出失敗', err);
             setError('登出失敗，請稍後再試。');
