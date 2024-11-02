@@ -119,14 +119,17 @@ const ProductFront = () => {
             });
             if (response.data.length > 0) {
                 const pendingOrder = response.data[0];
-                setCartItems(pendingOrder.orderItems);
-                setTotalProducts(pendingOrder.orderItems.length);
+                const items = Array.isArray(pendingOrder.orderItems) ? pendingOrder.orderItems : [];
+                setCartItems(items);
+                setTotalProducts(items.length);
             } else {
                 setCartItems([]);
                 setTotalProducts(0);
             }
         } catch (error) {
             console.error('Error fetching cart items:', error);
+            setCartItems([]);
+            setTotalProducts(0);
         }
     };
 
