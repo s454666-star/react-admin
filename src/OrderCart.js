@@ -59,6 +59,8 @@ const OrderCart = () => {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate(); // 使用 useNavigate 進行跳轉
 
+    const [user, setUser] = useState({ id: null, username: '', email_verified: false });
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     const [addresses, setAddresses] = useState([]);
@@ -75,19 +77,39 @@ const OrderCart = () => {
         severity: 'success',
     });
     const [error, setError] = useState('');
+    const [authLoading, setAuthLoading] = useState(false);
+    const [loginError, setLoginError] = useState('');
 
     // 設定 axios 預設 headers
     useEffect(() => {
         const token = localStorage.getItem('access_token');
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setIsLoggedIn(true);
+            fetchUserInfo();
             fetchCartItems();
             fetchAddresses();
             fetchCreditCards();
         }
     }, []);
 
-    // 獲取購物車項目
+    // 獲取使用者資訊
+    const fetchUserInfo = async () => {
+        try {
+            setAuthLoading(true);
+            const response = await axios.get(`${API_URL}/me`);
+            setUser(response.data);
+            setIsLoggedIn(true);
+            setAuthLoading(false);
+        } catch (err) {
+            console.error('獲取使用者資訊失敗', err);
+            setIsLoggedIn(false);
+            setUser({ id: null, username: '', email_verified: false });
+            setAuthLoading(false);
+        }
+    };
+
+    // 獲取購物車品項
     const fetchCartItems = async () => {
         try {
             const response = await axios.get(`${API_URL}/orders`, {
@@ -98,7 +120,7 @@ const OrderCart = () => {
             if (response.data && response.data.length > 0) {
                 const pendingOrder = response.data[0];
                 const orderId = pendingOrder.id;
-                // Fetch order details with orderItems
+                // Fetch order details with orderItems and products
                 const orderResponse = await axios.get(`${API_URL}/orders/${orderId}`);
                 const order = orderResponse.data;
                 const items = Array.isArray(order.orderItems) ? order.orderItems : [];
@@ -199,13 +221,19 @@ const OrderCart = () => {
     // 處理會員登入
     const handleLogin = async (email, password) => {
         try {
-            // 假設有一個登入 API
+            setAuthLoading(true);
             const response = await axios.post(`${API_URL}/auth/login`, { email, password });
             if (response.data && response.data.token) {
                 localStorage.setItem('access_token', response.data.token);
-                localStorage.setItem('username', response.data.username);
-                localStorage.setItem('email_verified', response.data.email_verified);
+                localStorage.setItem('username', response.data.user.username);
+                localStorage.setItem('email_verified', response.data.user.email_verified);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                setUser({
+                    id: response.data.user.id,
+                    username: response.data.user.username,
+                    email_verified: response.data.user.email_verified,
+                });
+                setIsLoggedIn(true);
                 setSnackbar({
                     open: true,
                     message: '登入成功！',
@@ -215,12 +243,14 @@ const OrderCart = () => {
                 fetchCartItems();
                 fetchAddresses();
                 fetchCreditCards();
+                setAuthLoading(false);
             } else {
                 setSnackbar({
                     open: true,
                     message: '登入失敗，請檢查您的帳號或密碼',
                     severity: 'error',
                 });
+                setAuthLoading(false);
             }
         } catch (error) {
             console.error('Error during login:', error);
@@ -229,6 +259,39 @@ const OrderCart = () => {
                 message: '登入失敗，請稍後再試',
                 severity: 'error',
             });
+            setAuthLoading(false);
+        }
+    };
+
+    // 處理登出
+    const handleLogout = async () => {
+        try {
+            setAuthLoading(true);
+            await axios.post(`${API_URL}/auth/logout`);
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('email_verified');
+            delete axios.defaults.headers.common['Authorization'];
+            setIsLoggedIn(false);
+            setUser({ id: null, username: '', email_verified: false });
+            setCartItems([]); // 清空購物車
+            setTotalAmount(0);
+            setSnackbar({
+                open: true,
+                message: '登出成功！',
+                severity: 'success',
+            });
+            setAuthLoading(false);
+            navigate('/');
+            window.location.reload();
+        } catch (error) {
+            console.error('登出失敗', error);
+            setSnackbar({
+                open: true,
+                message: '登出失敗，請稍後再試。',
+                severity: 'error',
+            });
+            setAuthLoading(false);
         }
     };
 
@@ -295,7 +358,7 @@ const OrderCart = () => {
                                 購物車
                             </Typography>
                         </Button>
-                        {!localStorage.getItem('access_token') ? (
+                        {!isLoggedIn ? (
                             <>
                                 <Button
                                     color="secondary"
@@ -331,9 +394,9 @@ const OrderCart = () => {
                                         fontWeight: 'bold',
                                     }}
                                 >
-                                    {localStorage.getItem('username') || '用戶'}
+                                    {user.username}
                                 </Typography>
-                                {!localStorage.getItem('email_verified') && (
+                                {!user.email_verified && (
                                     <Typography
                                         variant="body2"
                                         sx={{
@@ -347,13 +410,7 @@ const OrderCart = () => {
                                 )}
                                 <Button
                                     color="secondary"
-                                    onClick={() => {
-                                        localStorage.removeItem('access_token');
-                                        localStorage.removeItem('username');
-                                        localStorage.removeItem('email_verified');
-                                        navigate('/');
-                                        window.location.reload();
-                                    }}
+                                    onClick={handleLogout}
                                     sx={{
                                         color: '#f7f8fa',
                                         fontWeight: 'bold',
@@ -622,7 +679,7 @@ const OrderCart = () => {
                         <Typography variant="h6" component="h2" sx={{ marginBottom: theme.spacing(2), color: theme.palette.text.primary, fontWeight: 'bold' }}>
                             會員登入
                         </Typography>
-                        <LoginForm onLogin={handleLogin} loading={false} error={error} />
+                        <LoginForm onLogin={handleLogin} loading={authLoading} error={loginError} />
                     </Box>
                 </Modal>
             </div>
