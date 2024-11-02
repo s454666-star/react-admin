@@ -67,6 +67,8 @@ const OrderCart = () => {
     const [isAddressOpen, setIsAddressOpen] = useState(false);
     const [isCreditCardOpen, setIsCreditCardOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [openRegisterModal, setOpenRegisterModal] = useState(false);
+    const [openLoginModal, setOpenLoginModal] = useState(false);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -189,6 +191,42 @@ const OrderCart = () => {
             setSnackbar({
                 open: true,
                 message: '無法刪除品項，請稍後再試。',
+                severity: 'error',
+            });
+        }
+    };
+
+    // 處理會員登入
+    const handleLogin = async (email, password) => {
+        try {
+            // 假設有一個登入 API
+            const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+            if (response.data && response.data.token) {
+                localStorage.setItem('access_token', response.data.token);
+                localStorage.setItem('username', response.data.username);
+                localStorage.setItem('email_verified', response.data.email_verified);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                setSnackbar({
+                    open: true,
+                    message: '登入成功！',
+                    severity: 'success',
+                });
+                setOpenLoginModal(false);
+                fetchCartItems();
+                fetchAddresses();
+                fetchCreditCards();
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: '登入失敗，請檢查您的帳號或密碼',
+                    severity: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            setSnackbar({
+                open: true,
+                message: '登入失敗，請稍後再試',
                 severity: 'error',
             });
         }
@@ -524,7 +562,7 @@ const OrderCart = () => {
                     </Container>
                 </Box>
 
-                {/* 會員註冊的 Modal */}
+                {/* 一般新增/編輯表單的 Modal */}
                 <Modal open={openModal} onClose={() => setOpenModal(false)}>
                     <Box
                         sx={{
