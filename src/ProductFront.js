@@ -220,9 +220,10 @@ const ProductFront = () => {
         if (!isLoggedIn) {
             setOpenLoginModal(true);
         } else {
+            console.log('User ID:', user.id); // 調試輸出
             try {
                 await axios.post(`${API_URL}/orders`, {
-                    member_id: user.id, // 確保 `user` 包含 `id`
+                    // 移除 member_id
                     product_id: product.id,
                     quantity: 1,
                     price: product.price,
@@ -235,7 +236,16 @@ const ProductFront = () => {
                     severity: 'success',
                 });
             } catch (err) {
-                setError('無法加入購物車，請稍後再試');
+                if (err.response && err.response.data && err.response.data.errors) {
+                    const memberIdError = err.response.data.errors.member_id;
+                    if (memberIdError) {
+                        setError('請先登入以加入購物車。');
+                    } else {
+                        setError('無法加入購物車，請稍後再試');
+                    }
+                } else {
+                    setError('無法加入購物車，請稍後再試');
+                }
                 console.error('加入購物車失敗', err);
             }
         }
