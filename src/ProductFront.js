@@ -30,10 +30,14 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Remove from '@mui/icons-material/Remove';
+import Add from '@mui/icons-material/Add';
+import Delete from '@mui/icons-material/Delete';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister';
-import LoginForm from './LoginForm';
 
 const appTheme = createTheme({
     palette: {
@@ -106,6 +110,8 @@ const ProductFront = () => {
     const [loginError, setLoginError] = useState('');
 
     const [cartItems, setCartItems] = useState([]);
+    const [isItemsOpen, setIsItemsOpen] = useState(true);
+    const [totalAmount, setTotalAmount] = useState(0);
 
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -153,15 +159,23 @@ const ProductFront = () => {
                 const items = Array.isArray(pendingOrder.orderItems) ? pendingOrder.orderItems : [];
                 setCartItems(items);
                 setTotalProducts(items.length);
+                calculateTotalAmount(items);
             } else {
                 setCartItems([]);
                 setTotalProducts(0);
+                setTotalAmount(0);
             }
         } catch (error) {
             console.error('Error fetching cart items:', error);
             setCartItems([]);
             setTotalProducts(0);
+            setTotalAmount(0);
         }
+    };
+
+    const calculateTotalAmount = (items) => {
+        const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        setTotalAmount(total);
     };
 
     // 獲取商品類別
@@ -335,6 +349,7 @@ const ProductFront = () => {
             setUser({ id: null, username: '', email_verified: false });
             setCartItems([]);
             setTotalProducts(0);
+            setTotalAmount(0);
             setSnackbar({
                 open: true,
                 message: '登出成功！',
@@ -353,6 +368,69 @@ const ProductFront = () => {
             setAuthLoading(false);
         }
     };
+
+    const toggleSection = (section) => {
+        if (section === 'items') {
+            setIsItemsOpen(!isItemsOpen);
+        }
+    };
+
+    const handleQuantityChange = async (item, delta) => {
+        const newQuantity = item.quantity + delta;
+        if (newQuantity < 1) return;
+        try {
+            await axios.put(`${API_URL}/orders/${item.order_id}/items/${item.id}`, {
+                quantity: newQuantity,
+            });
+            fetchCartItems();
+        } catch (error) {
+            console.error('更新數量失敗', error);
+            setSnackbar({
+                open: true,
+                message: '更新數量失敗，請稍後再試',
+                severity: 'error',
+            });
+        }
+    };
+
+    const handleRemoveItem = async (orderId, itemId) => {
+        try {
+            await axios.delete(`${API_URL}/orders/${orderId}/items/${itemId}`);
+            fetchCartItems();
+            setSnackbar({
+                open: true,
+                message: '已移除商品',
+                severity: 'info',
+            });
+        } catch (error) {
+            console.error('移除商品失敗', error);
+            setSnackbar({
+                open: true,
+                message: '移除商品失敗，請稍後再試',
+                severity: 'error',
+            });
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    // 假設的 DeliveryAddress 組件
+    const DeliveryAddress = () => (
+        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>配送地址</Typography>
+            {/* 地址表單內容 */}
+        </Card>
+    );
+
+    // 假設的 CreditCard 組件
+    const CreditCard = () => (
+        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>信用卡資訊</Typography>
+            {/* 信用卡表單內容 */}
+        </Card>
+    );
 
     return (
         <ThemeProvider theme={appTheme}>
