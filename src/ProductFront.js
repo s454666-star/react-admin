@@ -662,6 +662,7 @@ const ProductFront = () => {
                 </Modal>
             </div>
         </ThemeProvider>
+    );
 };
 
 // LoginForm 組件
