@@ -14,7 +14,6 @@ import {
     Select,
     TextField,
     Typography,
-    Fade,
 } from '@mui/material';
 import { Add, Delete, Edit } from '@mui/icons-material';
 import axios from 'axios';
@@ -23,6 +22,7 @@ const API_URL = 'https://mystar.monster/api';
 
 const CreditCard = () => {
     const [creditCards, setCreditCards] = useState([]);
+    const [isCreditCardOpen, setIsCreditCardOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [currentCard, setCurrentCard] = useState(null);
     const [formData, setFormData] = useState({
@@ -118,7 +118,7 @@ const CreditCard = () => {
 
     return (
         <Box sx={{ marginBottom: 3 }}>
-            <Card variant="outlined" sx={{ padding: 2, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+            <Card variant="outlined" sx={{ padding: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h6">付款信用卡</Typography>
                     <Button variant="outlined" startIcon={<Add />} onClick={() => handleOpenModal()}>
@@ -128,14 +128,11 @@ const CreditCard = () => {
                 <Box>
                     {creditCards && creditCards.length > 0 ? (
                         creditCards.map((card) => (
-                            <Card key={card.id} variant="outlined" sx={{ marginTop: 2, transition: 'background-color 0.3s' }}
-                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
-                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                            >
+                            <Card key={card.id} variant="outlined" sx={{ marginTop: 2 }}>
                                 <CardContent>
                                     <Grid container spacing={2} alignItems="center">
                                         <Grid item xs={12} sm={8}>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                                 {card.cardholder_name} - {card.card_type}
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
@@ -166,7 +163,7 @@ const CreditCard = () => {
                             </Card>
                         ))
                     ) : (
-                        <Typography variant="body1" sx={{ padding: 2, color: '#757575' }}>
+                        <Typography variant="body1" sx={{ padding: 2 }}>
                             尚無信用卡資料。
                         </Typography>
                     )}
@@ -197,10 +194,7 @@ const CreditCard = () => {
                         border: '2px solid #000',
                         boxShadow: 24,
                         p: 4,
-                        borderRadius: 2,
                     }}
-                    component={Fade}
-                    timeout={500}
                 >
                     <Typography variant="h6" sx={{ marginBottom: 2 }}>
                         {currentCard ? '編輯信用卡' : '新增信用卡'}
@@ -213,27 +207,6 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.cardholder_name}
                         onChange={(e) => setFormData({ ...formData, cardholder_name: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <TextField
                         label="信用卡號"
@@ -243,27 +216,6 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.card_number}
                         onChange={(e) => setFormData({ ...formData, card_number: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <TextField
                         label="到期日 (MM/YY)"
@@ -273,50 +225,13 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.expiry_date}
                         onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <FormControl variant="outlined" fullWidth required margin="normal">
-                        <InputLabel sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>信用卡類型</InputLabel>
+                        <InputLabel>信用卡類型</InputLabel>
                         <Select
                             value={formData.card_type}
                             onChange={(e) => setFormData({ ...formData, card_type: e.target.value })}
                             label="信用卡類型"
-                            sx={{
-                                '& .MuiSelect-icon': {
-                                    color: theme.palette.text.primary,
-                                },
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            }}
                         >
                             <MenuItem value="Visa">Visa</MenuItem>
                             <MenuItem value="MasterCard">MasterCard</MenuItem>
@@ -332,27 +247,6 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.billing_address}
                         onChange={(e) => setFormData({ ...formData, billing_address: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <TextField
                         label="郵遞區號"
@@ -362,27 +256,6 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.postal_code}
                         onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <TextField
                         label="國家"
@@ -392,38 +265,17 @@ const CreditCard = () => {
                         margin="normal"
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        sx={{
-                            '& .MuiInputLabel-root': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: theme.palette.text.primary,
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: theme.palette.text.secondary,
-                                },
-                            },
-                            '& .MuiInputBase-input': {
-                                color: theme.palette.text.primary,
-                                fontWeight: 'bold',
-                            },
-                        }}
                     />
                     <Box display="flex" alignItems="center" marginTop={2}>
                         <Button
                             variant="contained"
                             color="primary"
                             type="submit"
-                            sx={{ marginRight: 2, fontWeight: 'bold', textTransform: 'none' }}
+                            sx={{ marginRight: 2 }}
                         >
                             {currentCard ? '更新' : '新增'}
                         </Button>
-                        <Button variant="outlined" onClick={handleCloseModal} sx={{ fontWeight: 'bold', textTransform: 'none' }}>
+                        <Button variant="outlined" onClick={handleCloseModal}>
                             取消
                         </Button>
                     </Box>
@@ -436,6 +288,7 @@ const CreditCard = () => {
             </Modal>
         </Box>
     );
+
 };
 
 export default CreditCard;
