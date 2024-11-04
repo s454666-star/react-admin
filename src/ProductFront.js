@@ -18,7 +18,6 @@ import {
     InputLabel,
     MenuItem,
     Modal,
-    Select,
     Snackbar,
     TextField,
     ThemeProvider,
@@ -545,86 +544,171 @@ const ProductFront = () => {
                             <CircularProgress />
                         </Box>
                     ) : (
-                        <Grid container spacing={4}>
-                            {products.map((product) => {
-                                // 處理圖片來源
-                                let imageSrc = '';
-                                if (product.image_base64) {
-                                    if (product.image_base64.startsWith('data:image')) {
-                                        imageSrc = product.image_base64;
+                        <>
+                            <Grid container spacing={4}>
+                                {products.map((product) => {
+                                    // 處理圖片來源
+                                    let imageSrc = '';
+                                    if (product.image_base64) {
+                                        if (product.image_base64.startsWith('data:image')) {
+                                            imageSrc = product.image_base64;
+                                        } else {
+                                            // 假設圖片格式為 PNG，如果有其他格式，請根據實際情況修改
+                                            imageSrc = `data:image/png;base64,${product.image_base64}`;
+                                        }
                                     } else {
-                                        // 假設圖片格式為 PNG，如果有其他格式，請根據實際情況修改
-                                        imageSrc = `data:image/png;base64,${product.image_base64}`;
+                                        // 設定預設圖片（可選）
+                                        imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
                                     }
-                                } else {
-                                    // 設定預設圖片（可選）
-                                    imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
-                                }
 
-                                return (
-                                    <Grid item key={product.id} xs={12} sm={6} md={4}>
-                                        <Card
-                                            sx={{
-                                                transition: 'transform 0.2s',
-                                                '&:hover': {
-                                                    transform: 'scale(1.05)',
-                                                },
-                                                height: '100%',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                            }}
-                                        >
-                                            <CardMedia
-                                                component="img"
-                                                height="140"
-                                                src={imageSrc}
-                                                alt={product.product_name}
+                                    return (
+                                        <Grid item key={product.id} xs={12} sm={6} md={4}>
+                                            <Card
                                                 sx={{
-                                                    objectFit: 'contain',
-                                                    marginTop: theme.spacing(2),
+                                                    transition: 'transform 0.2s',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.05)',
+                                                    },
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
                                                 }}
-                                            />
-                                            <CardContent sx={{ flexGrow: 1 }}>
-                                                <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                                                    {product.product_name}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    價格：${product.price}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    庫存：{product.stock_quantity}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    狀態：
-                                                    {product.status === 'available'
-                                                        ? '可用'
-                                                        : product.status === 'out_of_stock'
-                                                            ? '缺貨'
-                                                            : '已停產'}
-                                                </Typography>
-                                            </CardContent>
-                                            <CardActions>
-                                                <Button
-                                                    size="small"
-                                                    color="secondary"
-                                                    onClick={() => handleAddToCart(product)}
-                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
-                                                >
-                                                    加入購物車
-                                                </Button>
-                                                <Button
-                                                    size="small"
-                                                    color="secondary"
-                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
-                                                >
-                                                    詳細資訊
-                                                </Button>
-                                            </CardActions>
-                                        </Card>
+                                            >
+                                                <CardMedia
+                                                    component="img"
+                                                    height="140"
+                                                    src={imageSrc}
+                                                    alt={product.product_name}
+                                                    sx={{
+                                                        objectFit: 'contain',
+                                                        marginTop: theme.spacing(2),
+                                                    }}
+                                                />
+                                                <CardContent sx={{ flexGrow: 1 }}>
+                                                    <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                                                        {product.product_name}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                        價格：${product.price}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                        庫存：{product.stock_quantity}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                        狀態：
+                                                        {product.status === 'available'
+                                                            ? '可用'
+                                                            : product.status === 'out_of_stock'
+                                                                ? '缺貨'
+                                                                : '已停產'}
+                                                    </Typography>
+                                                </CardContent>
+                                                <CardActions>
+                                                    <Button
+                                                        size="small"
+                                                        color="secondary"
+                                                        onClick={() => handleAddToCart(product)}
+                                                        sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                    >
+                                                        加入購物車
+                                                    </Button>
+                                                    <Button
+                                                        size="small"
+                                                        color="secondary"
+                                                        sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                    >
+                                                        詳細資訊
+                                                    </Button>
+                                                </CardActions>
+                                            </Card>
+                                        </Grid>
+                                    );
+                                })}
+                            </Grid>
+
+                            {/* 顯示購物車內容 */}
+                            {cartItems.length > 0 && (
+                                <Box sx={{ marginTop: theme.spacing(6) }}>
+                                    <Typography variant="h5" sx={{ marginBottom: theme.spacing(2), fontWeight: 'bold' }}>
+                                        我的購物車
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        {cartItems.map((item) => {
+                                            // 處理圖片來源
+                                            let imageSrc = '';
+                                            if (item.product.image_base64) {
+                                                if (item.product.image_base64.startsWith('data:image')) {
+                                                    imageSrc = item.product.image_base64;
+                                                } else {
+                                                    imageSrc = `data:image/png;base64,${item.product.image_base64}`;
+                                                }
+                                            } else {
+                                                imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
+                                            }
+
+                                            return (
+                                                <Grid item key={item.id} xs={12} sm={6} md={4}>
+                                                    <Card
+                                                        sx={{
+                                                            transition: 'transform 0.2s',
+                                                            '&:hover': {
+                                                                transform: 'scale(1.05)',
+                                                            },
+                                                            height: '100%',
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                        }}
+                                                    >
+                                                        <CardMedia
+                                                            component="img"
+                                                            height="140"
+                                                            src={imageSrc}
+                                                            alt={item.product.product_name}
+                                                            sx={{
+                                                                objectFit: 'contain',
+                                                                marginTop: theme.spacing(2),
+                                                            }}
+                                                        />
+                                                        <CardContent sx={{ flexGrow: 1 }}>
+                                                            <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                                                                {item.product.product_name}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                                價格：${item.price}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                                數量：{item.quantity}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                                                                小計：${(item.price * item.quantity).toFixed(2)}
+                                                            </Typography>
+                                                        </CardContent>
+                                                        <CardActions>
+                                                            <Button
+                                                                size="small"
+                                                                color="secondary"
+                                                                onClick={() => handleAddToCart(item.product)}
+                                                                sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                            >
+                                                                加入更多
+                                                            </Button>
+                                                            <Button
+                                                                size="small"
+                                                                color="secondary"
+                                                                onClick={() => navigate('/order-cart')}
+                                                                sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                                                            >
+                                                                前往購物車
+                                                            </Button>
+                                                        </CardActions>
+                                                    </Card>
+                                                </Grid>
+                                            );
+                                        })}
                                     </Grid>
-                                );
-                            })}
-                        </Grid>
+                                </Box>
+                            )}
+                        </>
                     )}
 
                     <Snackbar
