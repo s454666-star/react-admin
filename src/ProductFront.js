@@ -19,6 +19,7 @@ import {
     MenuItem,
     Modal,
     Snackbar,
+    Select,
     TextField,
     ThemeProvider,
     Toolbar,
