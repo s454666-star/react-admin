@@ -119,7 +119,7 @@ const ProductFront = () => {
             });
             if (response.data.length > 0) {
                 const pendingOrder = response.data[0];
-                const items = Array.isArray(pendingOrder.orderItems) ? pendingOrder.orderItems : [];
+                const items = Array.isArray(pendingOrder.order_items) ? pendingOrder.order_items : [];
                 setCartItems(items);
                 setTotalProducts(items.length);
             } else {
@@ -637,7 +637,7 @@ const ProductFront = () => {
                                         {cartItems.map((item) => {
                                             // 處理圖片來源
                                             let imageSrc = '';
-                                            if (item.product.image_base64) {
+                                            if (item.product && item.product.image_base64) {
                                                 if (item.product.image_base64.startsWith('data:image')) {
                                                     imageSrc = item.product.image_base64;
                                                 } else {
@@ -664,7 +664,7 @@ const ProductFront = () => {
                                                             component="img"
                                                             height="140"
                                                             src={imageSrc}
-                                                            alt={item.product.product_name}
+                                                            alt={item.product?.product_name || '商品名稱'}
                                                             sx={{
                                                                 objectFit: 'contain',
                                                                 marginTop: theme.spacing(2),
@@ -672,7 +672,7 @@ const ProductFront = () => {
                                                         />
                                                         <CardContent sx={{ flexGrow: 1 }}>
                                                             <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                                                                {item.product.product_name}
+                                                                {item.product?.product_name || '未知商品'}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                                 價格：${item.price}
