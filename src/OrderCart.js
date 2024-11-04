@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Alert,
     AppBar,
@@ -21,12 +21,12 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material';
-import {useTheme} from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import {Add, Delete, Remove} from '@mui/icons-material';
-import {Helmet} from 'react-helmet';
+import { Add, Delete, Remove } from '@mui/icons-material';
+import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister';
 import DeliveryAddress from './DeliveryAddress';
@@ -393,7 +393,7 @@ const OrderCart = () => {
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h6">訂單品項</Typography>
                                 <IconButton onClick={() => toggleSection('items')}>
-                                    {isItemsOpen ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
+                                    {isItemsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </IconButton>
                             </Box>
                             {isItemsOpen && (
@@ -461,8 +461,8 @@ const OrderCart = () => {
 
                         {isLoggedIn && (
                             <>
-                                <DeliveryAddress/>
-                                <CreditCard/>
+                                <DeliveryAddress />
+                                <CreditCard />
                             </>
                         )}
 
