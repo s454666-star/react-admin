@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
     Alert,
     AppBar,
@@ -7,19 +7,13 @@ import {
     Box,
     Button,
     Card,
-    CardActions,
-    CardContent,
     CardMedia,
     CircularProgress,
     Container,
     createTheme,
-    FormControl,
     Grid,
     IconButton,
-    InputLabel,
-    MenuItem,
     Modal,
-    Select,
     Snackbar,
     TextField,
     ThemeProvider,
@@ -27,12 +21,16 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Add, Remove, Delete } from '@mui/icons-material';
-import { Helmet } from 'react-helmet';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import {Add, Delete, Remove} from '@mui/icons-material';
+import {Helmet} from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister';
+import DeliveryAddress from './DeliveryAddress';
+import CreditCard from './CreditCard';
 
 const appTheme = createTheme({
     palette: {
@@ -63,12 +61,7 @@ const OrderCart = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
-    const [addresses, setAddresses] = useState([]);
-    const [creditCards, setCreditCards] = useState([]);
     const [isItemsOpen, setIsItemsOpen] = useState(true);
-    const [isAddressOpen, setIsAddressOpen] = useState(false);
-    const [isCreditCardOpen, setIsCreditCardOpen] = useState(false);
-    const [openModal, setOpenModal] = useState(false);
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
     const [openLoginModal, setOpenLoginModal] = useState(false);
     const [snackbar, setSnackbar] = useState({
@@ -87,8 +80,6 @@ const OrderCart = () => {
             setIsLoggedIn(true);
             fetchUserInfo();
             fetchCartItems();
-            fetchAddresses();
-            fetchCreditCards();
         }
     }, []);
 
@@ -156,30 +147,8 @@ const OrderCart = () => {
         }
     };
 
-    const fetchAddresses = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/delivery-addresses`);
-            setAddresses(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.error('Error fetching addresses:', error);
-            setAddresses([]);
-        }
-    };
-
-    const fetchCreditCards = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/credit-cards`);
-            setCreditCards(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.error('Error fetching credit cards:', error);
-            setCreditCards([]);
-        }
-    };
-
     const toggleSection = (section) => {
         if (section === 'items') setIsItemsOpen(!isItemsOpen);
-        if (section === 'address') setIsAddressOpen(!isAddressOpen);
-        if (section === 'creditCard') setIsCreditCardOpen(!isCreditCardOpen);
     };
 
     const handleQuantityChange = async (item, change) => {
@@ -218,8 +187,6 @@ const OrderCart = () => {
             const response = await axios.post(`${API_URL}/auth/login`, { email, password });
             if (response.data && response.data.token) {
                 localStorage.setItem('access_token', response.data.token);
-                localStorage.setItem('username', response.data.user.username);
-                localStorage.setItem('email_verified', response.data.user.email_verified);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
                 setUser({
                     id: response.data.user.id,
@@ -234,8 +201,6 @@ const OrderCart = () => {
                 });
                 setOpenLoginModal(false);
                 fetchCartItems();
-                fetchAddresses();
-                fetchCreditCards();
                 setAuthLoading(false);
             } else {
                 setSnackbar({
@@ -261,8 +226,6 @@ const OrderCart = () => {
             setAuthLoading(true);
             await axios.post(`${API_URL}/auth/logout`);
             localStorage.removeItem('access_token');
-            localStorage.removeItem('username');
-            localStorage.removeItem('email_verified');
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
             setUser({ id: null, username: '', email_verified: false });
@@ -429,9 +392,9 @@ const OrderCart = () => {
                         <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h6">訂單品項</Typography>
-                                <Button onClick={() => toggleSection('items')}>
-                                    {isItemsOpen ? '隱藏' : '顯示'}
-                                </Button>
+                                <IconButton onClick={() => toggleSection('items')}>
+                                    {isItemsOpen ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
+                                </IconButton>
                             </Box>
                             {isItemsOpen && (
                                 <Box>
@@ -496,97 +459,12 @@ const OrderCart = () => {
                             )}
                         </Card>
 
-                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Typography variant="h6">配送地址</Typography>
-                                <Button onClick={() => toggleSection('address')}>
-                                    {isAddressOpen ? '隱藏' : '顯示'}
-                                </Button>
-                            </Box>
-                            {isAddressOpen && (
-                                <Box>
-                                    {addresses && addresses.length > 0 ? (
-                                        <>
-                                            {addresses.map((address) => (
-                                                <Box key={address.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                        {address.recipient}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="textSecondary">
-                                                        {address.address}, {address.city}, {address.country}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="textSecondary">
-                                                        電話：{address.phone}
-                                                    </Typography>
-                                                </Box>
-                                            ))}
-                                            <Button variant="outlined" onClick={() => setOpenModal(true)}>
-                                                新增/編輯地址
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <Typography variant="body1" sx={{ padding: 2 }}>
-                                            尚無配送地址。
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-                        </Card>
-
-                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Typography variant="h6">付款信用卡</Typography>
-                                <Button onClick={() => toggleSection('creditCard')}>
-                                    {isCreditCardOpen ? '隱藏' : '顯示'}
-                                </Button>
-                            </Box>
-                            {isCreditCardOpen && (
-                                <Box>
-                                    {creditCards && creditCards.length > 0 ? (
-                                        <>
-                                            {creditCards.map((card) => (
-                                                <Box key={card.id} sx={{ padding: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                        {card.cardholder_name} - {card.card_type}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="textSecondary">
-                                                        卡號：{'**** **** **** ' + card.card_number.slice(-4)}
-                                                    </Typography>
-                                                </Box>
-                                            ))}
-                                            <Button variant="outlined" onClick={() => setOpenModal(true)}>
-                                                新增/編輯信用卡
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <Typography variant="body1" sx={{ padding: 2 }}>
-                                            尚無信用卡資料。
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-                        </Card>
-
-                        <Modal open={openModal} onClose={() => setOpenModal(false)}>
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: { xs: '90%', sm: 400 },
-                                    bgcolor: 'background.paper',
-                                    border: '2px solid #000',
-                                    boxShadow: 24,
-                                    p: 4,
-                                }}
-                            >
-                                <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                                    新增/編輯表單
-                                </Typography>
-                                <Typography>表單待實作</Typography>
-                            </Box>
-                        </Modal>
+                        {isLoggedIn && (
+                            <>
+                                <DeliveryAddress/>
+                                <CreditCard/>
+                            </>
+                        )}
 
                         <Snackbar
                             open={snackbar.open}
