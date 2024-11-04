@@ -7,7 +7,7 @@ import {
     Box,
     Button,
     Card,
-    CardContent,
+    CardMedia,
     CircularProgress,
     Container,
     createTheme,
@@ -20,7 +20,6 @@ import {
     Toolbar,
     Typography,
     useMediaQuery,
-    Fade,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -36,10 +35,7 @@ import CreditCard from './CreditCard';
 const appTheme = createTheme({
     palette: {
         primary: {
-            main: '#1976d2',
-        },
-        secondary: {
-            main: '#dc004e',
+            main: '#87CEFA',
         },
         background: {
             default: '#f4f6f8',
@@ -51,31 +47,6 @@ const appTheme = createTheme({
     },
     typography: {
         fontFamily: 'Roboto Slab, serif',
-    },
-    components: {
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 8,
-                    transition: 'background-color 0.3s, transform 0.3s',
-                    '&:hover': {
-                        transform: 'scale(1.05)',
-                    },
-                },
-            },
-        },
-        MuiCard: {
-            styleOverrides: {
-                root: {
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                    transition: 'transform 0.3s, box-shadow 0.3s',
-                    '&:hover': {
-                        transform: 'translateY(-5px)',
-                        boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-                    },
-                },
-            },
-        },
     },
 });
 
@@ -134,7 +105,7 @@ const OrderCart = () => {
                     filter: JSON.stringify({ status: 'pending' }),
                 },
             });
-            if (response.data.length > 0) {
+            if (response.data && response.data.length > 0) {
                 const pendingOrder = response.data[0];
                 const orderId = pendingOrder.id;
                 const orderResponse = await axios.get(`${API_URL}/orders/${orderId}`);
@@ -411,8 +382,6 @@ const OrderCart = () => {
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         paddingY: 5,
-                        minHeight: '80vh',
-                        transition: 'background-image 0.5s ease-in-out',
                     }}
                 >
                     <Container>
@@ -420,7 +389,7 @@ const OrderCart = () => {
                             我的購物車
                         </Typography>
 
-                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h6">訂單品項</Typography>
                                 <IconButton onClick={() => toggleSection('items')}>
@@ -432,10 +401,7 @@ const OrderCart = () => {
                                     {cartItems && cartItems.length > 0 ? (
                                         <>
                                             {cartItems.map((item) => (
-                                                <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0', transition: 'background-color 0.3s' }}
-                                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
-                                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                                >
+                                                <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0' }}>
                                                     <Grid container spacing={2} alignItems="center">
                                                         <Grid item xs={12} sm={6}>
                                                             <Box display="flex" alignItems="center">
@@ -447,10 +413,10 @@ const OrderCart = () => {
                                                                             : `data:image/png;base64,${item.product.image_base64}`
                                                                     }
                                                                     alt={item.product?.product_name || '產品圖片'}
-                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2, borderRadius: 2 }}
+                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2 }}
                                                                 />
                                                                 <Box>
-                                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                                                         {item.product?.product_name || '產品名稱'}
                                                                     </Typography>
                                                                     <Typography variant="body2" color="textSecondary">
@@ -460,11 +426,11 @@ const OrderCart = () => {
                                                             </Box>
                                                         </Grid>
                                                         <Grid item xs={6} sm={3} display="flex" alignItems="center">
-                                                            <IconButton onClick={() => handleQuantityChange(item, -1)} color="secondary">
+                                                            <IconButton onClick={() => handleQuantityChange(item, -1)}>
                                                                 <Remove />
                                                             </IconButton>
                                                             <Typography sx={{ marginX: 1 }}>{item.quantity}</Typography>
-                                                            <IconButton onClick={() => handleQuantityChange(item, 1)} color="secondary">
+                                                            <IconButton onClick={() => handleQuantityChange(item, 1)}>
                                                                 <Add />
                                                             </IconButton>
                                                         </Grid>
@@ -473,14 +439,6 @@ const OrderCart = () => {
                                                                 color="error"
                                                                 onClick={() => handleRemoveItem(item.order_id, item.id)}
                                                                 startIcon={<Delete />}
-                                                                sx={{
-                                                                    fontWeight: 'bold',
-                                                                    textTransform: 'none',
-                                                                    transition: 'background-color 0.3s',
-                                                                    '&:hover': {
-                                                                        backgroundColor: '#ffebee',
-                                                                    },
-                                                                }}
                                                             >
                                                                 刪除
                                                             </Button>
@@ -488,12 +446,12 @@ const OrderCart = () => {
                                                     </Grid>
                                                 </Box>
                                             ))}
-                                            <Typography variant="h6" sx={{ paddingTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>
+                                            <Typography variant="h6" sx={{ paddingTop: 2 }}>
                                                 小計金額：${parseFloat(totalAmount).toFixed(2)}
                                             </Typography>
                                         </>
                                     ) : (
-                                        <Typography variant="body1" sx={{ padding: 2, color: '#757575' }}>
+                                        <Typography variant="body1" sx={{ padding: 2 }}>
                                             購物車中沒有任何商品。
                                         </Typography>
                                     )}
@@ -512,12 +470,11 @@ const OrderCart = () => {
                             open={snackbar.open}
                             autoHideDuration={6000}
                             onClose={handleCloseSnackbar}
-                            TransitionComponent={Fade}
                         >
                             <Alert
                                 onClose={handleCloseSnackbar}
                                 severity={snackbar.severity}
-                                sx={{ width: '100%', fontWeight: 'bold' }}
+                                sx={{ width: '100%' }}
                             >
                                 {snackbar.message}
                             </Alert>
@@ -545,10 +502,7 @@ const OrderCart = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
-                            borderRadius: 2,
                         }}
-                        component={Fade}
-                        timeout={500}
                     >
                         <MemberRegister onClose={() => setOpenRegisterModal(false)} />
                     </Box>
@@ -566,10 +520,7 @@ const OrderCart = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
-                            borderRadius: 2,
                         }}
-                        component={Fade}
-                        timeout={500}
                     >
                         <Typography variant="h6" component="h2" sx={{ marginBottom: theme.spacing(2), color: theme.palette.text.primary, fontWeight: 'bold' }}>
                             會員登入
