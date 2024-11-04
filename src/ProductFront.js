@@ -15,6 +15,7 @@ import {
     createTheme,
     FormControl,
     Grid,
+    IconButton,
     InputLabel,
     MenuItem,
     Modal,
@@ -25,28 +26,58 @@ import {
     Toolbar,
     Typography,
     useMediaQuery,
+    Fade,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
-import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
+import MemberRegister from './MemberRegister';
+import LoginForm from './LoginForm';
 
 const appTheme = createTheme({
     palette: {
         primary: {
-            main: '#87CEFA',
+            main: '#1976d2',
+        },
+        secondary: {
+            main: '#dc004e',
         },
         background: {
             default: '#f4f6f8',
         },
         text: {
-            primary: '#003366', // 深藍色文字
+            primary: '#003366',
             secondary: '#00509e',
         },
     },
     typography: {
         fontFamily: 'Roboto Slab, serif',
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 8,
+                    transition: 'background-color 0.3s, transform 0.3s',
+                    '&:hover': {
+                        transform: 'scale(1.05)',
+                    },
+                },
+            },
+        },
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.3s, box-shadow 0.3s',
+                    '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+                    },
+                },
+            },
+        },
     },
 });
 
@@ -55,7 +86,7 @@ const API_URL = 'https://mystar.monster/api';
 const ProductFront = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-    const navigate = useNavigate(); // 使用 useNavigate 進行跳轉
+    const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -74,7 +105,7 @@ const ProductFront = () => {
     const [authLoading, setAuthLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
 
-    const [cartItems, setCartItems] = useState([]); // 新增 cartItems 狀態
+    const [cartItems, setCartItems] = useState([]);
 
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -223,7 +254,6 @@ const ProductFront = () => {
         if (!isLoggedIn) {
             setOpenLoginModal(true);
         } else {
-            console.log('User ID:', user.id); // 調試輸出
             try {
                 await axios.post(`${API_URL}/orders`, {
                     product_id: product.id,
@@ -257,24 +287,39 @@ const ProductFront = () => {
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/login`, { email, password });
-            const { access_token, user } = response.data;
-            localStorage.setItem('access_token', access_token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-            setUser(user);
-            setIsLoggedIn(true);
-            setAuthLoading(false);
-            setOpenLoginModal(false);
-            fetchCartItems(); // 獲取登入後的購物車數據
-            // 顯示登入成功的通知
+            const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+            if (response.data && response.data.token) {
+                localStorage.setItem('access_token', response.data.token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                setUser({
+                    id: response.data.user.id,
+                    username: response.data.user.username,
+                    email_verified: response.data.user.email_verified,
+                });
+                setIsLoggedIn(true);
+                setSnackbar({
+                    open: true,
+                    message: '登入成功！',
+                    severity: 'success',
+                });
+                setOpenLoginModal(false);
+                fetchCartItems();
+                setAuthLoading(false);
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: '登入失敗，請檢查您的帳號或密碼',
+                    severity: 'error',
+                });
+                setAuthLoading(false);
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
             setSnackbar({
                 open: true,
-                message: '登入成功！',
-                severity: 'success',
+                message: '登入失敗，請稍後再試',
+                severity: 'error',
             });
-        } catch (err) {
-            console.error('登入失敗', err);
-            setLoginError(err.response?.data?.message || '登入失敗，請稍後再試。');
             setAuthLoading(false);
         }
     };
@@ -283,23 +328,28 @@ const ProductFront = () => {
     const handleLogout = async () => {
         try {
             setAuthLoading(true);
-            await axios.post(`${API_URL}/logout`);
+            await axios.post(`${API_URL}/auth/logout`);
             localStorage.removeItem('access_token');
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
             setUser({ id: null, username: '', email_verified: false });
-            setCartItems([]); // 清空購物車
+            setCartItems([]);
             setTotalProducts(0);
-            setAuthLoading(false);
-            // 顯示登出成功的通知
             setSnackbar({
                 open: true,
                 message: '登出成功！',
                 severity: 'success',
             });
-        } catch (err) {
-            console.error('登出失敗', err);
-            setError('登出失敗，請稍後再試。');
+            setAuthLoading(false);
+            navigate('/');
+            window.location.reload();
+        } catch (error) {
+            console.error('登出失敗', error);
+            setSnackbar({
+                open: true,
+                message: '登出失敗，請稍後再試。',
+                severity: 'error',
+            });
             setAuthLoading(false);
         }
     };
@@ -308,7 +358,7 @@ const ProductFront = () => {
         <ThemeProvider theme={appTheme}>
             <div>
                 <Helmet>
-                    <title>星夜商城</title>
+                    <title>我的購物車 - 星夜商城</title>
                     <link rel="icon" href="/icon_198x278.png" type="image/png" />
                     <link
                         href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
@@ -337,7 +387,6 @@ const ProductFront = () => {
                         >
                             星夜電商平台
                         </Typography>
-                        {/* 新增購物車按鈕 */}
                         <Button
                             color="secondary"
                             onClick={() => navigate('/order-cart')}
@@ -348,6 +397,10 @@ const ProductFront = () => {
                                 marginRight: theme.spacing(2),
                                 display: 'flex',
                                 alignItems: 'center',
+                                transition: 'color 0.3s',
+                                '&:hover': {
+                                    color: theme.palette.secondary.main,
+                                },
                             }}
                         >
                             <Badge badgeContent={cartItems.length} color="error">
@@ -366,6 +419,10 @@ const ProductFront = () => {
                                         color: '#f5f6f6',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
+                                        transition: 'color 0.3s',
+                                        '&:hover': {
+                                            color: theme.palette.secondary.main,
+                                        },
                                     }}
                                 >
                                     登入
@@ -378,6 +435,10 @@ const ProductFront = () => {
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                         marginLeft: theme.spacing(1),
+                                        transition: 'color 0.3s',
+                                        '&:hover': {
+                                            color: theme.palette.secondary.main,
+                                        },
                                     }}
                                 >
                                     註冊
@@ -399,7 +460,7 @@ const ProductFront = () => {
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#d32f2f', // 鮮豔紅色
+                                            color: '#d32f2f',
                                             marginRight: theme.spacing(2),
                                             fontWeight: 'bold',
                                         }}
@@ -414,6 +475,10 @@ const ProductFront = () => {
                                         color: '#f7f8fa',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
+                                        transition: 'color 0.3s',
+                                        '&:hover': {
+                                            color: theme.palette.secondary.main,
+                                        },
                                     }}
                                 >
                                     登出
@@ -423,232 +488,134 @@ const ProductFront = () => {
                     </Toolbar>
                 </AppBar>
 
-                <Container>
-                    <Box sx={{ marginBottom: theme.spacing(4), display: 'flex', overflowX: 'auto' }}>
-                        {categories.map((category) => (
-                            <Button
-                                key={category.id}
-                                variant={selectedCategory === category.id ? 'contained' : 'outlined'}
-                                color="primary"
-                                sx={{
-                                    marginRight: theme.spacing(2),
-                                    whiteSpace: 'nowrap',
-                                    fontWeight: 'bold',
-                                    textTransform: 'none',
-                                }}
-                                onClick={() => handleCategorySelect(category.id)}
-                            >
-                                {category.category_name}
-                            </Button>
-                        ))}
-                    </Box>
+                <Box
+                    sx={{
+                        backgroundImage: 'url(/path/to/background/image.jpg)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        paddingY: 5,
+                        minHeight: '80vh',
+                        transition: 'background-image 0.5s ease-in-out',
+                    }}
+                >
+                    <Container>
+                        <Typography variant="h4" sx={{ fontWeight: 'bold', marginY: 3, color: '#003366' }}>
+                            我的購物車
+                        </Typography>
 
-                    <Grid container spacing={2} sx={{ marginBottom: theme.spacing(4) }}>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth
-                                label="搜尋商品名稱"
-                                variant="outlined"
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        color: theme.palette.text.primary,
-                                        fontWeight: 'bold',
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: theme.palette.text.primary,
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                    },
-                                    '& .MuiInputBase-input': {
-                                        color: theme.palette.text.primary,
-                                        fontWeight: 'bold',
-                                    },
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormControl fullWidth variant="outlined">
-                                <InputLabel sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
-                                    排序欄位
-                                </InputLabel>
-                                <Select
-                                    value={sortField}
-                                    onChange={handleSortFieldChange}
-                                    label="排序欄位"
-                                    sx={{
-                                        '& .MuiSelect-icon': {
-                                            color: theme.palette.text.primary,
-                                        },
-                                        '& .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.primary,
-                                        },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                        color: theme.palette.text.primary,
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    <MenuItem value="product_name">商品名稱</MenuItem>
-                                    <MenuItem value="price">價格</MenuItem>
-                                    <MenuItem value="stock_quantity">庫存數量</MenuItem>
-                                    <MenuItem value="id">編號</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormControl fullWidth variant="outlined">
-                                <InputLabel sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
-                                    排序方式
-                                </InputLabel>
-                                <Select
-                                    value={sortDirection}
-                                    onChange={handleSortDirectionChange}
-                                    label="排序方式"
-                                    sx={{
-                                        '& .MuiSelect-icon': {
-                                            color: theme.palette.text.primary,
-                                        },
-                                        '& .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.primary,
-                                        },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: theme.palette.text.secondary,
-                                        },
-                                        color: theme.palette.text.primary,
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    <MenuItem value="asc">升冪</MenuItem>
-                                    <MenuItem value="desc">降冪</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-
-                    {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: theme.spacing(4) }}>
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        <Grid container spacing={4}>
-                            {products.map((product) => {
-                                // 處理圖片來源
-                                let imageSrc = '';
-                                if (product.image_base64) {
-                                    if (product.image_base64.startsWith('data:image')) {
-                                        imageSrc = product.image_base64;
-                                    } else {
-                                        // 假設圖片格式為 PNG，如果有其他格式，請根據實際情況修改
-                                        imageSrc = `data:image/png;base64,${product.image_base64}`;
-                                    }
-                                } else {
-                                    // 設定預設圖片（可選）
-                                    imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
-                                }
-
-                                return (
-                                    <Grid item key={product.id} xs={12} sm={6} md={4}>
-                                        <Card
-                                            sx={{
-                                                transition: 'transform 0.2s',
-                                                '&:hover': {
-                                                    transform: 'scale(1.05)',
-                                                },
-                                                height: '100%',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                            }}
-                                        >
-                                            <CardMedia
-                                                component="img"
-                                                height="140"
-                                                src={imageSrc}
-                                                alt={product.product_name}
-                                                sx={{
-                                                    objectFit: 'contain',
-                                                    marginTop: theme.spacing(2),
-                                                }}
-                                            />
-                                            <CardContent sx={{ flexGrow: 1 }}>
-                                                <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                                                    {product.product_name}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    價格：${product.price}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    庫存：{product.stock_quantity}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                    狀態：
-                                                    {product.status === 'available'
-                                                        ? '可用'
-                                                        : product.status === 'out_of_stock'
-                                                            ? '缺貨'
-                                                            : '已停產'}
-                                                </Typography>
-                                            </CardContent>
-                                            <CardActions>
-                                                <Button
-                                                    size="small"
-                                                    color="secondary"
-                                                    onClick={() => handleAddToCart(product)}
-                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
+                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant="h6">訂單品項</Typography>
+                                <IconButton onClick={() => toggleSection('items')}>
+                                    {isItemsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                            </Box>
+                            {isItemsOpen && (
+                                <Box>
+                                    {cartItems && cartItems.length > 0 ? (
+                                        <>
+                                            {cartItems.map((item) => (
+                                                <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0', transition: 'background-color 0.3s' }}
+                                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
+                                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                                 >
-                                                    加入購物車
-                                                </Button>
-                                                <Button
-                                                    size="small"
-                                                    color="secondary"
-                                                    sx={{ fontWeight: 'bold', textTransform: 'none' }}
-                                                >
-                                                    詳細資訊
-                                                </Button>
-                                            </CardActions>
-                                        </Card>
-                                    </Grid>
-                                );
-                            })}
-                        </Grid>
-                    )}
+                                                    <Grid container spacing={2} alignItems="center">
+                                                        <Grid item xs={12} sm={6}>
+                                                            <Box display="flex" alignItems="center">
+                                                                <CardMedia
+                                                                    component="img"
+                                                                    image={
+                                                                        item.product?.image_base64?.startsWith('data:image')
+                                                                            ? item.product.image_base64
+                                                                            : `data:image/png;base64,${item.product.image_base64}`
+                                                                    }
+                                                                    alt={item.product?.product_name || '產品圖片'}
+                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2, borderRadius: 2 }}
+                                                                />
+                                                                <Box>
+                                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                                                                        {item.product?.product_name || '產品名稱'}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" color="textSecondary">
+                                                                        單價：${parseFloat(item.price).toFixed(2)}
+                                                                    </Typography>
+                                                                </Box>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item xs={6} sm={3} display="flex" alignItems="center">
+                                                            <IconButton onClick={() => handleQuantityChange(item, -1)} color="secondary">
+                                                                <Remove />
+                                                            </IconButton>
+                                                            <Typography sx={{ marginX: 1 }}>{item.quantity}</Typography>
+                                                            <IconButton onClick={() => handleQuantityChange(item, 1)} color="secondary">
+                                                                <Add />
+                                                            </IconButton>
+                                                        </Grid>
+                                                        <Grid item xs={12} sm={3} display="flex" justifyContent="flex-end">
+                                                            <Button
+                                                                color="error"
+                                                                onClick={() => handleRemoveItem(item.order_id, item.id)}
+                                                                startIcon={<Delete />}
+                                                                sx={{
+                                                                    fontWeight: 'bold',
+                                                                    textTransform: 'none',
+                                                                    transition: 'background-color 0.3s',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#ffebee',
+                                                                    },
+                                                                }}
+                                                            >
+                                                                刪除
+                                                            </Button>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Box>
+                                            ))}
+                                            <Typography variant="h6" sx={{ paddingTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>
+                                                小計金額：${parseFloat(totalAmount).toFixed(2)}
+                                            </Typography>
+                                        </>
+                                    ) : (
+                                        <Typography variant="body1" sx={{ padding: 2, color: '#757575' }}>
+                                            購物車中沒有任何商品。
+                                        </Typography>
+                                    )}
+                                </Box>
+                            )}
+                        </Card>
 
-                    <Snackbar
-                        open={snackbar.open}
-                        autoHideDuration={6000}
-                        onClose={() => setSnackbar({ ...snackbar, open: false })}
-                    >
-                        <Alert
-                            onClose={() => setSnackbar({ ...snackbar, open: false })}
-                            severity={snackbar.severity}
-                            sx={{ width: '100%' }}
+                        {isLoggedIn && (
+                            <>
+                                <DeliveryAddress />
+                                <CreditCard />
+                            </>
+                        )}
+
+                        <Snackbar
+                            open={snackbar.open}
+                            autoHideDuration={6000}
+                            onClose={handleCloseSnackbar}
+                            TransitionComponent={Fade}
                         >
-                            {snackbar.message}
-                        </Alert>
-                    </Snackbar>
+                            <Alert
+                                onClose={handleCloseSnackbar}
+                                severity={snackbar.severity}
+                                sx={{ width: '100%', fontWeight: 'bold' }}
+                            >
+                                {snackbar.message}
+                            </Alert>
+                        </Snackbar>
 
-                    <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
-                        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%', fontWeight: 'bold' }}>
-                            {error}
-                        </Alert>
-                    </Snackbar>
-                </Container>
+                        {error && (
+                            <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+                                <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%', fontWeight: 'bold' }}>
+                                    {error}
+                                </Alert>
+                            </Snackbar>
+                        )}
+                    </Container>
+                </Box>
 
-                {/* 會員註冊的 Modal */}
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                     <Box
                         sx={{
@@ -661,13 +628,15 @@ const ProductFront = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
+                            borderRadius: 2,
                         }}
+                        component={Fade}
+                        timeout={500}
                     >
                         <MemberRegister onClose={() => setOpenRegisterModal(false)} />
                     </Box>
                 </Modal>
 
-                {/* 會員登入的 Modal */}
                 <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
                     <Box
                         sx={{
@@ -680,7 +649,10 @@ const ProductFront = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
+                            borderRadius: 2,
                         }}
+                        component={Fade}
+                        timeout={500}
                     >
                         <Typography variant="h6" component="h2" sx={{ marginBottom: theme.spacing(2), color: theme.palette.text.primary, fontWeight: 'bold' }}>
                             會員登入
@@ -690,7 +662,6 @@ const ProductFront = () => {
                 </Modal>
             </div>
         </ThemeProvider>
-    );
 };
 
 // LoginForm 組件
@@ -699,9 +670,9 @@ const LoginForm = ({ onLogin, loading, error }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        onLogin(email, password);
+        await onLogin(email, password);
     };
 
     return (
