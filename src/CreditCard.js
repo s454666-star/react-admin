@@ -33,7 +33,6 @@ const CreditCard = () => {
         billing_address: '',
         postal_code: '',
         country: 'Taiwan',
-        city: '',
         is_default: false,
     });
     const [error, setError] = useState('');
@@ -57,14 +56,13 @@ const CreditCard = () => {
         if (card) {
             setCurrentCard(card);
             setFormData({
-                cardholder_name: card.cardholder_name,
+                cardholder_name: card.cardholder_name || '',
                 card_number: card.card_number || '',
                 expiry_date: card.expiry_date || '',
                 card_type: card.card_type || '',
                 billing_address: card.billing_address || '',
                 postal_code: card.postal_code || '',
                 country: card.country || 'Taiwan',
-                city: card.city || '',
                 is_default: card.is_default === 1,
             });
         } else {
@@ -77,7 +75,6 @@ const CreditCard = () => {
                 billing_address: '',
                 postal_code: '',
                 country: 'Taiwan',
-                city: '',
                 is_default: false,
             });
         }
@@ -145,7 +142,7 @@ const CreditCard = () => {
                                                 到期日：{card.expiry_date}
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
-                                                帳單地址：{card.billing_address}, {card.city}, {card.country}
+                                                帳單地址：{card.billing_address}, {card.country}
                                             </Typography>
                                             {card.is_default === 1 && (
                                                 <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold' }}>
@@ -261,15 +258,6 @@ const CreditCard = () => {
                         onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
                     />
                     <TextField
-                        label="城市"
-                        variant="outlined"
-                        fullWidth
-                        required
-                        margin="normal"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    />
-                    <TextField
                         label="國家"
                         variant="outlined"
                         fullWidth
@@ -300,6 +288,7 @@ const CreditCard = () => {
             </Modal>
         </Box>
     );
+
 };
 
 export default CreditCard;
