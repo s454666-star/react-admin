@@ -119,8 +119,8 @@ const OrderCart = () => {
                 const orderId = pendingOrder.id;
                 const orderResponse = await axios.get(`${API_URL}/orders/${orderId}`);
                 const order = orderResponse.data;
-                const items = Array.isArray(order.orderItems) ? order.orderItems : [];
-                const calculatedTotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+                const items = Array.isArray(order.order_items) ? order.order_items : [];
+                const calculatedTotalAmount = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0);
                 setCartItems(items);
                 setTotalAmount(calculatedTotalAmount);
             } else {
@@ -444,9 +444,11 @@ const OrderCart = () => {
                                                             <Box display="flex" alignItems="center">
                                                                 <CardMedia
                                                                     component="img"
-                                                                    image={item.product?.image_base64?.startsWith('data:image')
-                                                                        ? item.product.image_base64
-                                                                        : `data:image/png;base64,${item.product.image_base64}`}
+                                                                    image={
+                                                                        item.product?.image_base64?.startsWith('data:image')
+                                                                            ? item.product.image_base64
+                                                                            : `data:image/png;base64,${item.product.image_base64}`
+                                                                    }
                                                                     alt={item.product?.product_name || '產品圖片'}
                                                                     sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2 }}
                                                                 />
@@ -579,6 +581,9 @@ const OrderCart = () => {
                                     p: 4,
                                 }}
                             >
+                                <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                                    新增/編輯表單
+                                </Typography>
                                 <Typography>表單待實作</Typography>
                             </Box>
                         </Modal>
@@ -606,27 +611,6 @@ const OrderCart = () => {
                         )}
                     </Container>
                 </Box>
-
-                <Modal open={openModal} onClose={() => setOpenModal(false)}>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: { xs: '90%', sm: 400 },
-                            bgcolor: 'background.paper',
-                            border: '2px solid #000',
-                            boxShadow: 24,
-                            p: 4,
-                        }}
-                    >
-                        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                            新增/編輯表單
-                        </Typography>
-                        <Typography>表單待實作</Typography>
-                    </Box>
-                </Modal>
 
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                     <Box
@@ -671,6 +655,7 @@ const OrderCart = () => {
     );
 };
 
+// LoginForm 組件
 const LoginForm = ({ onLogin, loading, error }) => {
     const theme = useTheme();
     const [email, setEmail] = useState('');
