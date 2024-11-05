@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource, useNavigate } from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -16,7 +16,7 @@ import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import VideosList from './VideosList';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
@@ -170,11 +170,11 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /orders
+// Dashboard 組件，用於重定向到 /star-admin/orders
 const Dashboard = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // 從 react-router-dom 導入 useNavigate
     useEffect(() => {
-        navigate('/orders', { replace: true });
+        navigate('/star-admin/orders', { replace: true });
     }, [navigate]);
     return null;
 };
@@ -252,9 +252,7 @@ const App = () => (
                 <Route path="/member-register" element={<MemberRegister />} />
                 <Route path="/order-cart" element={<OrderCart />} />
 
-                {/* 預設路由：若訪問 /star-admin，則重定向到 /star-admin/orders */}
-                <Route path="/star-admin" element={<Navigate to="/star-admin/orders" replace />} />
-
+                {/* 預設路由：若訪問 /star-admin，則 Dashboard 組件會處理重定向 */}
                 {/* 可選：其他預設路由，例如首頁 */}
                 <Route path="*" element={<ProductFront />} />
             </Routes>
