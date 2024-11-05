@@ -202,7 +202,6 @@ const App = () => (
                             loginPage={Login}
                             appBar={MyAppBar}
                             i18nProvider={i18nProvider}
-                            dashboard={Dashboard}
                             theme={theme}
                         >
                             <Resource
