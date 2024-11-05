@@ -81,9 +81,9 @@ export const OrderList = (props) => (
                 label="總金額"
                 render={(record) => {
                     const totalItemsPrice = record.orderItems
-                        ? record.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+                        ? record.orderItems.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
                         : 0;
-                    const totalAmount = totalItemsPrice + (record.shipping_fee || 0);
+                    const totalAmount = totalItemsPrice + Number(record.shipping_fee || 0);
                     return `${totalAmount.toFixed(2)} 元`;
                 }}
             />
