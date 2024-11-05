@@ -12,7 +12,6 @@ import {
     SimpleForm,
     ReferenceInput,
     TextInput,
-    SelectArrayInput,
     Edit,
     Filter,
 } from 'react-admin';

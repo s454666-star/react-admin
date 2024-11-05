@@ -9,7 +9,6 @@ import {
     Create,
     SimpleForm,
     TextInput,
-    EmailInput,
     Edit,
     Filter,
 } from 'react-admin';
@@ -19,7 +18,7 @@ const MemberFilter = (props) => (
     <Filter {...props}>
         <TextInput label="搜尋" source="q" alwaysOn />
         <TextInput label="姓名" source="name" />
-        <EmailInput label="電子郵件" source="email" />
+        <TextInput label="電子郵件" source="email" type="email" />
     </Filter>
 );
 
@@ -43,7 +42,7 @@ export const MemberCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
             <TextInput source="name" label="姓名" required />
-            <EmailInput source="email" label="電子郵件" required />
+            <TextInput source="email" label="電子郵件" type="email" required />
             <TextInput source="phone" label="電話" />
             <TextInput source="address" label="地址" />
         </SimpleForm>
@@ -55,7 +54,7 @@ export const MemberEdit = (props) => (
     <Edit {...props}>
         <SimpleForm>
             <TextInput source="name" label="姓名" required />
-            <EmailInput source="email" label="電子郵件" required />
+            <TextInput source="email" label="電子郵件" type="email" required />
             <TextInput source="phone" label="電話" />
             <TextInput source="address" label="地址" />
         </SimpleForm>

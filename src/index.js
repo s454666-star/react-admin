@@ -1,4 +1,3 @@
-// index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Admin, Resource } from 'react-admin';
@@ -24,6 +23,7 @@ import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
 import { MemberList, MemberCreate, MemberEdit } from './Member';
 import { OrderList, OrderCreate, OrderEdit } from './Order';
+import { Helmet } from 'react-helmet';
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -165,6 +165,14 @@ const theme = createTheme({
 
 const App = () => (
     <ThemeProvider theme={theme}>
+        <Helmet>
+            <title>星夜商城後台</title>
+            <link rel="icon" href="/icon_198x278.png" type="image/png" />
+            <link
+                href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+                rel="stylesheet"
+            />
+        </Helmet>
         <BrowserRouter>
             <Routes>
                 <Route exact path="/videos-list" element={<VideosList />} />
