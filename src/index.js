@@ -172,73 +172,79 @@ const theme = createTheme({
 });
 
 const App = () => (
-    <ThemeProvider theme={theme}>
-        <Helmet>
-            <title>星夜商城後台</title>
-            <link rel="icon" href="/icon_198x278.png" type="image/png" />
-            <link
-                href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
-                rel="stylesheet"
-            />
-        </Helmet>
-        <Admin
-            authProvider={authProvider}
-            dataProvider={dataProvider}
-            loginPage={Login}
-            appBar={MyAppBar}
-            i18nProvider={i18nProvider}
-        >
-            <Resource
-                name="members"
-                list={MemberList}
-                create={MemberCreate}
-                edit={MemberEdit}
-                show={MemberShow}
-                options={{ label: '會員' }}
-            />
-            <Resource
-                name="orders"
-                list={OrderList}
-                create={OrderCreate}
-                edit={OrderEdit}
-                show={OrderShow}
-                options={{ label: '訂單' }}
-            />
-            <Resource
-                name="users"
-                list={UserList}
-                create={UserCreate}
-                edit={UserEdit}
-                show={UserShow}
-                options={{ label: '使用者' }}
-            />
-            <Resource
-                name="products"
-                options={{ label: '商品' }}
-                list={ProductList}
-                create={ProductCreate}
-                edit={ProductEdit}
-            />
-            <Resource
-                name="product-categories"
-                options={{ label: '產品類別' }}
-                list={ProductCategoryList}
-                create={ProductCategoryCreate}
-                edit={ProductCategoryEdit}
-            />
-        </Admin>
-        <BrowserRouter>
+    <BrowserRouter>
+        <ThemeProvider theme={theme}>
+            <Helmet>
+                <title>星夜商城後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png" />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+                    rel="stylesheet"
+                />
+            </Helmet>
             <Routes>
-                <Route exact path="/videos-list" element={<VideosList />} />
-                <Route exact path="/star-album/*" element={<StarAlbum />} />
-                <Route exact path="/star-video/*" element={<FileScreenshotList />} />
-                <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
-                <Route exact path="/star-mall" element={<ProductFront />} />
-                <Route exact path="/member-register" element={<MemberRegister />} />
-                <Route exact path="/order-cart" element={<OrderCart />} />
+                <Route path="/admin/*" element={
+                    <Admin
+                        authProvider={authProvider}
+                        dataProvider={dataProvider}
+                        loginPage={Login}
+                        appBar={MyAppBar}
+                        i18nProvider={i18nProvider}
+                    >
+                        <Resource
+                            name="members"
+                            list={MemberList}
+                            create={MemberCreate}
+                            edit={MemberEdit}
+                            show={MemberShow}
+                            options={{ label: '會員' }}
+                        />
+                        <Resource
+                            name="orders"
+                            list={OrderList}
+                            create={OrderCreate}
+                            edit={OrderEdit}
+                            show={OrderShow}
+                            options={{ label: '訂單' }}
+                        />
+                        <Resource
+                            name="users"
+                            list={UserList}
+                            create={UserCreate}
+                            edit={UserEdit}
+                            show={UserShow}
+                            options={{ label: '使用者' }}
+                        />
+                        <Resource
+                            name="products"
+                            options={{ label: '商品' }}
+                            list={ProductList}
+                            create={ProductCreate}
+                            edit={ProductEdit}
+                        />
+                        <Resource
+                            name="product-categories"
+                            options={{ label: '產品類別' }}
+                            list={ProductCategoryList}
+                            create={ProductCategoryCreate}
+                            edit={ProductCategoryEdit}
+                        />
+                    </Admin>
+                } />
+
+                <Route path="/videos-list" element={<VideosList />} />
+                <Route path="/star-album/*" element={<StarAlbum />} />
+                <Route path="/star-video/*" element={<FileScreenshotList />} />
+                <Route path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
+                <Route path="/star-mall" element={<ProductFront />} />
+                <Route path="/member-register" element={<MemberRegister />} />
+                <Route path="/order-cart" element={<OrderCart />} />
+
+                {/* 可選：預設路由，例如首頁 */}
+                <Route path="*" element={<ProductFront />} />
             </Routes>
-        </BrowserRouter>
-    </ThemeProvider>
+        </ThemeProvider>
+    </BrowserRouter>
 );
 
 ReactDOM.render(<App />, document.getElementById('root'));

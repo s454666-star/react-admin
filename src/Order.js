@@ -6,10 +6,10 @@ import {
     ReferenceField,
     DateField,
     SelectInput,
-    SelectField, // 已添加
+    SelectField,
     EditButton,
     DeleteButton,
-    ShowButton, // 已添加
+    ShowButton,
     Create,
     SimpleForm,
     ReferenceInput,
@@ -18,7 +18,8 @@ import {
     Filter,
     Show,
     SimpleShowLayout,
-    NumberInput, // 已更改
+    NumberInput,
+    FunctionField,
 } from 'react-admin';
 
 // 訂單狀態選項
@@ -45,11 +46,47 @@ export const OrderList = (props) => (
     <List {...props} filters={<OrderFilter />} perPage={25}>
         <Datagrid rowClick="show">
             <TextField source="id" />
-            <ReferenceField source="member_id" reference="members" label="會員">
-                <TextField source="name" />
+            {/* 會員名稱和地址 */}
+            <ReferenceField source="member_id" reference="members" label="會員" link={false}>
+                <FunctionField
+                    render={(record) => (
+                        <span>
+                            <div><strong>姓名:</strong> {record.name}</div>
+                            <div><strong>地址:</strong> {record.address}</div>
+                        </span>
+                    )}
+                />
             </ReferenceField>
             <TextField source="order_number" label="訂單編號" />
             <SelectField source="status" label="狀態" choices={orderStatusChoices} />
+            {/* 顯示訂單品項 */}
+            <FunctionField
+                label="訂單品項"
+                render={(record) => (
+                    <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                        {record.orderItems && record.orderItems.length > 0 ? (
+                            record.orderItems.map((item) => (
+                                <li key={item.id}>
+                                    {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
+                                </li>
+                            ))
+                        ) : (
+                            <li>無品項</li>
+                        )}
+                    </ul>
+                )}
+            />
+            {/* 訂單總金額 */}
+            <FunctionField
+                label="總金額"
+                render={(record) => {
+                    const totalItemsPrice = record.orderItems
+                        ? record.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+                        : 0;
+                    const totalAmount = totalItemsPrice + (record.shipping_fee || 0);
+                    return `${totalAmount.toFixed(2)} 元`;
+                }}
+            />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />
             <EditButton />
@@ -105,17 +142,23 @@ export const OrderShow = (props) => (
             <NumberField source="shipping_fee" label="運費" />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />
-            {/* 如果有訂單明細，可以使用 ArrayField */}
-            {/* <ArrayField source="orderItems" label="訂單明細">
-                <Datagrid>
-                    <TextField source="id" label="品項ID" />
-                    <ReferenceField source="product_id" reference="products" label="產品名稱">
-                        <TextField source="name" />
-                    </ReferenceField>
-                    <NumberField source="quantity" label="數量" />
-                    <NumberField source="price" label="價格" />
-                </Datagrid>
-            </ArrayField> */}
+            {/* 訂單明細 */}
+            <FunctionField
+                label="訂單明細"
+                render={(record) => (
+                    <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                        {record.orderItems && record.orderItems.length > 0 ? (
+                            record.orderItems.map((item) => (
+                                <li key={item.id}>
+                                    {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
+                                </li>
+                            ))
+                        ) : (
+                            <li>無品項</li>
+                        )}
+                    </ul>
+                )}
+            />
         </SimpleShowLayout>
     </Show>
 );
