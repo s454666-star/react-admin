@@ -16,7 +16,7 @@ import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import VideosList from './VideosList';
-import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
@@ -170,11 +170,11 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /star-admin/orders
+// Dashboard 組件，用於重定向到 /orders
 const Dashboard = () => {
-    const navigate = useNavigate(); // 從 react-router-dom 導入 useNavigate
+    const navigate = useNavigate();
     useEffect(() => {
-        navigate('/star-admin/orders', { replace: true });
+        navigate('/orders', { replace: true });
     }, [navigate]);
     return null;
 };
@@ -192,56 +192,60 @@ const App = () => (
             </Helmet>
             <Routes>
                 {/* 後台路由 */}
-                <Route path="/star-admin/*" element={
-                    <Admin
-                        authProvider={authProvider}
-                        dataProvider={dataProvider}
-                        loginPage={Login}
-                        appBar={MyAppBar}
-                        i18nProvider={i18nProvider}
-                        dashboard={Dashboard} // 設定 Dashboard 重定向
-                        theme={theme} // 可選：傳遞主題
-                    >
-                        <Resource
-                            name="members"
-                            list={MemberList}
-                            create={MemberCreate}
-                            edit={MemberEdit}
-                            show={MemberShow}
-                            options={{ label: '會員' }}
-                        />
-                        <Resource
-                            name="orders"
-                            list={OrderList}
-                            create={OrderCreate}
-                            edit={OrderEdit}
-                            show={OrderShow}
-                            options={{ label: '訂單' }}
-                        />
-                        <Resource
-                            name="users"
-                            list={UserList}
-                            create={UserCreate}
-                            edit={UserEdit}
-                            show={UserShow}
-                            options={{ label: '使用者' }}
-                        />
-                        <Resource
-                            name="products"
-                            options={{ label: '商品' }}
-                            list={ProductList}
-                            create={ProductCreate}
-                            edit={ProductEdit}
-                        />
-                        <Resource
-                            name="product-categories"
-                            options={{ label: '產品類別' }}
-                            list={ProductCategoryList}
-                            create={ProductCategoryCreate}
-                            edit={ProductCategoryEdit}
-                        />
-                    </Admin>
-                } />
+                <Route
+                    path="/star-admin/*"
+                    element={
+                        <Admin
+                            basename="/star-admin"
+                            authProvider={authProvider}
+                            dataProvider={dataProvider}
+                            loginPage={Login}
+                            appBar={MyAppBar}
+                            i18nProvider={i18nProvider}
+                            dashboard={Dashboard}
+                            theme={theme}
+                        >
+                            <Resource
+                                name="members"
+                                list={MemberList}
+                                create={MemberCreate}
+                                edit={MemberEdit}
+                                show={MemberShow}
+                                options={{ label: '會員' }}
+                            />
+                            <Resource
+                                name="orders"
+                                list={OrderList}
+                                create={OrderCreate}
+                                edit={OrderEdit}
+                                show={OrderShow}
+                                options={{ label: '訂單' }}
+                            />
+                            <Resource
+                                name="users"
+                                list={UserList}
+                                create={UserCreate}
+                                edit={UserEdit}
+                                show={UserShow}
+                                options={{ label: '使用者' }}
+                            />
+                            <Resource
+                                name="products"
+                                options={{ label: '商品' }}
+                                list={ProductList}
+                                create={ProductCreate}
+                                edit={ProductEdit}
+                            />
+                            <Resource
+                                name="product-categories"
+                                options={{ label: '產品類別' }}
+                                list={ProductCategoryList}
+                                create={ProductCategoryCreate}
+                                edit={ProductCategoryEdit}
+                            />
+                        </Admin>
+                    }
+                />
 
                 {/* 前台路由 */}
                 <Route path="/videos-list" element={<VideosList />} />
@@ -252,8 +256,7 @@ const App = () => (
                 <Route path="/member-register" element={<MemberRegister />} />
                 <Route path="/order-cart" element={<OrderCart />} />
 
-                {/* 預設路由：若訪問 /star-admin，則 Dashboard 組件會處理重定向 */}
-                {/* 可選：其他預設路由，例如首頁 */}
+                {/* 預設路由 */}
                 <Route path="*" element={<ProductFront />} />
             </Routes>
         </ThemeProvider>
