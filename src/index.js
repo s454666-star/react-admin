@@ -1,3 +1,5 @@
+// src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Admin, Resource } from 'react-admin';
@@ -13,7 +15,7 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import VideosList from './VideosList'; // 保留 videos-list 功能
+import VideosList from './VideosList';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
@@ -21,10 +23,11 @@ import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
 import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
-import { MemberList, MemberCreate, MemberEdit } from './Member';
-import { OrderList, OrderCreate, OrderEdit } from './Order';
+import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
+import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
 import { Helmet } from 'react-helmet';
 
+// 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
     ra: {
         action: {
@@ -105,17 +108,21 @@ const customTraditionalChineseMessages = {
     },
 };
 
-// 設定繁體中文翻譯，並使用 polyglotI18nProvider
+// 設定繁體中文翻譯
 const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages, 'zh');
 
+// API 基本 URL
 const API_URL = 'https://mystar.monster/api';
+
+// 資料提供者
 const dataProvider = simpleRestProvider(API_URL, httpClient);
 
+// 認證提供者
 const authProvider = {
     login: async ({ username, password }) => {
         const request = new Request(`${API_URL}/login`, {
             method: 'POST',
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ email: username, password }), // 根據您的後端需求，可能需要使用 email 而非 username
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
 
@@ -127,7 +134,7 @@ const authProvider = {
             }
             const { user, access_token, token_type } = await response.json();
 
-            // 儲存 token 和 user 信息到 localStorage
+            // 儲存 token 和 user 資訊到 localStorage
             localStorage.setItem('auth', JSON.stringify({ user, token: `${token_type} ${access_token}` }));
             return Promise.resolve();
         } catch (error) {
@@ -173,6 +180,52 @@ const App = () => (
                 rel="stylesheet"
             />
         </Helmet>
+        <Admin
+            authProvider={authProvider}
+            dataProvider={dataProvider}
+            loginPage={Login}
+            appBar={MyAppBar}
+            i18nProvider={i18nProvider}
+        >
+            <Resource
+                name="members"
+                list={MemberList}
+                create={MemberCreate}
+                edit={MemberEdit}
+                show={MemberShow}
+                options={{ label: '會員' }}
+            />
+            <Resource
+                name="orders"
+                list={OrderList}
+                create={OrderCreate}
+                edit={OrderEdit}
+                show={OrderShow}
+                options={{ label: '訂單' }}
+            />
+            <Resource
+                name="users"
+                list={UserList}
+                create={UserCreate}
+                edit={UserEdit}
+                show={UserShow}
+                options={{ label: '使用者' }}
+            />
+            <Resource
+                name="products"
+                options={{ label: '商品' }}
+                list={ProductList}
+                create={ProductCreate}
+                edit={ProductEdit}
+            />
+            <Resource
+                name="product-categories"
+                options={{ label: '產品類別' }}
+                list={ProductCategoryList}
+                create={ProductCategoryCreate}
+                edit={ProductCategoryEdit}
+            />
+        </Admin>
         <BrowserRouter>
             <Routes>
                 <Route exact path="/videos-list" element={<VideosList />} />
@@ -182,55 +235,6 @@ const App = () => (
                 <Route exact path="/star-mall" element={<ProductFront />} />
                 <Route exact path="/member-register" element={<MemberRegister />} />
                 <Route exact path="/order-cart" element={<OrderCart />} />
-                <Route
-                    path="*"
-                    element={(
-                        <Admin
-                            authProvider={authProvider}
-                            dataProvider={dataProvider}
-                            loginPage={Login}
-                            appBar={MyAppBar}
-                            i18nProvider={i18nProvider}
-                        >
-                            <Resource
-                                name="users"
-                                list={UserList}
-                                create={UserCreate}
-                                edit={UserEdit}
-                                show={UserShow}
-                                options={{ label: '使用者' }}
-                            />
-                            <Resource
-                                name="products"
-                                options={{ label: '商品' }}
-                                list={ProductList}
-                                create={ProductCreate}
-                                edit={ProductEdit}
-                            />
-                            <Resource
-                                name="product-categories"
-                                options={{ label: '產品類別' }}
-                                list={ProductCategoryList}
-                                create={ProductCategoryCreate}
-                                edit={ProductCategoryEdit}
-                            />
-                            <Resource
-                                name="members"
-                                options={{ label: '會員' }}
-                                list={MemberList}
-                                create={MemberCreate}
-                                edit={MemberEdit}
-                            />
-                            <Resource
-                                name="orders"
-                                options={{ label: '訂單' }}
-                                list={OrderList}
-                                create={OrderCreate}
-                                edit={OrderEdit}
-                            />
-                        </Admin>
-                    )}
-                />
             </Routes>
         </BrowserRouter>
     </ThemeProvider>
