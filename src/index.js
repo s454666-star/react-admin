@@ -1,8 +1,8 @@
 // src/index.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource } from 'react-admin';
+import { Admin, Resource, useNavigate } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -16,7 +16,7 @@ import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import VideosList from './VideosList';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
@@ -25,7 +25,6 @@ import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
 import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
 import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
-import { Show } from 'react-admin';
 import { Helmet } from 'react-helmet';
 
 // 繁體中文翻譯訊息
@@ -171,6 +170,15 @@ const theme = createTheme({
     },
 });
 
+// Dashboard 組件，用於重定向到 /orders
+const Dashboard = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        navigate('/orders', { replace: true });
+    }, [navigate]);
+    return null;
+};
+
 const App = () => (
     <BrowserRouter>
         <ThemeProvider theme={theme}>
@@ -183,13 +191,16 @@ const App = () => (
                 />
             </Helmet>
             <Routes>
-                <Route path="/admin/*" element={
+                {/* 後台路由 */}
+                <Route path="/star-admin/*" element={
                     <Admin
                         authProvider={authProvider}
                         dataProvider={dataProvider}
                         loginPage={Login}
                         appBar={MyAppBar}
                         i18nProvider={i18nProvider}
+                        dashboard={Dashboard} // 設定 Dashboard 重定向
+                        theme={theme} // 可選：傳遞主題
                     >
                         <Resource
                             name="members"
@@ -232,6 +243,7 @@ const App = () => (
                     </Admin>
                 } />
 
+                {/* 前台路由 */}
                 <Route path="/videos-list" element={<VideosList />} />
                 <Route path="/star-album/*" element={<StarAlbum />} />
                 <Route path="/star-video/*" element={<FileScreenshotList />} />
@@ -240,7 +252,10 @@ const App = () => (
                 <Route path="/member-register" element={<MemberRegister />} />
                 <Route path="/order-cart" element={<OrderCart />} />
 
-                {/* 可選：預設路由，例如首頁 */}
+                {/* 預設路由：若訪問 /star-admin，則重定向到 /star-admin/orders */}
+                <Route path="/star-admin" element={<Navigate to="/star-admin/orders" replace />} />
+
+                {/* 可選：其他預設路由，例如首頁 */}
                 <Route path="*" element={<ProductFront />} />
             </Routes>
         </ThemeProvider>
