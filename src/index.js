@@ -1,26 +1,29 @@
+// index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Admin, Resource} from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
-import {createTheme, ThemeProvider} from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 import httpClient from './dataProvider';
-import {ProductCreate, ProductEdit, ProductList} from './Product';
-import {ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList} from './ProductCategory';
+import { ProductCreate, ProductEdit, ProductList } from './Product';
+import { ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList } from './ProductCategory';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import VideosList from './VideosList'; // 保留 videos-list 功能
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StarAlbum from "./StarAlbum";
 import FileScreenshotList from "./FileScreenshotList";
 import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
 import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
+import { MemberList, MemberCreate, MemberEdit } from './Member';
+import { OrderList, OrderCreate, OrderEdit } from './Order';
 
 const customTraditionalChineseMessages = {
     ra: {
@@ -109,11 +112,11 @@ const API_URL = 'https://mystar.monster/api';
 const dataProvider = simpleRestProvider(API_URL, httpClient);
 
 const authProvider = {
-    login: async ({username, password}) => {
+    login: async ({ username, password }) => {
         const request = new Request(`${API_URL}/login`, {
             method: 'POST',
-            body: JSON.stringify({username, password}),
-            headers: new Headers({'Content-Type': 'application/json'}),
+            body: JSON.stringify({ username, password }),
+            headers: new Headers({ 'Content-Type': 'application/json' }),
         });
 
         try {
@@ -122,10 +125,10 @@ const authProvider = {
                 const error = await response.json();
                 throw new Error(error.message || 'Login failed');
             }
-            const {user, access_token, token_type} = await response.json();
+            const { user, access_token, token_type } = await response.json();
 
             // 儲存 token 和 user 信息到 localStorage
-            localStorage.setItem('auth', JSON.stringify({user, token: `${token_type} ${access_token}`}));
+            localStorage.setItem('auth', JSON.stringify({ user, token: `${token_type} ${access_token}` }));
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error.message);
@@ -135,7 +138,7 @@ const authProvider = {
         localStorage.removeItem('auth');
         return Promise.resolve();
     },
-    checkError: ({status}) => {
+    checkError: ({ status }) => {
         if (status === 401 || status === 403) {
             localStorage.removeItem('auth');
             return Promise.reject();
@@ -164,11 +167,11 @@ const App = () => (
     <ThemeProvider theme={theme}>
         <BrowserRouter>
             <Routes>
-                <Route exact path="/videos-list" element={<VideosList/>}/>
-                <Route exact path="/star-album/*" element={<StarAlbum/>}/>
-                <Route exact path="/star-video/*" element={<FileScreenshotList/>}/>
+                <Route exact path="/videos-list" element={<VideosList />} />
+                <Route exact path="/star-album/*" element={<StarAlbum />} />
+                <Route exact path="/star-video/*" element={<FileScreenshotList />} />
                 <Route exact path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
-                <Route exact path="/star-mall" element={<ProductFront/>}/>
+                <Route exact path="/star-mall" element={<ProductFront />} />
                 <Route exact path="/member-register" element={<MemberRegister />} />
                 <Route exact path="/order-cart" element={<OrderCart />} />
                 <Route
@@ -187,21 +190,35 @@ const App = () => (
                                 create={UserCreate}
                                 edit={UserEdit}
                                 show={UserShow}
-                                options={{label: '使用者'}}
+                                options={{ label: '使用者' }}
                             />
                             <Resource
                                 name="products"
-                                options={{label: '商品'}}
+                                options={{ label: '商品' }}
                                 list={ProductList}
                                 create={ProductCreate}
                                 edit={ProductEdit}
                             />
                             <Resource
                                 name="product-categories"
-                                options={{label: '產品類別'}}
+                                options={{ label: '產品類別' }}
                                 list={ProductCategoryList}
                                 create={ProductCategoryCreate}
                                 edit={ProductCategoryEdit}
+                            />
+                            <Resource
+                                name="members"
+                                options={{ label: '會員' }}
+                                list={MemberList}
+                                create={MemberCreate}
+                                edit={MemberEdit}
+                            />
+                            <Resource
+                                name="orders"
+                                options={{ label: '訂單' }}
+                                list={OrderList}
+                                create={OrderCreate}
+                                edit={OrderEdit}
                             />
                         </Admin>
                     )}
@@ -211,4 +228,4 @@ const App = () => (
     </ThemeProvider>
 );
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
