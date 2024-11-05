@@ -6,8 +6,10 @@ import {
     ReferenceField,
     DateField,
     SelectInput,
+    SelectField, // 已添加
     EditButton,
     DeleteButton,
+    ShowButton, // 已添加
     Create,
     SimpleForm,
     ReferenceInput,
@@ -16,7 +18,7 @@ import {
     Filter,
     Show,
     SimpleShowLayout,
-    NumberField,
+    NumberInput, // 已更改
 } from 'react-admin';
 
 // 訂單狀態選項
@@ -67,7 +69,7 @@ export const OrderCreate = (props) => (
             <SelectInput source="status" label="狀態" choices={orderStatusChoices} defaultValue="pending" />
             <TextInput source="payment_method" label="付款方式" />
             <TextInput source="notes" label="備註" multiline />
-            <NumberField source="shipping_fee" label="運費" />
+            <NumberInput source="shipping_fee" label="運費" />
             {/* 如果需要訂單明細，可以使用 ArrayInput */}
         </SimpleForm>
     </Create>
@@ -83,7 +85,7 @@ export const OrderEdit = (props) => (
             <SelectInput source="status" label="狀態" choices={orderStatusChoices} />
             <TextInput source="payment_method" label="付款方式" />
             <TextInput source="notes" label="備註" multiline />
-            <NumberField source="shipping_fee" label="運費" />
+            <NumberInput source="shipping_fee" label="運費" />
         </SimpleForm>
     </Edit>
 );
