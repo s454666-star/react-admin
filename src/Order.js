@@ -14,6 +14,9 @@ import {
     TextInput,
     Edit,
     Filter,
+    Show,
+    SimpleShowLayout,
+    NumberField,
 } from 'react-admin';
 
 // 訂單狀態選項
@@ -37,17 +40,19 @@ const OrderFilter = (props) => (
 
 // 訂單列表
 export const OrderList = (props) => (
-    <List {...props} filters={<OrderFilter />}>
-        <Datagrid>
+    <List {...props} filters={<OrderFilter />} perPage={25}>
+        <Datagrid rowClick="show">
             <TextField source="id" />
             <ReferenceField source="member_id" reference="members" label="會員">
                 <TextField source="name" />
             </ReferenceField>
-            <TextField source="status" label="狀態" />
+            <TextField source="order_number" label="訂單編號" />
+            <SelectField source="status" label="狀態" choices={orderStatusChoices} />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />
             <EditButton />
             <DeleteButton />
+            <ShowButton />
         </Datagrid>
     </List>
 );
@@ -60,7 +65,10 @@ export const OrderCreate = (props) => (
                 <SelectInput optionText="name" />
             </ReferenceInput>
             <SelectInput source="status" label="狀態" choices={orderStatusChoices} defaultValue="pending" />
+            <TextInput source="payment_method" label="付款方式" />
             <TextInput source="notes" label="備註" multiline />
+            <NumberField source="shipping_fee" label="運費" />
+            {/* 如果需要訂單明細，可以使用 ArrayInput */}
         </SimpleForm>
     </Create>
 );
@@ -73,7 +81,39 @@ export const OrderEdit = (props) => (
                 <SelectInput optionText="name" />
             </ReferenceInput>
             <SelectInput source="status" label="狀態" choices={orderStatusChoices} />
+            <TextInput source="payment_method" label="付款方式" />
             <TextInput source="notes" label="備註" multiline />
+            <NumberField source="shipping_fee" label="運費" />
         </SimpleForm>
     </Edit>
+);
+
+// 訂單顯示詳情
+export const OrderShow = (props) => (
+    <Show {...props}>
+        <SimpleShowLayout>
+            <TextField source="id" />
+            <ReferenceField source="member_id" reference="members" label="會員">
+                <TextField source="name" />
+            </ReferenceField>
+            <TextField source="order_number" label="訂單編號" />
+            <SelectField source="status" label="狀態" choices={orderStatusChoices} />
+            <TextField source="payment_method" label="付款方式" />
+            <TextField source="notes" label="備註" />
+            <NumberField source="shipping_fee" label="運費" />
+            <DateField source="created_at" label="創建時間" />
+            <DateField source="updated_at" label="更新時間" />
+            {/* 如果有訂單明細，可以使用 ArrayField */}
+            {/* <ArrayField source="orderItems" label="訂單明細">
+                <Datagrid>
+                    <TextField source="id" label="品項ID" />
+                    <ReferenceField source="product_id" reference="products" label="產品名稱">
+                        <TextField source="name" />
+                    </ReferenceField>
+                    <NumberField source="quantity" label="數量" />
+                    <NumberField source="price" label="價格" />
+                </Datagrid>
+            </ArrayField> */}
+        </SimpleShowLayout>
+    </Show>
 );

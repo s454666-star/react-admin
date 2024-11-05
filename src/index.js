@@ -25,6 +25,7 @@ import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
 import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
 import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
+import { Show } from 'react-admin';
 import { Helmet } from 'react-helmet';
 
 // 繁體中文翻譯訊息
