@@ -2,7 +2,14 @@
 
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource, useRedirect, useResourceDefinitions, MenuItemLink } from 'react-admin';
+import {
+    Admin,
+    Resource,
+    useRedirect,
+    useResourceDefinitions,
+    MenuItemLink,
+    Menu,
+} from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -10,22 +17,36 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 import httpClient from './dataProvider';
 import { ProductCreate, ProductEdit, ProductList } from './Product';
-import { ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList } from './ProductCategory';
+import {
+    ProductCategoryCreate,
+    ProductCategoryEdit,
+    ProductCategoryList,
+} from './ProductCategory';
 import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
-import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
+import {
+    MemberList,
+    MemberCreate,
+    MemberEdit,
+    MemberShow,
+} from './Member';
+import {
+    OrderList,
+    OrderCreate,
+    OrderEdit,
+    OrderShow,
+} from './Order';
 import { Helmet } from 'react-helmet';
-import VideosList from "./VideosList";
-import StarAlbum from "./StarAlbum";
-import FileScreenshotList from "./FileScreenshotList";
-import FileScreenshotDetail from "./FileScreenshotDetail";
-import ProductFront from "./ProductFront";
-import MemberRegister from "./MemberRegister";
-import OrderCart from "./OrderCart";
+import VideosList from './VideosList';
+import StarAlbum from './StarAlbum';
+import FileScreenshotList from './FileScreenshotList';
+import FileScreenshotDetail from './FileScreenshotDetail';
+import ProductFront from './ProductFront';
+import MemberRegister from './MemberRegister';
+import OrderCart from './OrderCart';
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -155,7 +176,10 @@ const customTraditionalChineseMessages = {
 };
 
 // 設定繁體中文翻譯
-const i18nProvider = polyglotI18nProvider(() => customTraditionalChineseMessages, 'zh');
+const i18nProvider = polyglotI18nProvider(
+    () => customTraditionalChineseMessages,
+    'zh'
+);
 
 // API 基本 URL
 const API_URL = 'https://mystar.monster/api';
@@ -180,7 +204,10 @@ const authProvider = {
             }
             const { user, access_token, token_type } = await response.json();
 
-            localStorage.setItem('auth', JSON.stringify({ user, token: `${token_type} ${access_token}` }));
+            localStorage.setItem(
+                'auth',
+                JSON.stringify({ user, token: `${token_type} ${access_token}` })
+            );
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error.message);
@@ -219,7 +246,7 @@ const theme = createTheme({
 const Dashboard = () => {
     const redirect = useRedirect();
     useEffect(() => {
-        redirect('orders');
+        redirect('/star-admin/orders');
     }, [redirect]);
     return null;
 };
@@ -228,8 +255,8 @@ const Dashboard = () => {
 const MyMenu = () => {
     const resources = useResourceDefinitions();
     return (
-        <div>
-            {Object.keys(resources).map(resourceName => {
+        <Menu hasDashboard={false}>
+            {Object.keys(resources).map((resourceName) => {
                 const resource = resources[resourceName];
                 return (
                     <MenuItemLink
@@ -239,7 +266,7 @@ const MyMenu = () => {
                     />
                 );
             })}
-        </div>
+        </Menu>
     );
 };
 
@@ -311,7 +338,10 @@ const App = () => (
                 <Route path="/videos-list" element={<VideosList />} />
                 <Route path="/star-album/*" element={<StarAlbum />} />
                 <Route path="/star-video/*" element={<FileScreenshotList />} />
-                <Route path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
+                <Route
+                    path="/file-screenshots/:id"
+                    element={<FileScreenshotDetail />}
+                />
                 <Route path="/star-mall" element={<ProductFront />} />
                 <Route path="/member-register" element={<MemberRegister />} />
                 <Route path="/order-cart" element={<OrderCart />} />
