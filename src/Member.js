@@ -30,9 +30,9 @@ const MemberFilter = (props) => (
 
 // 會員列表
 export const MemberList = (props) => (
-    <List {...props} filters={<MemberFilter />} perPage={25}>
+    <List {...props} filters={<MemberFilter />} perPage={25} title="會員列表">
         <Datagrid rowClick="show">
-            <TextField source="id" />
+            <TextField source="id" label="ID" />
             <TextField source="username" label="帳號" />
             <TextField source="name" label="姓名" />
             <EmailField source="email" label="電子郵件" />
@@ -50,7 +50,7 @@ export const MemberList = (props) => (
 
 // 會員創建
 export const MemberCreate = (props) => (
-    <Create {...props}>
+    <Create {...props} title="建立會員">
         <SimpleForm>
             <TextInput source="username" label="帳號" required />
             <TextInput source="password" label="密碼" type="password" required />
@@ -66,7 +66,7 @@ export const MemberCreate = (props) => (
 
 // 會員編輯
 export const MemberEdit = (props) => (
-    <Edit {...props}>
+    <Edit {...props} title="編輯會員">
         <SimpleForm>
             <TextField source="id" label="ID" />
             <TextInput source="username" label="帳號" disabled />
@@ -85,9 +85,9 @@ export const MemberEdit = (props) => (
 
 // 會員顯示詳情
 export const MemberShow = (props) => (
-    <Show {...props}>
+    <Show {...props} title="會員詳情">
         <SimpleShowLayout>
-            <TextField source="id" />
+            <TextField source="id" label="ID" />
             <TextField source="username" label="帳號" />
             <TextField source="name" label="姓名" />
             <EmailField source="email" label="電子郵件" />

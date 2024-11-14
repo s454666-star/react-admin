@@ -99,32 +99,57 @@ const customTraditionalChineseMessages = {
             page_rows_per_page: '每頁顯示筆數',
         },
         page: {
+            list: '%{name} 列表',
+            create: '建立 %{name}',
+            edit: '編輯 %{name}',
+            show: '查看 %{name}',
             empty: '目前沒有資料',
             invite: '',
             error: '發生錯誤',
             not_found: '頁面未找到',
             unauthorized: '未授權',
-            list: '%{name} 列表',
-            create: '新增 %{name}',
-            edit: '編輯 %{name}',
-            show: '查看 %{name}',
         },
     },
     resources: {
         members: {
-            name: '會員 |||| 會員',
+            name: '會員',
+            fields: {
+                id: 'ID',
+                username: '帳號',
+                name: '姓名',
+                email: '電子郵件',
+                phone: '電話',
+                address: '地址',
+                is_admin: '是否管理員',
+                status: '狀態',
+                created_at: '創建時間',
+                updated_at: '更新時間',
+            },
         },
         orders: {
-            name: '訂單 |||| 訂單',
+            name: '訂單',
+            fields: {
+                id: 'ID',
+                member_id: '會員',
+                order_number: '訂單編號',
+                status: '狀態',
+                payment_method: '付款方式',
+                notes: '備註',
+                shipping_fee: '運費',
+                created_at: '創建時間',
+                updated_at: '更新時間',
+                orderItems: '訂單品項',
+                totalAmount: '總金額',
+            },
         },
         users: {
-            name: '使用者 |||| 使用者',
+            name: '使用者',
         },
         products: {
-            name: '商品 |||| 商品',
+            name: '商品',
         },
         'product-categories': {
-            name: '產品類別 |||| 產品類別',
+            name: '產品類別',
         },
     },
 };
@@ -232,7 +257,6 @@ const App = () => (
                                 create={MemberCreate}
                                 edit={MemberEdit}
                                 show={MemberShow}
-                                options={{ label: '會員' }}
                             />
                             <Resource
                                 name="orders"
@@ -240,7 +264,6 @@ const App = () => (
                                 create={OrderCreate}
                                 edit={OrderEdit}
                                 show={OrderShow}
-                                options={{ label: '訂單' }}
                             />
                             <Resource
                                 name="users"
@@ -248,18 +271,15 @@ const App = () => (
                                 create={UserCreate}
                                 edit={UserEdit}
                                 show={UserShow}
-                                options={{ label: '使用者' }}
                             />
                             <Resource
                                 name="products"
-                                options={{ label: '商品' }}
                                 list={ProductList}
                                 create={ProductCreate}
                                 edit={ProductEdit}
                             />
                             <Resource
                                 name="product-categories"
-                                options={{ label: '產品類別' }}
                                 list={ProductCategoryList}
                                 create={ProductCategoryCreate}
                                 edit={ProductCategoryEdit}

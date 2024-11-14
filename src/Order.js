@@ -46,9 +46,9 @@ const OrderFilter = (props) => (
 
 // 訂單列表
 export const OrderList = (props) => (
-    <List {...props} filters={<OrderFilter />} perPage={25}>
+    <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
         <Datagrid rowClick="show">
-            <TextField source="id" />
+            <TextField source="id" label="ID" />
             {/* 會員名稱和地址 */}
             <ReferenceField source="member_id" reference="members" label="會員" link={false}>
                 <FunctionField
@@ -101,7 +101,7 @@ export const OrderList = (props) => (
 
 // 訂單創建
 export const OrderCreate = (props) => (
-    <Create {...props}>
+    <Create {...props} title="建立訂單">
         <SimpleForm>
             <ReferenceInput source="member_id" reference="members" label="會員" required>
                 <SelectInput optionText="name" />
@@ -117,7 +117,7 @@ export const OrderCreate = (props) => (
 
 // 訂單編輯
 export const OrderEdit = (props) => (
-    <Edit {...props}>
+    <Edit {...props} title="編輯訂單">
         <SimpleForm>
             <ReferenceInput source="member_id" reference="members" label="會員" required>
                 <SelectInput optionText="name" />
@@ -132,9 +132,9 @@ export const OrderEdit = (props) => (
 
 // 訂單顯示詳情
 export const OrderShow = (props) => (
-    <Show {...props}>
+    <Show {...props} title="訂單詳情">
         <SimpleShowLayout>
-            <TextField source="id" />
+            <TextField source="id" label="ID" />
             <ReferenceField source="member_id" reference="members" label="會員">
                 <TextField source="name" />
             </ReferenceField>
