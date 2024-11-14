@@ -104,6 +104,10 @@ const customTraditionalChineseMessages = {
             error: '發生錯誤',
             not_found: '頁面未找到',
             unauthorized: '未授權',
+            list: '%{name} 列表',
+            create: '新增 %{name}',
+            edit: '編輯 %{name}',
+            show: '查看 %{name}',
         },
     },
     resources: {
