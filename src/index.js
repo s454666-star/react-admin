@@ -1,22 +1,26 @@
 // src/index.js
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {
     Admin,
     Resource,
-    useRedirect,
     MenuItemLink,
     Menu,
     fetchUtils,
 } from 'react-admin';
-import simpleRestProvider from 'ra-data-simple-rest';
-import MyAppBar from './MyAppBar';
-import Login from './Login';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
-import httpClient from './dataProvider';
-import { ProductCreate, ProductEdit, ProductList } from './Product';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+
+import Login from './Login';
+import MyAppBar from './MyAppBar';
+import {
+    ProductCreate,
+    ProductEdit,
+    ProductList,
+} from './Product';
 import {
     ProductCategoryCreate,
     ProductCategoryEdit,
@@ -26,7 +30,6 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import {
     MemberList,
     MemberCreate,
@@ -39,7 +42,6 @@ import {
     OrderEdit,
     OrderShow,
 } from './Order';
-import { Helmet } from 'react-helmet';
 import VideosList from './VideosList';
 import StarAlbum from './StarAlbum';
 import FileScreenshotList from './FileScreenshotList';
@@ -192,7 +194,12 @@ const customHttpClient = (url, options = {}) => {
     if (auth && auth.token) {
         options.headers = new Headers({
             Accept: 'application/json',
-            Authorization: auth.token,
+            Authorization: `Bearer ${auth.token}`,
+            'Content-Type': 'application/json',
+        });
+    } else {
+        options.headers = new Headers({
+            Accept: 'application/json',
             'Content-Type': 'application/json',
         });
     }
@@ -294,7 +301,7 @@ const authProvider = {
     login: async ({ username, password }) => {
         const request = new Request(`${API_URL}/admin-login`, {
             method: 'POST',
-            body: JSON.stringify({ email: username, password }),
+            body: JSON.stringify({ username, password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
 
@@ -308,7 +315,7 @@ const authProvider = {
 
             localStorage.setItem(
                 'auth',
-                JSON.stringify({ user, token: `${token_type} ${access_token}` })
+                JSON.stringify({ user, token: access_token })
             );
             return Promise.resolve();
         } catch (error) {

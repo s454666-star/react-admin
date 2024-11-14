@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useNotify } from 'react-admin';
+import { useLogin, useNotify } from 'react-admin';
 import { TextField, Button, Grid, Paper, Typography, Box } from '@mui/material';
-import axios from 'axios';
 import { keyframes } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 
@@ -32,22 +31,14 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const notify = useNotify();
+    const login = useLogin();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://mystar.monster/api/admin-login', {
-                username,
-                password,
-            }, {
-                withCredentials: true,
-            });
-            const { access_token, user } = response.data;
-            localStorage.setItem('access_token', access_token);
-            localStorage.setItem('user', JSON.stringify(user));
-            window.location.href = '/';
+            await login({ username, password });
         } catch (error) {
-            if (error.response && error.response.status === 401) {
+            if (error.message === 'Invalid credentials' || error.status === 401) {
                 notify('無效的用戶名或密碼', 'warning');
             } else {
                 notify('登入失敗，請稍後再試', 'warning');
