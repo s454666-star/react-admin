@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource, useRedirect, getResources, MenuItemLink } from 'react-admin';
+import { Admin, Resource, useRedirect, useResourceDefinitions, MenuItemLink } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -26,7 +26,6 @@ import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
 import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
-import { useSelector } from 'react-redux';
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -216,7 +215,7 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /orders
+// Dashboard 組件，用於重定向到 /star-admin/orders
 const Dashboard = () => {
     const redirect = useRedirect();
     useEffect(() => {
@@ -227,16 +226,19 @@ const Dashboard = () => {
 
 // 自訂菜單組件，移除 Dashboard 選項
 const MyMenu = () => {
-    const resources = useSelector(getResources);
+    const resources = useResourceDefinitions();
     return (
         <div>
-            {resources.map(resource => (
-                <MenuItemLink
-                    key={resource.name}
-                    to={`/${resource.name}`}
-                    primaryText={resource.options?.label || resource.name}
-                />
-            ))}
+            {Object.keys(resources).map(resourceName => {
+                const resource = resources[resourceName];
+                return (
+                    <MenuItemLink
+                        key={resource.name}
+                        to={`/${resource.name}`}
+                        primaryText={resource.options?.label || resource.name}
+                    />
+                );
+            })}
         </div>
     );
 };
