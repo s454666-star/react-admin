@@ -1,8 +1,8 @@
 // src/index.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource } from 'react-admin';
+import { Admin, Resource, useRedirect } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -15,11 +15,17 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
 import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
 import { Helmet } from 'react-helmet';
-import { Navigate } from 'react-router-dom';
+import VideosList from "./VideosList";
+import StarAlbum from "./StarAlbum";
+import FileScreenshotList from "./FileScreenshotList";
+import FileScreenshotDetail from "./FileScreenshotDetail";
+import ProductFront from "./ProductFront";
+import MemberRegister from "./MemberRegister";
+import OrderCart from "./OrderCart";
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -162,7 +168,7 @@ const authProvider = {
     login: async ({ username, password }) => {
         const request = new Request(`${API_URL}/login`, {
             method: 'POST',
-            body: JSON.stringify({ email: username, password }), // 根據您的後端需求，可能需要使用 email 而非 username
+            body: JSON.stringify({ email: username, password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
 
@@ -174,7 +180,6 @@ const authProvider = {
             }
             const { user, access_token, token_type } = await response.json();
 
-            // 儲存 token 和 user 資訊到 localStorage
             localStorage.setItem('auth', JSON.stringify({ user, token: `${token_type} ${access_token}` }));
             return Promise.resolve();
         } catch (error) {
@@ -211,7 +216,61 @@ const theme = createTheme({
 });
 
 // Dashboard 組件，用於重定向到 /star-admin/orders
-const Dashboard = () => <Navigate to="orders" replace />;
+const Dashboard = () => {
+    const redirect = useRedirect();
+    useEffect(() => {
+        redirect('/orders');
+    }, [redirect]);
+    return null;
+};
+
+// 後台 Admin 組件
+const AdminApp = () => (
+    <Admin
+        basename="/star-admin"
+        authProvider={authProvider}
+        dataProvider={dataProvider}
+        loginPage={Login}
+        appBar={MyAppBar}
+        i18nProvider={i18nProvider}
+        theme={theme}
+        dashboard={Dashboard}
+    >
+        <Resource
+            name="members"
+            list={MemberList}
+            create={MemberCreate}
+            edit={MemberEdit}
+            show={MemberShow}
+        />
+        <Resource
+            name="orders"
+            list={OrderList}
+            create={OrderCreate}
+            edit={OrderEdit}
+            show={OrderShow}
+        />
+        <Resource
+            name="users"
+            list={UserList}
+            create={UserCreate}
+            edit={UserEdit}
+            show={UserShow}
+        />
+        <Resource
+            name="products"
+            list={ProductList}
+            create={ProductCreate}
+            edit={ProductEdit}
+        />
+        <Resource
+            name="product-categories"
+            list={ProductCategoryList}
+            create={ProductCategoryCreate}
+            edit={ProductCategoryEdit}
+        />
+    </Admin>
+);
 
 const App = () => (
     <BrowserRouter>
@@ -224,50 +283,22 @@ const App = () => (
                     rel="stylesheet"
                 />
             </Helmet>
-            <Admin
-                basename="/star-admin"
-                authProvider={authProvider}
-                dataProvider={dataProvider}
-                loginPage={Login}
-                appBar={MyAppBar}
-                i18nProvider={i18nProvider}
-                theme={theme}
-                dashboard={Dashboard}
-            >
-                <Resource
-                    name="members"
-                    list={MemberList}
-                    create={MemberCreate}
-                    edit={MemberEdit}
-                    show={MemberShow}
-                />
-                <Resource
-                    name="orders"
-                    list={OrderList}
-                    create={OrderCreate}
-                    edit={OrderEdit}
-                    show={OrderShow}
-                />
-                <Resource
-                    name="users"
-                    list={UserList}
-                    create={UserCreate}
-                    edit={UserEdit}
-                    show={UserShow}
-                />
-                <Resource
-                    name="products"
-                    list={ProductList}
-                    create={ProductCreate}
-                    edit={ProductEdit}
-                />
-                <Resource
-                    name="product-categories"
-                    list={ProductCategoryList}
-                    create={ProductCategoryCreate}
-                    edit={ProductCategoryEdit}
-                />
-            </Admin>
+            <Routes>
+                {/* 後台路由 */}
+                <Route path="/star-admin/*" element={<AdminApp />} />
+
+                {/* 前台路由 */}
+                <Route path="/videos-list" element={<VideosList />} />
+                <Route path="/star-album/*" element={<StarAlbum />} />
+                <Route path="/star-video/*" element={<FileScreenshotList />} />
+                <Route path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
+                <Route path="/star-mall" element={<ProductFront />} />
+                <Route path="/member-register" element={<MemberRegister />} />
+                <Route path="/order-cart" element={<OrderCart />} />
+
+                {/* 預設路由 */}
+                <Route path="*" element={<ProductFront />} />
+            </Routes>
         </ThemeProvider>
     </BrowserRouter>
 );
