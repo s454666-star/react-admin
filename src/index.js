@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Admin, Resource, useRedirect } from 'react-admin';
+import { Admin, Resource, useRedirect, getResources, MenuItemLink } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
 import Login from './Login';
@@ -26,6 +26,7 @@ import FileScreenshotDetail from "./FileScreenshotDetail";
 import ProductFront from "./ProductFront";
 import MemberRegister from "./MemberRegister";
 import OrderCart from "./OrderCart";
+import { useSelector } from 'react-redux';
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -215,13 +216,29 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /star-admin/orders
+// Dashboard 組件，用於重定向到 /orders
 const Dashboard = () => {
     const redirect = useRedirect();
     useEffect(() => {
-        redirect('/orders');
+        redirect('orders');
     }, [redirect]);
     return null;
+};
+
+// 自訂菜單組件，移除 Dashboard 選項
+const MyMenu = () => {
+    const resources = useSelector(getResources);
+    return (
+        <div>
+            {resources.map(resource => (
+                <MenuItemLink
+                    key={resource.name}
+                    to={`/${resource.name}`}
+                    primaryText={resource.options?.label || resource.name}
+                />
+            ))}
+        </div>
+    );
 };
 
 // 後台 Admin 組件
@@ -235,6 +252,7 @@ const AdminApp = () => (
         i18nProvider={i18nProvider}
         theme={theme}
         dashboard={Dashboard}
+        menu={MyMenu}
     >
         <Resource
             name="members"
