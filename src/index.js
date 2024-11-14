@@ -6,7 +6,6 @@ import {
     Admin,
     Resource,
     useRedirect,
-    useResourceDefinitions,
     MenuItemLink,
     Menu,
 } from 'react-admin';
@@ -129,6 +128,7 @@ const customTraditionalChineseMessages = {
             error: '發生錯誤',
             not_found: '頁面未找到',
             unauthorized: '未授權',
+            dashboard: '首頁',
         },
     },
     resources: {
@@ -184,8 +184,92 @@ const i18nProvider = polyglotI18nProvider(
 // API 基本 URL
 const API_URL = 'https://mystar.monster/api';
 
-// 資料提供者
-const dataProvider = simpleRestProvider(API_URL, httpClient);
+// 自訂資料提供者
+import { fetchUtils } from 'react-admin';
+
+const customDataProvider = {
+    getList: (resource, params) => {
+        const { page, perPage } = params.pagination;
+        const { field, order } = params.sort;
+        const query = {
+            page: page,
+            per_page: perPage,
+            sort_by: field,
+            sort_order: order,
+            ...params.filter,
+        };
+        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
+        return httpClient(url).then(({ json }) => ({
+            data: json.data || json,
+            total: json.total || json.data.length,
+        }));
+    },
+    getOne: (resource, params) =>
+        httpClient(`${API_URL}/${resource}/${params.id}`).then(({ json }) => ({
+            data: json.data || json,
+        })),
+    getMany: (resource, params) => {
+        const query = {
+            ids: params.ids.join(','),
+        };
+        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
+        return httpClient(url).then(({ json }) => ({
+            data: json.data || json,
+        }));
+    },
+    getManyReference: (resource, params) => {
+        const { page, perPage } = params.pagination;
+        const { field, order } = params.sort;
+        const query = {
+            page: page,
+            per_page: perPage,
+            sort_by: field,
+            sort_order: order,
+            [params.target]: params.id,
+            ...params.filter,
+        };
+        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
+        return httpClient(url).then(({ json }) => ({
+            data: json.data || json,
+            total: json.total || json.data.length,
+        }));
+    },
+    update: (resource, params) =>
+        httpClient(`${API_URL}/${resource}/${params.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(params.data),
+        }).then(({ json }) => ({ data: json.data || json })),
+    updateMany: (resource, params) => {
+        const query = {
+            ids: params.ids,
+        };
+        return httpClient(`${API_URL}/${resource}`, {
+            method: 'PUT',
+            body: JSON.stringify(params.data),
+            query,
+        }).then(({ json }) => ({ data: json.data || json }));
+    },
+    create: (resource, params) =>
+        httpClient(`${API_URL}/${resource}`, {
+            method: 'POST',
+            body: JSON.stringify(params.data),
+        }).then(({ json }) => ({
+            data: { ...params.data, id: json.data.id || json.id },
+        })),
+    delete: (resource, params) =>
+        httpClient(`${API_URL}/${resource}/${params.id}`, {
+            method: 'DELETE',
+        }).then(({ json }) => ({ data: json.data || json })),
+    deleteMany: (resource, params) => {
+        const query = {
+            ids: params.ids,
+        };
+        return httpClient(`${API_URL}/${resource}`, {
+            method: 'DELETE',
+            query,
+        }).then(({ json }) => ({ data: json.data || json }));
+    },
+};
 
 // 認證提供者
 const authProvider = {
@@ -252,30 +336,22 @@ const Dashboard = () => {
 };
 
 // 自訂菜單組件，移除 Dashboard 選項
-const MyMenu = () => {
-    const resources = useResourceDefinitions();
-    return (
-        <Menu hasDashboard={false}>
-            {Object.keys(resources).map((resourceName) => {
-                const resource = resources[resourceName];
-                return (
-                    <MenuItemLink
-                        key={resource.name}
-                        to={`/${resource.name}`}
-                        primaryText={resource.options?.label || resource.name}
-                    />
-                );
-            })}
-        </Menu>
-    );
-};
+const MyMenu = () => (
+    <Menu>
+        <MenuItemLink to="/members" primaryText="會員" />
+        <MenuItemLink to="/orders" primaryText="訂單" />
+        <MenuItemLink to="/users" primaryText="使用者" />
+        <MenuItemLink to="/products" primaryText="商品" />
+        <MenuItemLink to="/product-categories" primaryText="產品類別" />
+    </Menu>
+);
 
 // 後台 Admin 組件
 const AdminApp = () => (
     <Admin
         basename="/star-admin"
         authProvider={authProvider}
-        dataProvider={dataProvider}
+        dataProvider={customDataProvider}
         loginPage={Login}
         appBar={MyAppBar}
         i18nProvider={i18nProvider}
@@ -289,6 +365,7 @@ const AdminApp = () => (
             create={MemberCreate}
             edit={MemberEdit}
             show={MemberShow}
+            options={{ label: '會員' }}
         />
         <Resource
             name="orders"
@@ -296,6 +373,7 @@ const AdminApp = () => (
             create={OrderCreate}
             edit={OrderEdit}
             show={OrderShow}
+            options={{ label: '訂單' }}
         />
         <Resource
             name="users"
@@ -303,18 +381,21 @@ const AdminApp = () => (
             create={UserCreate}
             edit={UserEdit}
             show={UserShow}
+            options={{ label: '使用者' }}
         />
         <Resource
             name="products"
             list={ProductList}
             create={ProductCreate}
             edit={ProductEdit}
+            options={{ label: '商品' }}
         />
         <Resource
             name="product-categories"
             list={ProductCategoryList}
             create={ProductCategoryCreate}
             edit={ProductCategoryEdit}
+            options={{ label: '產品類別' }}
         />
     </Admin>
 );
