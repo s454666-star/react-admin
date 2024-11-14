@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useLogin, useNotify, Notification } from 'react-admin';
+import { useNotify } from 'react-admin';
 import { TextField, Button, Grid, Paper, Typography, Box } from '@mui/material';
+import axios from 'axios';
 import { keyframes } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 
-// Define fade-in animation
+// 定義淡入動畫
 const fadeIn = keyframes`
     from {
         opacity: 0;
@@ -16,7 +17,7 @@ const fadeIn = keyframes`
     }
 `;
 
-// Styled Paper component with animation
+// 使用動畫的樣式化 Paper 元件
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(4),
     display: 'flex',
@@ -30,14 +31,28 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const login = useLogin();
     const notify = useNotify();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        login({ username, password }).catch(() =>
-            notify('Invalid username or password', 'warning')
-        );
+        try {
+            const response = await axios.post('https://mystar.monster/api/admin-login', {
+                username,
+                password,
+            }, {
+                withCredentials: true,
+            });
+            const { access_token, user } = response.data;
+            localStorage.setItem('access_token', access_token);
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/';
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                notify('無效的用戶名或密碼', 'warning');
+            } else {
+                notify('登入失敗，請稍後再試', 'warning');
+            }
+        }
     };
 
     return (
@@ -102,7 +117,6 @@ const Login = () => {
                             登入
                         </Button>
                     </Box>
-                    <Notification />
                 </StyledPaper>
             </Grid>
         </Grid>
