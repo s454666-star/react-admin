@@ -8,6 +8,7 @@ import {
     useRedirect,
     MenuItemLink,
     Menu,
+    fetchUtils,
 } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
 import MyAppBar from './MyAppBar';
@@ -128,7 +129,6 @@ const customTraditionalChineseMessages = {
             error: '發生錯誤',
             not_found: '頁面未找到',
             unauthorized: '未授權',
-            dashboard: '首頁',
         },
     },
     resources: {
@@ -185,7 +185,19 @@ const i18nProvider = polyglotI18nProvider(
 const API_URL = 'https://mystar.monster/api';
 
 // 自訂資料提供者
-import { fetchUtils } from 'react-admin';
+import { stringify } from 'query-string';
+
+const customHttpClient = (url, options = {}) => {
+    const auth = JSON.parse(localStorage.getItem('auth'));
+    if (auth && auth.token) {
+        options.headers = new Headers({
+            Accept: 'application/json',
+            Authorization: auth.token,
+            'Content-Type': 'application/json',
+        });
+    }
+    return fetchUtils.fetchJson(url, options);
+};
 
 const customDataProvider = {
     getList: (resource, params) => {
@@ -198,22 +210,25 @@ const customDataProvider = {
             sort_order: order,
             ...params.filter,
         };
-        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
-        return httpClient(url).then(({ json }) => ({
-            data: json.data || json,
-            total: json.total || json.data.length,
-        }));
+        const url = `${API_URL}/${resource}?${stringify(query)}`;
+        return customHttpClient(url).then(({ json }) => {
+            const data = json.data || json;
+            return {
+                data: Array.isArray(data) ? data : [data],
+                total: json.total || (Array.isArray(data) ? data.length : 0),
+            };
+        });
     },
     getOne: (resource, params) =>
-        httpClient(`${API_URL}/${resource}/${params.id}`).then(({ json }) => ({
+        customHttpClient(`${API_URL}/${resource}/${params.id}`).then(({ json }) => ({
             data: json.data || json,
         })),
     getMany: (resource, params) => {
         const query = {
             ids: params.ids.join(','),
         };
-        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
-        return httpClient(url).then(({ json }) => ({
+        const url = `${API_URL}/${resource}?${stringify(query)}`;
+        return customHttpClient(url).then(({ json }) => ({
             data: json.data || json,
         }));
     },
@@ -228,14 +243,17 @@ const customDataProvider = {
             [params.target]: params.id,
             ...params.filter,
         };
-        const url = `${API_URL}/${resource}?${fetchUtils.queryParameters(query)}`;
-        return httpClient(url).then(({ json }) => ({
-            data: json.data || json,
-            total: json.total || json.data.length,
-        }));
+        const url = `${API_URL}/${resource}?${stringify(query)}`;
+        return customHttpClient(url).then(({ json }) => {
+            const data = json.data || json;
+            return {
+                data: Array.isArray(data) ? data : [data],
+                total: json.total || (Array.isArray(data) ? data.length : 0),
+            };
+        });
     },
     update: (resource, params) =>
-        httpClient(`${API_URL}/${resource}/${params.id}`, {
+        customHttpClient(`${API_URL}/${resource}/${params.id}`, {
             method: 'PUT',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({ data: json.data || json })),
@@ -243,28 +261,28 @@ const customDataProvider = {
         const query = {
             ids: params.ids,
         };
-        return httpClient(`${API_URL}/${resource}`, {
+        return customHttpClient(`${API_URL}/${resource}`, {
             method: 'PUT',
             body: JSON.stringify(params.data),
             query,
         }).then(({ json }) => ({ data: json.data || json }));
     },
     create: (resource, params) =>
-        httpClient(`${API_URL}/${resource}`, {
+        customHttpClient(`${API_URL}/${resource}`, {
             method: 'POST',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({
             data: { ...params.data, id: json.data.id || json.id },
         })),
     delete: (resource, params) =>
-        httpClient(`${API_URL}/${resource}/${params.id}`, {
+        customHttpClient(`${API_URL}/${resource}/${params.id}`, {
             method: 'DELETE',
         }).then(({ json }) => ({ data: json.data || json })),
     deleteMany: (resource, params) => {
         const query = {
             ids: params.ids,
         };
-        return httpClient(`${API_URL}/${resource}`, {
+        return customHttpClient(`${API_URL}/${resource}`, {
             method: 'DELETE',
             query,
         }).then(({ json }) => ({ data: json.data || json }));
@@ -326,18 +344,9 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /star-admin/orders
-const Dashboard = () => {
-    const redirect = useRedirect();
-    useEffect(() => {
-        redirect('/star-admin/orders');
-    }, [redirect]);
-    return null;
-};
-
-// 自訂菜單組件，移除 Dashboard 選項
+// 自訂菜單組件，移除首頁選項
 const MyMenu = () => (
-    <Menu>
+    <Menu hasDashboard={false}>
         <MenuItemLink to="/members" primaryText="會員" />
         <MenuItemLink to="/orders" primaryText="訂單" />
         <MenuItemLink to="/users" primaryText="使用者" />
@@ -356,7 +365,7 @@ const AdminApp = () => (
         appBar={MyAppBar}
         i18nProvider={i18nProvider}
         theme={theme}
-        dashboard={Dashboard}
+        dashboard={null} // 移除 Dashboard
         menu={MyMenu}
     >
         <Resource
