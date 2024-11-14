@@ -24,6 +24,7 @@ import {
     FunctionField,
     NumberField,
 } from 'react-admin';
+import { Grid } from '@mui/material';
 
 // 訂單狀態選項
 const orderStatusChoices = [
@@ -103,14 +104,25 @@ export const OrderList = (props) => (
 export const OrderCreate = (props) => (
     <Create {...props} title="建立訂單">
         <SimpleForm>
-            <ReferenceInput source="member_id" reference="members" label="會員" required>
-                <SelectInput optionText="name" />
-            </ReferenceInput>
-            <SelectInput source="status" label="狀態" choices={orderStatusChoices} defaultValue="pending" />
-            <TextInput source="payment_method" label="付款方式" />
-            <TextInput source="notes" label="備註" multiline />
-            <NumberInput source="shipping_fee" label="運費" />
-            {/* 如果需要訂單明細，可以使用 ArrayInput */}
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <ReferenceInput source="member_id" reference="members" label="會員" required>
+                        <SelectInput optionText="name" />
+                    </ReferenceInput>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <SelectInput source="status" label="狀態" choices={orderStatusChoices} defaultValue="pending" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="payment_method" label="付款方式" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <NumberInput source="shipping_fee" label="運費" />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextInput source="notes" label="備註" multiline fullWidth />
+                </Grid>
+            </Grid>
         </SimpleForm>
     </Create>
 );
@@ -119,13 +131,25 @@ export const OrderCreate = (props) => (
 export const OrderEdit = (props) => (
     <Edit {...props} title="編輯訂單">
         <SimpleForm>
-            <ReferenceInput source="member_id" reference="members" label="會員" required>
-                <SelectInput optionText="name" />
-            </ReferenceInput>
-            <SelectInput source="status" label="狀態" choices={orderStatusChoices} />
-            <TextInput source="payment_method" label="付款方式" />
-            <TextInput source="notes" label="備註" multiline />
-            <NumberInput source="shipping_fee" label="運費" />
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <ReferenceInput source="member_id" reference="members" label="會員" required>
+                        <SelectInput optionText="name" />
+                    </ReferenceInput>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <SelectInput source="status" label="狀態" choices={orderStatusChoices} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="payment_method" label="付款方式" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <NumberInput source="shipping_fee" label="運費" />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextInput source="notes" label="備註" multiline fullWidth />
+                </Grid>
+            </Grid>
         </SimpleForm>
     </Edit>
 );
@@ -134,34 +158,56 @@ export const OrderEdit = (props) => (
 export const OrderShow = (props) => (
     <Show {...props} title="訂單詳情">
         <SimpleShowLayout>
-            <TextField source="id" label="ID" />
-            <ReferenceField source="member_id" reference="members" label="會員">
-                <TextField source="name" />
-            </ReferenceField>
-            <TextField source="order_number" label="訂單編號" />
-            <SelectField source="status" label="狀態" choices={orderStatusChoices} />
-            <TextField source="payment_method" label="付款方式" />
-            <TextField source="notes" label="備註" />
-            <NumberField source="shipping_fee" label="運費" />
-            <DateField source="created_at" label="創建時間" />
-            <DateField source="updated_at" label="更新時間" />
-            {/* 訂單明細 */}
-            <FunctionField
-                label="訂單明細"
-                render={(record) => (
-                    <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                        {record.orderItems && record.orderItems.length > 0 ? (
-                            record.orderItems.map((item) => (
-                                <li key={item.id}>
-                                    {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
-                                </li>
-                            ))
-                        ) : (
-                            <li>無品項</li>
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="id" label="ID" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <ReferenceField source="member_id" reference="members" label="會員">
+                        <TextField source="name" />
+                    </ReferenceField>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="order_number" label="訂單編號" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <SelectField source="status" label="狀態" choices={orderStatusChoices} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="payment_method" label="付款方式" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <NumberField source="shipping_fee" label="運費" />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField source="notes" label="備註" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="created_at" label="創建時間" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="updated_at" label="更新時間" />
+                </Grid>
+                {/* 訂單明細 */}
+                <Grid item xs={12}>
+                    <FunctionField
+                        label="訂單明細"
+                        render={(record) => (
+                            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                                {record.orderItems && record.orderItems.length > 0 ? (
+                                    record.orderItems.map((item) => (
+                                        <li key={item.id}>
+                                            {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>無品項</li>
+                                )}
+                            </ul>
                         )}
-                    </ul>
-                )}
-            />
+                    />
+                </Grid>
+            </Grid>
         </SimpleShowLayout>
     </Show>
 );

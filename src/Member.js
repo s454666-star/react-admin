@@ -19,6 +19,7 @@ import {
     BooleanField,
     DateField,
 } from 'react-admin';
+import { Grid } from '@mui/material';
 
 // 會員列表篩選器
 const MemberFilter = (props) => (
@@ -53,14 +54,32 @@ export const MemberList = (props) => (
 export const MemberCreate = (props) => (
     <Create {...props} title="建立會員">
         <SimpleForm>
-            <TextInput source="username" label="帳號" required />
-            <TextInput source="password" label="密碼" type="password" required />
-            <TextInput source="name" label="姓名" required />
-            <TextInput source="email" label="電子郵件" type="email" required />
-            <TextInput source="phone" label="電話" />
-            <TextInput source="address" label="地址" />
-            <BooleanInput source="is_admin" label="是否管理員" />
-            <TextInput source="status" label="狀態" defaultValue="active" />
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="username" label="帳號" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="password" label="密碼" type="password" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="name" label="姓名" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="email" label="電子郵件" type="email" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="phone" label="電話" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="address" label="地址" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <BooleanInput source="is_admin" label="是否管理員" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="status" label="狀態" defaultValue="active" />
+                </Grid>
+            </Grid>
         </SimpleForm>
     </Create>
 );
@@ -69,17 +88,41 @@ export const MemberCreate = (props) => (
 export const MemberEdit = (props) => (
     <Edit {...props} title="編輯會員">
         <SimpleForm>
-            <TextField source="id" label="ID" />
-            <TextInput source="username" label="帳號" disabled />
-            <TextInput source="password" label="密碼" type="password" helperText="留空則不更改" />
-            <TextInput source="name" label="姓名" required />
-            <TextInput source="email" label="電子郵件" type="email" required />
-            <TextInput source="phone" label="電話" />
-            <TextInput source="address" label="地址" />
-            <BooleanInput source="is_admin" label="是否管理員" />
-            <TextInput source="status" label="狀態" />
-            <DateField source="created_at" label="創建時間" />
-            <DateField source="updated_at" label="更新時間" />
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="id" label="ID" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="username" label="帳號" disabled />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="password" label="密碼" type="password" helperText="留空則不更改" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="name" label="姓名" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="email" label="電子郵件" type="email" required />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="phone" label="電話" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="address" label="地址" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <BooleanInput source="is_admin" label="是否管理員" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextInput source="status" label="狀態" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="created_at" label="創建時間" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="updated_at" label="更新時間" />
+                </Grid>
+            </Grid>
         </SimpleForm>
     </Edit>
 );
@@ -88,16 +131,38 @@ export const MemberEdit = (props) => (
 export const MemberShow = (props) => (
     <Show {...props} title="會員詳情">
         <SimpleShowLayout>
-            <TextField source="id" label="ID" />
-            <TextField source="username" label="帳號" />
-            <TextField source="name" label="姓名" />
-            <EmailField source="email" label="電子郵件" />
-            <TextField source="phone" label="電話" />
-            <TextField source="address" label="地址" />
-            <BooleanField source="is_admin" label="是否管理員" />
-            <TextField source="status" label="狀態" />
-            <DateField source="created_at" label="創建時間" />
-            <DateField source="updated_at" label="更新時間" />
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="id" label="ID" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="username" label="帳號" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="name" label="姓名" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <EmailField source="email" label="電子郵件" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="phone" label="電話" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="address" label="地址" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <BooleanField source="is_admin" label="是否管理員" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField source="status" label="狀態" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="created_at" label="創建時間" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <DateField source="updated_at" label="更新時間" />
+                </Grid>
+            </Grid>
         </SimpleShowLayout>
     </Show>
 );

@@ -1,3 +1,5 @@
+// src/Product.js
+
 import React, { useCallback } from 'react';
 import {
     List,
@@ -29,12 +31,11 @@ import {
     Box,
     Typography,
     Avatar,
+    Grid,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDropzone } from 'react-dropzone';
 import { Helmet } from 'react-helmet';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -212,31 +213,43 @@ export const ProductCreate = (props) => {
                     <Card className={classes.card}>
                         <CardHeader className={classes.header} title="新增商品" />
                         <CardContent>
-                            <ReferenceInput
-                                source="category_id"
-                                reference="product-categories"
-                                label="商品類別"
-                                validate={required()}
-                            >
-                                <SelectInput optionText="category_name" />
-                            </ReferenceInput>
-                            <TextInput source="product_name" label="商品名稱" validate={required()} />
-                            <NumberInput source="price" label="價格" validate={required()} />
-                            <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
-
-                            {/* 使用自定義的圖片輸入組件 */}
-                            <ImageBase64Input source="image_base64" validate={required()} />
-
-                            <SelectInput
-                                source="status"
-                                label="狀態"
-                                choices={[
-                                    { id: 'available', name: '可用' },
-                                    { id: 'out_of_stock', name: '缺貨' },
-                                    { id: 'discontinued', name: '已停產' },
-                                ]}
-                                validate={required()}
-                            />
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <ReferenceInput
+                                        source="category_id"
+                                        reference="product-categories"
+                                        label="商品類別"
+                                        validate={required()}
+                                    >
+                                        <SelectInput optionText="category_name" />
+                                    </ReferenceInput>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextInput source="product_name" label="商品名稱" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <NumberInput source="price" label="價格" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    {/* 使用自定義的圖片輸入組件 */}
+                                    <ImageBase64Input source="image_base64" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <SelectInput
+                                        source="status"
+                                        label="狀態"
+                                        choices={[
+                                            { id: 'available', name: '可用' },
+                                            { id: 'out_of_stock', name: '缺貨' },
+                                            { id: 'discontinued', name: '已停產' },
+                                        ]}
+                                        validate={required()}
+                                    />
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </SimpleForm>
@@ -269,31 +282,43 @@ export const ProductEdit = (props) => {
                     <Card className={classes.card}>
                         <CardHeader className={classes.header} title="編輯商品" />
                         <CardContent>
-                            <ReferenceInput
-                                source="category_id"
-                                reference="product-categories"
-                                label="商品類別"
-                                validate={required()}
-                            >
-                                <SelectInput optionText="category_name" />
-                            </ReferenceInput>
-                            <TextInput source="product_name" label="商品名稱" validate={required()} />
-                            <NumberInput source="price" label="價格" validate={required()} />
-                            <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
-
-                            {/* 使用自定義的圖片輸入組件 */}
-                            <ImageBase64Input source="image_base64" validate={required()} />
-
-                            <SelectInput
-                                source="status"
-                                label="狀態"
-                                choices={[
-                                    { id: 'available', name: '可用' },
-                                    { id: 'out_of_stock', name: '缺貨' },
-                                    { id: 'discontinued', name: '已停產' },
-                                ]}
-                                validate={required()}
-                            />
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <ReferenceInput
+                                        source="category_id"
+                                        reference="product-categories"
+                                        label="商品類別"
+                                        validate={required()}
+                                    >
+                                        <SelectInput optionText="category_name" />
+                                    </ReferenceInput>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextInput source="product_name" label="商品名稱" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <NumberInput source="price" label="價格" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    {/* 使用自定義的圖片輸入組件 */}
+                                    <ImageBase64Input source="image_base64" validate={required()} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <SelectInput
+                                        source="status"
+                                        label="狀態"
+                                        choices={[
+                                            { id: 'available', name: '可用' },
+                                            { id: 'out_of_stock', name: '缺貨' },
+                                            { id: 'discontinued', name: '已停產' },
+                                        ]}
+                                        validate={required()}
+                                    />
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </SimpleForm>
