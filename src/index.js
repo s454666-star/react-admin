@@ -15,14 +15,7 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import VideosList from './VideosList';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
-import StarAlbum from "./StarAlbum";
-import FileScreenshotList from "./FileScreenshotList";
-import FileScreenshotDetail from "./FileScreenshotDetail";
-import ProductFront from "./ProductFront";
-import MemberRegister from "./MemberRegister";
-import OrderCart from "./OrderCart";
 import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
 import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
 import { Helmet } from 'react-helmet';
@@ -287,18 +280,6 @@ const App = () => (
                         </Admin>
                     }
                 />
-
-                {/* 前台路由 */}
-                <Route path="/videos-list" element={<VideosList />} />
-                <Route path="/star-album/*" element={<StarAlbum />} />
-                <Route path="/star-video/*" element={<FileScreenshotList />} />
-                <Route path="/file-screenshots/:id" element={<FileScreenshotDetail />} />
-                <Route path="/star-mall" element={<ProductFront />} />
-                <Route path="/member-register" element={<MemberRegister />} />
-                <Route path="/order-cart" element={<OrderCart />} />
-
-                {/* 預設路由 */}
-                <Route path="*" element={<ProductFront />} />
             </Routes>
         </ThemeProvider>
     </BrowserRouter>
