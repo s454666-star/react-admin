@@ -1,3 +1,5 @@
+// src/Member.js
+
 import React from 'react';
 import {
     List,
@@ -13,7 +15,7 @@ import {
     Filter,
     Show,
     SimpleShowLayout,
-    BooleanField,
+    BooleanInput,
     DateField,
 } from 'react-admin';
 
@@ -36,7 +38,7 @@ export const MemberList = (props) => (
             <EmailField source="email" label="電子郵件" />
             <TextField source="phone" label="電話" />
             <TextField source="address" label="地址" />
-            <BooleanField source="is_admin" label="是否管理員" />
+            <BooleanInput source="is_admin" label="是否管理員" disabled />
             <TextField source="status" label="狀態" />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />
@@ -56,7 +58,7 @@ export const MemberCreate = (props) => (
             <TextInput source="email" label="電子郵件" type="email" required />
             <TextInput source="phone" label="電話" />
             <TextInput source="address" label="地址" />
-            <BooleanField source="is_admin" label="是否管理員" />
+            <BooleanInput source="is_admin" label="是否管理員" />
             <TextInput source="status" label="狀態" defaultValue="active" />
         </SimpleForm>
     </Create>
@@ -73,7 +75,7 @@ export const MemberEdit = (props) => (
             <TextInput source="email" label="電子郵件" type="email" required />
             <TextInput source="phone" label="電話" />
             <TextInput source="address" label="地址" />
-            <BooleanField source="is_admin" label="是否管理員" />
+            <BooleanInput source="is_admin" label="是否管理員" />
             <TextInput source="status" label="狀態" />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />
@@ -91,7 +93,7 @@ export const MemberShow = (props) => (
             <EmailField source="email" label="電子郵件" />
             <TextField source="phone" label="電話" />
             <TextField source="address" label="地址" />
-            <BooleanField source="is_admin" label="是否管理員" />
+            <BooleanInput source="is_admin" label="是否管理員" disabled />
             <TextField source="status" label="狀態" />
             <DateField source="created_at" label="創建時間" />
             <DateField source="updated_at" label="更新時間" />

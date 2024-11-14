@@ -106,6 +106,23 @@ const customTraditionalChineseMessages = {
             unauthorized: '未授權',
         },
     },
+    resources: {
+        members: {
+            name: '會員 |||| 會員',
+        },
+        orders: {
+            name: '訂單 |||| 訂單',
+        },
+        users: {
+            name: '使用者 |||| 使用者',
+        },
+        products: {
+            name: '商品 |||| 商品',
+        },
+        'product-categories': {
+            name: '產品類別 |||| 產品類別',
+        },
+    },
 };
 
 // 設定繁體中文翻譯
@@ -203,6 +220,7 @@ const App = () => (
                             appBar={MyAppBar}
                             i18nProvider={i18nProvider}
                             theme={theme}
+                            dashboard={Dashboard}
                         >
                             <Resource
                                 name="members"

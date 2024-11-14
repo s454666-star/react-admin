@@ -1,3 +1,5 @@
+// src/Order.js
+
 import React from 'react';
 import {
     List,
@@ -20,6 +22,7 @@ import {
     SimpleShowLayout,
     NumberInput,
     FunctionField,
+    NumberField,
 } from 'react-admin';
 
 // 訂單狀態選項
