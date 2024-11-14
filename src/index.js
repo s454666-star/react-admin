@@ -1,6 +1,6 @@
 // src/index.js
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Admin, Resource } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
@@ -15,10 +15,11 @@ import UserList from './UserList';
 import UserCreate from './UserCreate';
 import UserEdit from './UserEdit';
 import UserShow from './UserShow';
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { MemberList, MemberCreate, MemberEdit, MemberShow } from './Member';
 import { OrderList, OrderCreate, OrderEdit, OrderShow } from './Order';
 import { Helmet } from 'react-helmet';
+import { Navigate } from 'react-router-dom';
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -209,14 +210,8 @@ const theme = createTheme({
     },
 });
 
-// Dashboard 組件，用於重定向到 /orders
-const Dashboard = () => {
-    const navigate = useNavigate();
-    useEffect(() => {
-        navigate('/orders', { replace: true });
-    }, [navigate]);
-    return null;
-};
+// Dashboard 組件，用於重定向到 /star-admin/orders
+const Dashboard = () => <Navigate to="orders" replace />;
 
 const App = () => (
     <BrowserRouter>
@@ -229,58 +224,50 @@ const App = () => (
                     rel="stylesheet"
                 />
             </Helmet>
-            <Routes>
-                {/* 後台路由 */}
-                <Route
-                    path="/star-admin/*"
-                    element={
-                        <Admin
-                            basename="/star-admin"
-                            authProvider={authProvider}
-                            dataProvider={dataProvider}
-                            loginPage={Login}
-                            appBar={MyAppBar}
-                            i18nProvider={i18nProvider}
-                            theme={theme}
-                            dashboard={Dashboard}
-                        >
-                            <Resource
-                                name="members"
-                                list={MemberList}
-                                create={MemberCreate}
-                                edit={MemberEdit}
-                                show={MemberShow}
-                            />
-                            <Resource
-                                name="orders"
-                                list={OrderList}
-                                create={OrderCreate}
-                                edit={OrderEdit}
-                                show={OrderShow}
-                            />
-                            <Resource
-                                name="users"
-                                list={UserList}
-                                create={UserCreate}
-                                edit={UserEdit}
-                                show={UserShow}
-                            />
-                            <Resource
-                                name="products"
-                                list={ProductList}
-                                create={ProductCreate}
-                                edit={ProductEdit}
-                            />
-                            <Resource
-                                name="product-categories"
-                                list={ProductCategoryList}
-                                create={ProductCategoryCreate}
-                                edit={ProductCategoryEdit}
-                            />
-                        </Admin>
-                    }
+            <Admin
+                basename="/star-admin"
+                authProvider={authProvider}
+                dataProvider={dataProvider}
+                loginPage={Login}
+                appBar={MyAppBar}
+                i18nProvider={i18nProvider}
+                theme={theme}
+                dashboard={Dashboard}
+            >
+                <Resource
+                    name="members"
+                    list={MemberList}
+                    create={MemberCreate}
+                    edit={MemberEdit}
+                    show={MemberShow}
                 />
-            </Routes>
+                <Resource
+                    name="orders"
+                    list={OrderList}
+                    create={OrderCreate}
+                    edit={OrderEdit}
+                    show={OrderShow}
+                />
+                <Resource
+                    name="users"
+                    list={UserList}
+                    create={UserCreate}
+                    edit={UserEdit}
+                    show={UserShow}
+                />
+                <Resource
+                    name="products"
+                    list={ProductList}
+                    create={ProductCreate}
+                    edit={ProductEdit}
+                />
+                <Resource
+                    name="product-categories"
+                    list={ProductCategoryList}
+                    create={ProductCategoryCreate}
+                    edit={ProductCategoryEdit}
+                />
+            </Admin>
         </ThemeProvider>
     </BrowserRouter>
 );
