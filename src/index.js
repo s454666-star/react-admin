@@ -299,10 +299,19 @@ const customDataProvider = {
 // 認證提供者
 const authProvider = {
     login: async ({ username, password }) => {
+        // 获取 CSRF Token
+        await fetch('https://mystar.monster/sanctum/csrf-cookie', { credentials: 'include' });
+
+        const csrfToken = getCookie('XSRF-TOKEN');
+
         const request = new Request(`${API_URL}/admin-login`, {
             method: 'POST',
             body: JSON.stringify({ username, password }),
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: new Headers({
+                'Content-Type': 'application/json',
+                'X-XSRF-TOKEN': csrfToken,
+            }),
+            credentials: 'include',
         });
 
         try {
@@ -311,12 +320,9 @@ const authProvider = {
                 const error = await response.json();
                 throw new Error(error.message || 'Login failed');
             }
-            const { user, access_token, token_type } = await response.json();
+            const { user, access_token } = await response.json();
 
-            localStorage.setItem(
-                'auth',
-                JSON.stringify({ user, token: access_token })
-            );
+            localStorage.setItem('auth', JSON.stringify({ user, token: access_token }));
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error.message);
