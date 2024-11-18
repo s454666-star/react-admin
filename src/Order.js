@@ -21,6 +21,7 @@ import {
 import { Grid, Card, CardContent, CardHeader, Select, MenuItem, FormControl, InputLabel, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formatAmount } from './utils';
+import * as XLSX from 'xlsx';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -117,27 +118,29 @@ const StatusEditField = ({ record }) => {
     );
 };
 
-// 自定義匯出為XML的函數
-const exportToXML = (data) => {
-    const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<orders>\n';
-    const xmlFooter = '</orders>';
-    const xmlContent = data.map(order => {
+// 自定義匯出為XLSX的函數
+const exportToXLSX = (data) => {
+    const exportData = data.map(order => {
         const address = order.delivery_address && (order.delivery_address.city || order.delivery_address.address)
             ? `${order.delivery_address.city || ''} ${order.delivery_address.address || ''}`
             : '無配送地址';
-        return `  <order>
-    <配送地址>${address}</配送地址>
-    <訂單編號>${order.order_number}</訂單編號>
-    <狀態>${order.status}</狀態>
-    <總金額>${Math.round(order.total_amount)}</總金額>
-  </order>\n`;
-    }).join('');
-    const xmlString = xmlHeader + xmlContent + xmlFooter;
-    const blob = new Blob([xmlString], { type: 'application/xml' });
+        return {
+            配送地址: address,
+            訂單編號: order.order_number,
+            狀態: orderStatusChoices.find(choice => choice.id === order.status)?.name || order.status,
+            總金額: Math.round(order.total_amount),
+        };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '訂單');
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'orders.xml';
+    link.download = 'orders.xlsx';
     link.click();
     URL.revokeObjectURL(url);
 };
@@ -151,7 +154,7 @@ export const OrderList = (props) => {
             filters={<OrderFilter />}
             perPage={25}
             title="訂單列表"
-            exporter={exportToXML}
+            exporter={exportToXLSX}
         >
             <Datagrid rowClick={false}>
                 <TextField source="id" label="ID" />
