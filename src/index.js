@@ -185,6 +185,7 @@ const i18nProvider = polyglotI18nProvider(
 
 // API 基本 URL
 const API_URL = 'https://mystar.monster/api';
+const LOGIN_URL = 'https://mystar.monster/';
 
 // 自訂資料提供者
 import { stringify } from 'query-string';
@@ -310,7 +311,7 @@ const authProvider = {
 
         const csrfToken = getCookie('XSRF-TOKEN');
 
-        const request = new Request(`${API_URL}/admin-login`, {
+        const request = new Request(`${LOGIN_URL}/admin-login`, {
             method: 'POST',
             body: JSON.stringify({ username, password }),
             headers: new Headers({
