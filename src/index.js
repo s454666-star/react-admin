@@ -296,6 +296,12 @@ const customDataProvider = {
     },
 };
 
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
+
 // 認證提供者
 const authProvider = {
     login: async ({ username, password }) => {
