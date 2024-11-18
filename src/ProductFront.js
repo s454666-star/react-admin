@@ -113,11 +113,12 @@ const ProductFront = () => {
         try {
             const response = await axios.get(`${API_URL}/orders`, {
                 params: {
-                    filter: JSON.stringify({ status: 'pending' }),
+                    'filter[status]': 'pending',
                 },
             });
-            if (response.data.length > 0) {
-                const pendingOrder = response.data[0];
+            const pendingOrders = response.data.filter(order => order.status === 'pending');
+            if (pendingOrders.length > 0) {
+                const pendingOrder = pendingOrders[0];
                 const items = Array.isArray(pendingOrder.order_items) ? pendingOrder.order_items : [];
                 setCartItems(items);
                 setTotalProducts(items.length);
@@ -160,18 +161,13 @@ const ProductFront = () => {
                 const range = [0, 100];
                 const sort = [sortField, sortDirection];
 
-                const filter = {};
-                if (selectedCategory !== null) filter.category_id = selectedCategory;
-                if (searchQuery) filter.q = searchQuery;
-
                 const params = {
                     range: JSON.stringify(range),
                     sort: JSON.stringify(sort),
                 };
 
-                if (Object.keys(filter).length > 0) {
-                    params.filter = JSON.stringify(filter);
-                }
+                if (selectedCategory !== null) params['filter[category_id]'] = selectedCategory;
+                if (searchQuery) params['filter[q]'] = searchQuery;
 
                 const response = await axios.get(`${API_URL}/products`, { params });
 
@@ -218,12 +214,13 @@ const ProductFront = () => {
                 setLoading(true);
                 const response = await axios.get(`${API_URL}/orders`, {
                     params: {
-                        filter: JSON.stringify({ status: 'pending' }),
+                        'filter[status]': 'pending',
                     },
                 });
                 let pendingOrder;
-                if (response.data.length > 0) {
-                    pendingOrder = response.data[0];
+                const pendingOrders = response.data.filter(order => order.status === 'pending');
+                if (pendingOrders.length > 0) {
+                    pendingOrder = pendingOrders[0];
                 } else {
                     const newOrder = await axios.post(`${API_URL}/orders`, {
                         status: 'pending',

@@ -198,11 +198,12 @@ const OrderCart = () => {
         try {
             const response = await axios.get(`${API_URL}/orders`, {
                 params: {
-                    filter: JSON.stringify({ status: 'pending' }),
+                    'filter[status]': 'pending',
                 },
             });
-            if (response.data && response.data.length > 0) {
-                const pendingOrder = response.data[0];
+            const pendingOrders = response.data.filter(order => order.status === 'pending');
+            if (pendingOrders.length > 0) {
+                const pendingOrder = pendingOrders[0];
                 const items = Array.isArray(pendingOrder.order_items) ? pendingOrder.order_items : [];
                 const calculatedTotalAmount = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0);
                 setCartItems(items);
@@ -277,39 +278,27 @@ const OrderCart = () => {
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-            if (response.data && response.data.token) {
-                localStorage.setItem('access_token', response.data.token);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-                setUser({
-                    id: response.data.user.id,
-                    username: response.data.user.username,
-                    email_verified: response.data.user.email_verified,
-                });
-                setIsLoggedIn(true);
-                setSnackbar({
-                    open: true,
-                    message: '登入成功！',
-                    severity: 'success',
-                });
-                setOpenLoginModal(false);
-                fetchCartItems();
-                setAuthLoading(false);
-            } else {
-                setSnackbar({
-                    open: true,
-                    message: '登入失敗，請檢查您的帳號或密碼',
-                    severity: 'error',
-                });
-                setAuthLoading(false);
-            }
-        } catch (error) {
-            console.error('Error during login:', error);
+            const response = await axios.post(`${API_URL}/login`, { email, password }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const { access_token, user } = response.data;
+            localStorage.setItem('access_token', access_token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+            setUser(user);
+            setIsLoggedIn(true);
+            setAuthLoading(false);
+            setOpenLoginModal(false);
+            fetchCartItems();
             setSnackbar({
                 open: true,
-                message: '登入失敗，請稍後再試',
-                severity: 'error',
+                message: '登入成功！',
+                severity: 'success',
             });
+        } catch (err) {
+            console.error('登入失敗', err);
+            setLoginError(err.response?.data?.message || '登入失敗，請稍後再試。');
             setAuthLoading(false);
         }
     };
@@ -317,19 +306,19 @@ const OrderCart = () => {
     const handleLogout = async () => {
         try {
             setAuthLoading(true);
-            await axios.post(`${API_URL}/auth/logout`);
+            await axios.post(`${API_URL}/logout`);
             localStorage.removeItem('access_token');
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
             setUser({ id: null, username: '', email_verified: false });
             setCartItems([]);
             setTotalAmount(0);
+            setAuthLoading(false);
             setSnackbar({
                 open: true,
                 message: '登出成功！',
                 severity: 'success',
             });
-            setAuthLoading(false);
             navigate('/');
             window.location.reload();
         } catch (error) {
