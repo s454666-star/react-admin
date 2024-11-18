@@ -9,3 +9,8 @@ export const getFullImageUrl = (path) => {
     }
     return `${IMAGE_BASE_URL}${path}`;
 };
+
+export const formatAmount = (amount) => {
+    if (typeof amount !== 'number') return '0';
+    return Math.round(amount).toLocaleString();
+};

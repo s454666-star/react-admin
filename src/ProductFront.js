@@ -30,7 +30,8 @@ import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
-import MemberRegister from './MemberRegister'; // 確保正確導入 MemberRegister
+import MemberRegister from './MemberRegister';
+import { formatAmount } from './utils'; // 引入格式化函數
 
 const appTheme = createTheme({
     palette: {
@@ -41,7 +42,7 @@ const appTheme = createTheme({
             default: '#f4f6f8',
         },
         text: {
-            primary: '#003366', // 深藍色文字
+            primary: '#003366',
             secondary: '#00509e',
         },
     },
@@ -55,7 +56,7 @@ const API_URL = 'https://mystar.monster/api';
 const ProductFront = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-    const navigate = useNavigate(); // 使用 useNavigate 進行跳轉
+    const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -74,7 +75,7 @@ const ProductFront = () => {
     const [authLoading, setAuthLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
 
-    const [cartItems, setCartItems] = useState([]); // 新增 cartItems 狀態
+    const [cartItems, setCartItems] = useState([]);
 
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -82,7 +83,6 @@ const ProductFront = () => {
         severity: 'success',
     });
 
-    // 設定 axios 預設 headers
     useEffect(() => {
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -93,7 +93,6 @@ const ProductFront = () => {
         }
     }, []);
 
-    // 獲取使用者資訊
     const fetchUserInfo = async () => {
         try {
             setAuthLoading(true);
@@ -109,7 +108,6 @@ const ProductFront = () => {
         }
     };
 
-    // 獲取購物車品項數量
     const fetchCartItems = async () => {
         try {
             const response = await axios.get(`${API_URL}/orders`, {
@@ -133,7 +131,6 @@ const ProductFront = () => {
         }
     };
 
-    // 獲取商品類別
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -155,7 +152,6 @@ const ProductFront = () => {
         fetchCategories();
     }, []);
 
-    // 獲取商品列表
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -190,7 +186,6 @@ const ProductFront = () => {
         fetchProducts();
     }, [selectedCategory, sortField, sortDirection, searchQuery]);
 
-    // 選擇商品類別
     const handleCategorySelect = (categoryId) => {
         const numericCategoryId = Number(categoryId);
         setSelectedCategory((prevCategory) =>
@@ -198,40 +193,34 @@ const ProductFront = () => {
         );
     };
 
-    // 更改排序欄位
     const handleSortFieldChange = (event) => {
         setSortField(event.target.value);
     };
 
-    // 更改排序方式
     const handleSortDirectionChange = (event) => {
         setSortDirection(event.target.value);
     };
 
-    // 搜尋商品名稱
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
 
-    // 關閉錯誤訊息
     const handleCloseError = () => {
         setError('');
     };
 
-    // 加入購物車
     const handleAddToCart = async (product) => {
         if (!isLoggedIn) {
             setOpenLoginModal(true);
         } else {
-            console.log('User ID:', user.id); // 調試輸出
+            console.log('User ID:', user.id);
             try {
                 await axios.post(`${API_URL}/orders`, {
                     product_id: product.id,
                     quantity: 1,
                     price: product.price,
                 });
-                fetchCartItems(); // 更新購物車數量
-                // 顯示加入購物車成功的通知
+                fetchCartItems();
                 setSnackbar({
                     open: true,
                     message: '商品已成功加入購物車！',
@@ -253,7 +242,6 @@ const ProductFront = () => {
         }
     };
 
-    // 處理登入
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
@@ -264,13 +252,12 @@ const ProductFront = () => {
             });
             const { access_token, user } = response.data;
             localStorage.setItem('access_token', access_token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`; // 設置 Authorization 標頭
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
             setUser(user);
             setIsLoggedIn(true);
             setAuthLoading(false);
             setOpenLoginModal(false);
-            fetchCartItems(); // 獲取登入後的購物車數據
-            // 顯示登入成功的通知
+            fetchCartItems();
             setSnackbar({
                 open: true,
                 message: '登入成功！',
@@ -282,7 +269,7 @@ const ProductFront = () => {
             setAuthLoading(false);
         }
     };
-    // 處理登出
+
     const handleLogout = async () => {
         try {
             setAuthLoading(true);
@@ -291,10 +278,9 @@ const ProductFront = () => {
             delete axios.defaults.headers.common['Authorization'];
             setIsLoggedIn(false);
             setUser({ id: null, username: '', email_verified: false });
-            setCartItems([]); // 清空購物車
+            setCartItems([]);
             setTotalProducts(0);
             setAuthLoading(false);
-            // 顯示登出成功的通知
             setSnackbar({
                 open: true,
                 message: '登出成功！',
@@ -340,7 +326,7 @@ const ProductFront = () => {
                         >
                             星夜電商平台
                         </Typography>
-                        {/* 新增購物車按鈕 */}
+                        {/* 購物車按鈕 */}
                         <Button
                             color="secondary"
                             onClick={() => navigate('/order-cart')}
@@ -402,7 +388,7 @@ const ProductFront = () => {
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#d32f2f', // 鮮豔紅色
+                                            color: '#d32f2f',
                                             marginRight: theme.spacing(2),
                                             fontWeight: 'bold',
                                         }}
@@ -551,18 +537,15 @@ const ProductFront = () => {
                         <>
                             <Grid container spacing={4}>
                                 {products.map((product) => {
-                                    // 處理圖片來源
                                     let imageSrc = '';
                                     if (product.image_base64) {
                                         if (product.image_base64.startsWith('data:image')) {
                                             imageSrc = product.image_base64;
                                         } else {
-                                            // 假設圖片格式為 PNG，如果有其他格式，請根據實際情況修改
                                             imageSrc = `data:image/png;base64,${product.image_base64}`;
                                         }
                                     } else {
-                                        // 設定預設圖片（可選）
-                                        imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
+                                        imageSrc = '/path/to/default/image.png';
                                     }
 
                                     return (
@@ -593,7 +576,7 @@ const ProductFront = () => {
                                                         {product.product_name}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                        價格：${product.price}
+                                                        價格：${formatAmount(product.price)}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                         庫存：{product.stock_quantity}
@@ -619,6 +602,7 @@ const ProductFront = () => {
                                                     <Button
                                                         size="small"
                                                         color="secondary"
+                                                        onClick={() => navigate(`/product/${product.id}`)} // 假設有詳細資訊頁面
                                                         sx={{ fontWeight: 'bold', textTransform: 'none' }}
                                                     >
                                                         詳細資訊
@@ -638,7 +622,6 @@ const ProductFront = () => {
                                     </Typography>
                                     <Grid container spacing={2}>
                                         {cartItems.map((item) => {
-                                            // 處理圖片來源
                                             let imageSrc = '';
                                             if (item.product && item.product.image_base64) {
                                                 if (item.product.image_base64.startsWith('data:image')) {
@@ -647,7 +630,7 @@ const ProductFront = () => {
                                                     imageSrc = `data:image/png;base64,${item.product.image_base64}`;
                                                 }
                                             } else {
-                                                imageSrc = '/path/to/default/image.png'; // 請替換為實際預設圖片路徑
+                                                imageSrc = '/path/to/default/image.png';
                                             }
 
                                             return (
@@ -678,13 +661,13 @@ const ProductFront = () => {
                                                                 {item.product?.product_name || '未知商品'}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                                價格：${item.price}
+                                                                價格：${formatAmount(item.price)}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                                 數量：{item.quantity}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                                小計：${(item.price * item.quantity).toFixed(2)}
+                                                                小計：${formatAmount(item.price * item.quantity)}
                                                             </Typography>
                                                         </CardContent>
                                                         <CardActions>

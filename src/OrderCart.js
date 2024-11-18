@@ -33,6 +33,7 @@ import axios from 'axios';
 import MemberRegister from './MemberRegister';
 import DeliveryAddress from './DeliveryAddress';
 import CreditCard from './CreditCard';
+import { formatAmount } from './utils'; // 引入格式化函數
 
 const appTheme = createTheme({
     palette: {
@@ -508,7 +509,7 @@ const OrderCart = () => {
 
                 <Box
                     sx={{
-                        backgroundImage: 'url(/path/to/background/image.jpg)',
+                        backgroundImage: 'url(/path/to/background/image.jpg)', // 替換為實際背景圖片路徑
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         paddingY: 5,
@@ -530,55 +531,67 @@ const OrderCart = () => {
                                 <Box>
                                     {cartItems && cartItems.length > 0 ? (
                                         <>
-                                            {cartItems.map((item) => (
-                                                <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0' }}>
-                                                    <Grid container spacing={2} alignItems="center">
-                                                        <Grid item xs={12} sm={6}>
-                                                            <Box display="flex" alignItems="center">
-                                                                <CardMedia
-                                                                    component="img"
-                                                                    image={
-                                                                        item.product?.image_base64?.startsWith('data:image')
-                                                                            ? item.product.image_base64
-                                                                            : `data:image/png;base64,${item.product.image_base64}`
-                                                                    }
-                                                                    alt={item.product?.product_name || '產品圖片'}
-                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2, borderRadius: 1 }}
-                                                                />
-                                                                <Box>
-                                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                                        {item.product?.product_name || '產品名稱'}
-                                                                    </Typography>
-                                                                    <Typography variant="body2" color="textSecondary">
-                                                                        單價：${parseFloat(item.price).toFixed(2)}
-                                                                    </Typography>
+                                            {cartItems.map((item) => {
+                                                let imageSrc = '';
+                                                if (item.product?.image_base64) {
+                                                    if (item.product.image_base64.startsWith('data:image')) {
+                                                        imageSrc = item.product.image_base64;
+                                                    } else {
+                                                        imageSrc = `data:image/png;base64,${item.product.image_base64}`;
+                                                    }
+                                                } else {
+                                                    imageSrc = '/path/to/default/image.png'; // 替換為實際預設圖片路徑
+                                                }
+
+                                                return (
+                                                    <Box key={item.id} sx={{ padding: 2, borderBottom: '1px solid #e0e0e0' }}>
+                                                        <Grid container spacing={2} alignItems="center">
+                                                            <Grid item xs={12} sm={6}>
+                                                                <Box display="flex" alignItems="center">
+                                                                    <CardMedia
+                                                                        component="img"
+                                                                        image={imageSrc}
+                                                                        alt={item.product?.product_name || '產品圖片'}
+                                                                        sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2, borderRadius: 1 }}
+                                                                    />
+                                                                    <Box>
+                                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                                            {item.product?.product_name || '產品名稱'}
+                                                                        </Typography>
+                                                                        <Typography variant="body2" color="textSecondary">
+                                                                            單價：${formatAmount(parseFloat(item.price))}
+                                                                        </Typography>
+                                                                    </Box>
                                                                 </Box>
-                                                            </Box>
+                                                            </Grid>
+                                                            <Grid item xs={6} sm={3} display="flex" alignItems="center">
+                                                                <IconButton onClick={() => handleQuantityChange(item, -1)}>
+                                                                    <Remove />
+                                                                </IconButton>
+                                                                <Typography sx={{ marginX: 1 }}>{item.quantity}</Typography>
+                                                                <IconButton onClick={() => handleQuantityChange(item, 1)}>
+                                                                    <Add />
+                                                                </IconButton>
+                                                            </Grid>
+                                                            <Grid item xs={12} sm={3} display="flex" justifyContent="flex-end">
+                                                                <Button
+                                                                    color="error"
+                                                                    onClick={() => handleRemoveItem(item.order_id, item.id)}
+                                                                    startIcon={<Delete />}
+                                                                    sx={{ fontWeight: 'bold', borderRadius: 2 }}
+                                                                >
+                                                                    刪除
+                                                                </Button>
+                                                            </Grid>
                                                         </Grid>
-                                                        <Grid item xs={6} sm={3} display="flex" alignItems="center">
-                                                            <IconButton onClick={() => handleQuantityChange(item, -1)}>
-                                                                <Remove />
-                                                            </IconButton>
-                                                            <Typography sx={{ marginX: 1 }}>{item.quantity}</Typography>
-                                                            <IconButton onClick={() => handleQuantityChange(item, 1)}>
-                                                                <Add />
-                                                            </IconButton>
-                                                        </Grid>
-                                                        <Grid item xs={12} sm={3} display="flex" justifyContent="flex-end">
-                                                            <Button
-                                                                color="error"
-                                                                onClick={() => handleRemoveItem(item.order_id, item.id)}
-                                                                startIcon={<Delete />}
-                                                                sx={{ fontWeight: 'bold', borderRadius: 2 }}
-                                                            >
-                                                                刪除
-                                                            </Button>
-                                                        </Grid>
-                                                    </Grid>
-                                                </Box>
-                                            ))}
+                                                        <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold' }}>
+                                                            小計金額：${formatAmount(parseFloat(item.price) * item.quantity)}
+                                                        </Typography>
+                                                    </Box>
+                                                );
+                                            })}
                                             <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold' }}>
-                                                小計金額：${parseFloat(totalAmount).toFixed(2)}
+                                                小計金額：${formatAmount(parseFloat(totalAmount))}
                                             </Typography>
                                         </>
                                     ) : (
@@ -646,6 +659,7 @@ const OrderCart = () => {
                     </Container>
                 </Box>
 
+                {/* 會員註冊的 Modal */}
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                     <Box
                         sx={{
@@ -665,6 +679,7 @@ const OrderCart = () => {
                     </Box>
                 </Modal>
 
+                {/* 會員登入的 Modal */}
                 <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
                     <Box
                         sx={{
@@ -690,4 +705,5 @@ const OrderCart = () => {
         </ThemeProvider>
     );
 };
+
 export default OrderCart;
