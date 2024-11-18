@@ -18,7 +18,7 @@ import {
     useNotify,
     useRefresh,
 } from 'react-admin';
-import { Grid, Card, CardContent, CardHeader } from '@mui/material';
+import { Grid, Card, CardContent, CardHeader, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formatAmount } from './utils';
 
@@ -40,6 +40,9 @@ const useStyles = makeStyles({
     },
     gridItem: {
         marginBottom: '16px',
+    },
+    formControl: {
+        width: '100%',
     },
 });
 
@@ -65,6 +68,7 @@ const OrderFilter = (props) => (
 
 // 自定義狀態編輯欄位
 const StatusEditField = ({ record }) => {
+    const classes = useStyles();
     const [status, setStatus] = React.useState(record ? record.status : '');
     const update = useUpdate();
     const notify = useNotify();
@@ -88,13 +92,21 @@ const StatusEditField = ({ record }) => {
     if (!record) return null;
 
     return (
-        <SelectInput
-            source="status"
-            choices={orderStatusChoices}
-            value={status}
-            onChange={handleChange}
-            fullWidth
-        />
+        <FormControl className={classes.formControl}>
+            <InputLabel id={`status-select-label-${record.id}`}>狀態</InputLabel>
+            <Select
+                labelId={`status-select-label-${record.id}`}
+                value={status}
+                onChange={handleChange}
+                label="狀態"
+            >
+                {orderStatusChoices.map(choice => (
+                    <MenuItem key={choice.id} value={choice.id}>
+                        {choice.name}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
     );
 };
 
