@@ -185,7 +185,7 @@ const i18nProvider = polyglotI18nProvider(
 
 // API 基本 URL
 const API_URL = 'https://mystar.monster/api';
-const LOGIN_URL = 'https://mystar.monster/';
+const LOGIN_URL = 'https://mystar.monster';
 
 // 自訂資料提供者
 import { stringify } from 'query-string';
