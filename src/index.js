@@ -192,6 +192,7 @@ import { stringify } from 'query-string';
 
 const customHttpClient = (url, options = {}) => {
     const auth = JSON.parse(localStorage.getItem('auth'));
+    options.credentials = 'include';
     if (auth && auth.token) {
         options.headers = new Headers({
             Accept: 'application/json',
