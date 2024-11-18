@@ -18,7 +18,7 @@ import {
     useNotify,
     useRefresh,
 } from 'react-admin';
-import { Grid, Card, CardContent, CardHeader, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Grid, Card, CardContent, CardHeader, Select, MenuItem, FormControl, InputLabel, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formatAmount } from './utils';
 
@@ -43,6 +43,9 @@ const useStyles = makeStyles({
     },
     formControl: {
         width: '100%',
+    },
+    exportButton: {
+        margin: '10px',
     },
 });
 
@@ -114,11 +117,42 @@ const StatusEditField = ({ record }) => {
     );
 };
 
+// 自定義匯出為XML的函數
+const exportToXML = (data) => {
+    const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<orders>\n';
+    const xmlFooter = '</orders>';
+    const xmlContent = data.map(order => {
+        const address = order.delivery_address && (order.delivery_address.city || order.delivery_address.address)
+            ? `${order.delivery_address.city || ''} ${order.delivery_address.address || ''}`
+            : '無配送地址';
+        return `  <order>
+    <配送地址>${address}</配送地址>
+    <訂單編號>${order.order_number}</訂單編號>
+    <狀態>${order.status}</狀態>
+    <總金額>${Math.round(order.total_amount)}</總金額>
+  </order>\n`;
+    }).join('');
+    const xmlString = xmlHeader + xmlContent + xmlFooter;
+    const blob = new Blob([xmlString], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'orders.xml';
+    link.click();
+    URL.revokeObjectURL(url);
+};
+
 // 訂單列表
 export const OrderList = (props) => {
     const classes = useStyles();
     return (
-        <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
+        <List
+            {...props}
+            filters={<OrderFilter />}
+            perPage={25}
+            title="訂單列表"
+            exporter={exportToXML}
+        >
             <Datagrid rowClick={false}>
                 <TextField source="id" label="ID" />
                 <ReferenceField source="member_id" reference="members" label="會員" link={false}>
