@@ -74,17 +74,21 @@ export const OrderList = (props) => {
         <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
             <Datagrid rowClick="show">
                 <TextField source="id" label="ID" />
-                {/* 會員名稱和地址 */}
+                {/* 會員名稱 */}
                 <ReferenceField source="member_id" reference="members" label="會員" link={false}>
-                    <FunctionField
-                        render={(record) => (
-                            <span>
-                                <div><strong>姓名:</strong> {record.name}</div>
-                                <div><strong>地址:</strong> {record.address}</div>
-                            </span>
-                        )}
-                    />
+                    <TextField source="name" />
                 </ReferenceField>
+                {/* 配送地址 */}
+                <FunctionField
+                    label="配送地址"
+                    render={(record) => (
+                        <span>
+                            {record.delivery_address
+                                ? record.delivery_address.address
+                                : '無配送地址'}
+                        </span>
+                    )}
+                />
                 <TextField source="order_number" label="訂單編號" />
                 <SelectField source="status" label="狀態" choices={orderStatusChoices} />
                 {/* 顯示訂單品項 */}
@@ -92,10 +96,10 @@ export const OrderList = (props) => {
                     label="訂單品項"
                     render={(record) => (
                         <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                            {record.orderItems && record.orderItems.length > 0 ? (
-                                record.orderItems.map((item) => (
+                            {record.order_items && record.order_items.length > 0 ? (
+                                record.order_items.map((item) => (
                                     <li key={item.id}>
-                                        {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
+                                        {item.product ? item.product.product_name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
                                     </li>
                                 ))
                             ) : (
@@ -105,16 +109,7 @@ export const OrderList = (props) => {
                     )}
                 />
                 {/* 訂單總金額 */}
-                <FunctionField
-                    label="總金額"
-                    render={(record) => {
-                        const totalItemsPrice = record.orderItems
-                            ? record.orderItems.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
-                            : 0;
-                        const totalAmount = totalItemsPrice + Number(record.shipping_fee || 0);
-                        return `${totalAmount.toFixed(2)} 元`;
-                    }}
-                />
+                <TextField source="total_amount" label="總金額" />
                 <DateField source="created_at" label="創建時間" />
                 <DateField source="updated_at" label="更新時間" />
                 <EditButton />
@@ -211,6 +206,18 @@ export const OrderShow = (props) => {
                         </ReferenceField>
                     </Grid>
                     <Grid item xs={12} className={classes.gridItem}>
+                        <FunctionField
+                            label="配送地址"
+                            render={(record) => (
+                                <span>
+                                    {record.delivery_address
+                                        ? record.delivery_address.address
+                                        : '無配送地址'}
+                                </span>
+                            )}
+                        />
+                    </Grid>
+                    <Grid item xs={12} className={classes.gridItem}>
                         <TextField source="order_number" label="訂單編號" />
                     </Grid>
                     <Grid item xs={12} className={classes.gridItem}>
@@ -237,10 +244,10 @@ export const OrderShow = (props) => {
                             label="訂單明細"
                             render={(record) => (
                                 <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                                    {record.orderItems && record.orderItems.length > 0 ? (
-                                        record.orderItems.map((item) => (
+                                    {record.order_items && record.order_items.length > 0 ? (
+                                        record.order_items.map((item) => (
                                             <li key={item.id}>
-                                                {item.product ? item.product.name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
+                                                {item.product ? item.product.product_name : '無產品名稱'} - 數量: {item.quantity} - 價格: {item.price}
                                             </li>
                                         ))
                                     ) : (
