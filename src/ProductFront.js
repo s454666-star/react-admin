@@ -212,24 +212,7 @@ const ProductFront = () => {
         } else {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_URL}/orders`, {
-                    params: {
-                        'filter[status]': 'pending',
-                    },
-                });
-                let pendingOrder;
-                const pendingOrders = response.data.filter(order => order.status === 'pending');
-                if (pendingOrders.length > 0) {
-                    pendingOrder = pendingOrders[0];
-                } else {
-                    const newOrder = await axios.post(`${API_URL}/orders`, {
-                        status: 'pending',
-                        order_items: [],
-                    });
-                    pendingOrder = newOrder.data;
-                }
-
-                await axios.post(`${API_URL}/orders/${pendingOrder.id}/items`, {
+                await axios.post(`${API_URL}/orders`, {
                     product_id: product.id,
                     quantity: 1,
                     price: product.price,
