@@ -1,3 +1,4 @@
+// ProductFront.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -213,9 +214,25 @@ const ProductFront = () => {
         if (!isLoggedIn) {
             setOpenLoginModal(true);
         } else {
-            console.log('User ID:', user.id);
             try {
-                await axios.post(`${API_URL}/orders`, {
+                setLoading(true);
+                const response = await axios.get(`${API_URL}/orders`, {
+                    params: {
+                        filter: JSON.stringify({ status: 'pending' }),
+                    },
+                });
+                let pendingOrder;
+                if (response.data.length > 0) {
+                    pendingOrder = response.data[0];
+                } else {
+                    const newOrder = await axios.post(`${API_URL}/orders`, {
+                        status: 'pending',
+                        order_items: [],
+                    });
+                    pendingOrder = newOrder.data;
+                }
+
+                await axios.post(`${API_URL}/orders/${pendingOrder.id}/items`, {
                     product_id: product.id,
                     quantity: 1,
                     price: product.price,
@@ -226,7 +243,9 @@ const ProductFront = () => {
                     message: '商品已成功加入購物車！',
                     severity: 'success',
                 });
+                setLoading(false);
             } catch (err) {
+                setLoading(false);
                 if (err.response && err.response.data && err.response.data.errors) {
                     const memberIdError = err.response.data.errors.member_id;
                     if (memberIdError) {

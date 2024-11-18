@@ -203,10 +203,7 @@ const OrderCart = () => {
             });
             if (response.data && response.data.length > 0) {
                 const pendingOrder = response.data[0];
-                const orderId = pendingOrder.id;
-                const orderResponse = await axios.get(`${API_URL}/orders/${orderId}`);
-                const order = orderResponse.data;
-                const items = Array.isArray(order.order_items) ? order.order_items : [];
+                const items = Array.isArray(pendingOrder.order_items) ? pendingOrder.order_items : [];
                 const calculatedTotalAmount = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0);
                 setCartItems(items);
                 setTotalAmount(calculatedTotalAmount);
