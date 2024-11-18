@@ -1,3 +1,5 @@
+// src/ProductCategory.js
+
 import React from 'react';
 import {
     List,
@@ -17,21 +19,32 @@ import {
     useRedirect,
     useRefresh
 } from 'react-admin';
-import { Card, CardContent, CardHeader } from '@mui/material';
+import { Card, CardContent, CardHeader, Grid, Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { Helmet } from 'react-helmet';
 
 // 自定義樣式
 const useStyles = makeStyles({
     card: {
-        backgroundColor: '#f5f5f5',
-        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-        transition: '0.3s',
-        '&:hover': {
-            boxShadow: '0 8px 16px 0 rgba(0,0,0,0.2)',
-        },
+        maxWidth: '85%',
+        margin: '40px auto',
+        padding: '20px',
+        border: '1px solid #ddd',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        backgroundColor: '#ffffff',
     },
     header: {
-        color: '#1976d2',
+        backgroundColor: '#1976d2',
+        color: '#ffffff',
+        padding: '10px 20px',
+        borderRadius: '10px 10px 0 0',
+    },
+    formGrid: {
+        width: '100%',
+    },
+    formItem: {
+        marginBottom: '20px',
     },
 });
 
@@ -46,21 +59,27 @@ const CustomToolbar = props => (
 export const ProductCategoryList = (props) => {
     const classes = useStyles();
     return (
-        <List {...props} title="商品類別清單">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="商品類別" />
-                <CardContent>
-                    <Datagrid rowClick="edit">
-                        <TextField source="id" label="編號" />
-                        <TextField source="category_name" label="名稱" />
-                        <TextField source="description" label="描述" />
-                        <TextField source="status" label="狀態" />
-                        <EditButton />
-                        <DeleteButton />
-                    </Datagrid>
-                </CardContent>
-            </Card>
-        </List>
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png" />
+            </Helmet>
+            <List {...props} title="商品類別清單">
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="商品類別清單" />
+                    <CardContent>
+                        <Datagrid rowClick="edit">
+                            <TextField source="id" label="編號" />
+                            <TextField source="category_name" label="名稱" />
+                            <TextField source="description" label="描述" />
+                            <TextField source="status" label="狀態" />
+                            <EditButton />
+                            <DeleteButton />
+                        </Datagrid>
+                    </CardContent>
+                </Card>
+            </List>
+        </>
     );
 };
 
@@ -78,26 +97,50 @@ export const ProductCategoryCreate = (props) => {
     };
 
     return (
-        <Create {...props} mutationOptions={{onSuccess}} title="新增商品類別">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="新增商品類別" />
-                <CardContent>
-                    <SimpleForm toolbar={<CustomToolbar />} redirect="list">
-                        <TextInput source="category_name" label="名稱" validate={required()} />
-                        <TextInput source="description" label="描述" />
-                        <SelectInput
-                            source="status"
-                            label="狀態"
-                            choices={[
-                                { id: 1, name: '啟用' },
-                                { id: 0, name: '停用' },
-                            ]}
-                            validate={required()}
-                        />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
-        </Create>
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png" />
+            </Helmet>
+            <Create {...props} mutationOptions={{ onSuccess }} title="新增商品類別">
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="新增商品類別" />
+                    <CardContent>
+                        <SimpleForm toolbar={<CustomToolbar />} redirect="list">
+                            <Grid container className={classes.formGrid}>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="category_name"
+                                        label="名稱"
+                                        validate={required()}
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="description"
+                                        label="描述"
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <SelectInput
+                                        source="status"
+                                        label="狀態"
+                                        choices={[
+                                            { id: 1, name: '啟用' },
+                                            { id: 0, name: '停用' },
+                                        ]}
+                                        validate={required()}
+                                        fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                        </SimpleForm>
+                    </CardContent>
+                </Card>
+            </Create>
+        </>
     );
 };
 
@@ -110,30 +153,54 @@ export const ProductCategoryEdit = (props) => {
 
     const onSuccess = () => {
         notify('更新成功', { type: 'success' });
-        redirect('list', 'product-categories');
+        redirect('/product-categories');
         refresh();
     };
 
     return (
-        <Edit {...props} onSuccess={onSuccess} title="編輯商品類別">
-            <Card className={classes.card}>
-                <CardHeader className={classes.header} title="編輯商品類別" />
-                <CardContent>
-                    <SimpleForm toolbar={<CustomToolbar />}>
-                        <TextInput source="category_name" label="名稱" validate={required()} />
-                        <TextInput source="description" label="描述" />
-                        <SelectInput
-                            source="status"
-                            label="狀態"
-                            choices={[
-                                { id: 1, name: '啟用' },
-                                { id: 0, name: '停用' },
-                            ]}
-                            validate={required()}
-                        />
-                    </SimpleForm>
-                </CardContent>
-            </Card>
-        </Edit>
+        <>
+            <Helmet>
+                <title>星夜後台</title>
+                <link rel="icon" href="/icon_198x278.png" type="image/png" />
+            </Helmet>
+            <Edit {...props} mutationOptions={{ onSuccess }} title="編輯商品類別">
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="編輯商品類別" />
+                    <CardContent>
+                        <SimpleForm toolbar={<CustomToolbar />}>
+                            <Grid container className={classes.formGrid}>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="category_name"
+                                        label="名稱"
+                                        validate={required()}
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="description"
+                                        label="描述"
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <SelectInput
+                                        source="status"
+                                        label="狀態"
+                                        choices={[
+                                            { id: 1, name: '啟用' },
+                                            { id: 0, name: '停用' },
+                                        ]}
+                                        validate={required()}
+                                        fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                        </SimpleForm>
+                    </CardContent>
+                </Card>
+            </Edit>
+        </>
     );
 };

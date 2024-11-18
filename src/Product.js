@@ -30,7 +30,6 @@ import {
     CardHeader,
     Box,
     Typography,
-    Avatar,
     Grid,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -40,31 +39,41 @@ import { Helmet } from 'react-helmet';
 // 自定義樣式
 const useStyles = makeStyles({
     card: {
-        backgroundColor: '#f5f5f5',
-        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-        transition: '0.3s',
-        '&:hover': {
-            boxShadow: '0 8px 16px 0 rgba(0,0,0,0.2)',
-        },
+        maxWidth: '85%',
+        margin: '40px auto',
+        padding: '20px',
+        border: '1px solid #ddd',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        backgroundColor: '#ffffff',
     },
     header: {
-        color: '#1976d2',
+        backgroundColor: '#1976d2',
+        color: '#ffffff',
+        padding: '10px 20px',
+        borderRadius: '10px 10px 0 0',
     },
     dropzone: {
-        border: '2px dashed #ccc',
+        border: '2px dashed #1976d2',
         padding: '20px',
         textAlign: 'center',
         cursor: 'pointer',
-        backgroundColor: '#fff',
+        backgroundColor: '#f0f8ff',
+        borderRadius: '8px',
+        transition: 'background-color 0.3s',
     },
     dropzoneActive: {
-        backgroundColor: '#fafafa',
+        backgroundColor: '#e0f7fa',
     },
     previewImage: {
         marginTop: '20px',
+        textAlign: 'center',
     },
-    hiddenInput: {
-        display: 'none',
+    formGrid: {
+        width: '100%',
+    },
+    formItem: {
+        marginBottom: '20px',
     },
 });
 
@@ -160,6 +169,7 @@ const MyImageField = ({ source }) => {
                 objectFit: 'contain',
                 display: 'block',
                 margin: '0 auto',
+                borderRadius: '8px',
             }}
         />
     );
@@ -167,6 +177,7 @@ const MyImageField = ({ source }) => {
 
 // 商品清單頁面
 export const ProductList = (props) => {
+    const classes = useStyles();
     return (
         <>
             <Helmet>
@@ -174,16 +185,21 @@ export const ProductList = (props) => {
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
             <List {...props} title="商品清單">
-                <Datagrid>
-                    <TextField source="id" label="編號" />
-                    <MyImageField source="image_base64" label="商品圖片" />
-                    <TextField source="product_name" label="商品名稱" />
-                    <NumberField source="price" label="價格" />
-                    <NumberField source="stock_quantity" label="庫存數量" />
-                    <TextField source="status" label="狀態" />
-                    <EditButton />
-                    <DeleteButton />
-                </Datagrid>
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="商品清單" />
+                    <CardContent>
+                        <Datagrid>
+                            <TextField source="id" label="編號" />
+                            <MyImageField source="image_base64" label="商品圖片" />
+                            <TextField source="product_name" label="商品名稱" />
+                            <NumberField source="price" label="價格" />
+                            <NumberField source="stock_quantity" label="庫存數量" />
+                            <TextField source="status" label="狀態" />
+                            <EditButton />
+                            <DeleteButton />
+                        </Datagrid>
+                    </CardContent>
+                </Card>
             </List>
         </>
     );
@@ -209,35 +225,53 @@ export const ProductCreate = (props) => {
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
             <Create {...props} mutationOptions={{ onSuccess }} title="新增商品">
-                <SimpleForm toolbar={<CustomToolbar />} redirect="list">
-                    <Card className={classes.card}>
-                        <CardHeader className={classes.header} title="新增商品" />
-                        <CardContent>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="新增商品" />
+                    <CardContent>
+                        <SimpleForm toolbar={<CustomToolbar />} redirect="list">
+                            <Grid container className={classes.formGrid}>
+                                <Grid item xs={12} className={classes.formItem}>
                                     <ReferenceInput
                                         source="category_id"
                                         reference="product-categories"
                                         label="商品類別"
                                         validate={required()}
+                                        fullWidth
                                     >
                                         <SelectInput optionText="category_name" />
                                     </ReferenceInput>
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextInput source="product_name" label="商品名稱" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="product_name"
+                                        label="商品名稱"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <NumberInput source="price" label="價格" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <NumberInput
+                                        source="price"
+                                        label="價格"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <NumberInput
+                                        source="stock_quantity"
+                                        label="庫存數量"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    {/* 使用自定義的圖片輸入組件 */}
-                                    <ImageBase64Input source="image_base64" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <ImageBase64Input
+                                        source="image_base64"
+                                        validate={required()}
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} className={classes.formItem}>
                                     <SelectInput
                                         source="status"
                                         label="狀態"
@@ -247,12 +281,13 @@ export const ProductCreate = (props) => {
                                             { id: 'discontinued', name: '已停產' },
                                         ]}
                                         validate={required()}
+                                        fullWidth
                                     />
                                 </Grid>
                             </Grid>
-                        </CardContent>
-                    </Card>
-                </SimpleForm>
+                        </SimpleForm>
+                    </CardContent>
+                </Card>
             </Create>
         </>
     );
@@ -278,35 +313,53 @@ export const ProductEdit = (props) => {
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
             <Edit {...props} mutationOptions={{ onSuccess }} title="編輯商品">
-                <SimpleForm toolbar={<CustomToolbar />}>
-                    <Card className={classes.card}>
-                        <CardHeader className={classes.header} title="編輯商品" />
-                        <CardContent>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="編輯商品" />
+                    <CardContent>
+                        <SimpleForm toolbar={<CustomToolbar />}>
+                            <Grid container className={classes.formGrid}>
+                                <Grid item xs={12} className={classes.formItem}>
                                     <ReferenceInput
                                         source="category_id"
                                         reference="product-categories"
                                         label="商品類別"
                                         validate={required()}
+                                        fullWidth
                                     >
                                         <SelectInput optionText="category_name" />
                                     </ReferenceInput>
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextInput source="product_name" label="商品名稱" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <TextInput
+                                        source="product_name"
+                                        label="商品名稱"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <NumberInput source="price" label="價格" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <NumberInput
+                                        source="price"
+                                        label="價格"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <NumberInput source="stock_quantity" label="庫存數量" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <NumberInput
+                                        source="stock_quantity"
+                                        label="庫存數量"
+                                        validate={required()}
+                                        fullWidth
+                                    />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    {/* 使用自定義的圖片輸入組件 */}
-                                    <ImageBase64Input source="image_base64" validate={required()} />
+                                <Grid item xs={12} className={classes.formItem}>
+                                    <ImageBase64Input
+                                        source="image_base64"
+                                        validate={required()}
+                                    />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} className={classes.formItem}>
                                     <SelectInput
                                         source="status"
                                         label="狀態"
@@ -316,12 +369,13 @@ export const ProductEdit = (props) => {
                                             { id: 'discontinued', name: '已停產' },
                                         ]}
                                         validate={required()}
+                                        fullWidth
                                     />
                                 </Grid>
                             </Grid>
-                        </CardContent>
-                    </Card>
-                </SimpleForm>
+                        </SimpleForm>
+                    </CardContent>
+                </Card>
             </Edit>
         </>
     );
