@@ -1,3 +1,5 @@
+// OrderCart.js
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -51,6 +53,99 @@ const appTheme = createTheme({
 });
 
 const API_URL = 'https://mystar.monster/api';
+
+// LoginForm 組件
+const LoginForm = ({ onLogin, loading, error }) => {
+    const theme = useTheme();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        await onLogin(email, password);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <TextField
+                label="電子郵件"
+                variant="outlined"
+                fullWidth
+                required
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: theme.palette.text.primary,
+                        },
+                        '&:hover fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                }}
+            />
+            <TextField
+                label="密碼"
+                type="password"
+                variant="outlined"
+                fullWidth
+                required
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: theme.palette.text.primary,
+                        },
+                        '&:hover fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: theme.palette.text.secondary,
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                    },
+                }}
+            />
+            {error && (
+                <Alert severity="error" sx={{ marginTop: theme.spacing(2), fontWeight: 'bold' }}>
+                    {error}
+                </Alert>
+            )}
+            <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
+                fullWidth
+                sx={{ marginTop: theme.spacing(2), fontWeight: 'bold', textTransform: 'none' }}
+                disabled={loading}
+            >
+                {loading ? <CircularProgress size={24} /> : '登入'}
+            </Button>
+        </form>
+    );
+};
 
 const OrderCart = () => {
     const theme = useTheme();
@@ -258,6 +353,41 @@ const OrderCart = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
+    const handleCheckout = async () => {
+        if (cartItems.length === 0) {
+            setSnackbar({
+                open: true,
+                message: '購物車中沒有商品。',
+                severity: 'warning',
+            });
+            return;
+        }
+
+        try {
+            setAuthLoading(true);
+            const response = await axios.post(`${API_URL}/orders/process`);
+            if (response.status === 200) {
+                setSnackbar({
+                    open: true,
+                    message: '結帳成功！',
+                    severity: 'success',
+                });
+                setCartItems([]);
+                setTotalAmount(0);
+                navigate('/product-front');
+            }
+            setAuthLoading(false);
+        } catch (error) {
+            console.error('結帳失敗', error);
+            setSnackbar({
+                open: true,
+                message: '結帳失敗，請稍後再試。',
+                severity: 'error',
+            });
+            setAuthLoading(false);
+        }
+    };
+
     return (
         <ThemeProvider theme={appTheme}>
             <div>
@@ -389,7 +519,7 @@ const OrderCart = () => {
                             我的購物車
                         </Typography>
 
-                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                        <Card variant="outlined" sx={{ padding: 2, marginBottom: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: 2 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h6">訂單品項</Typography>
                                 <IconButton onClick={() => toggleSection('items')}>
@@ -413,7 +543,7 @@ const OrderCart = () => {
                                                                             : `data:image/png;base64,${item.product.image_base64}`
                                                                     }
                                                                     alt={item.product?.product_name || '產品圖片'}
-                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2 }}
+                                                                    sx={{ width: 80, height: 80, objectFit: 'contain', marginRight: 2, borderRadius: 1 }}
                                                                 />
                                                                 <Box>
                                                                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -439,6 +569,7 @@ const OrderCart = () => {
                                                                 color="error"
                                                                 onClick={() => handleRemoveItem(item.order_id, item.id)}
                                                                 startIcon={<Delete />}
+                                                                sx={{ fontWeight: 'bold', borderRadius: 2 }}
                                                             >
                                                                 刪除
                                                             </Button>
@@ -446,7 +577,7 @@ const OrderCart = () => {
                                                     </Grid>
                                                 </Box>
                                             ))}
-                                            <Typography variant="h6" sx={{ paddingTop: 2 }}>
+                                            <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold' }}>
                                                 小計金額：${parseFloat(totalAmount).toFixed(2)}
                                             </Typography>
                                         </>
@@ -464,6 +595,31 @@ const OrderCart = () => {
                                 <DeliveryAddress />
                                 <CreditCard />
                             </>
+                        )}
+
+                        {isLoggedIn && cartItems.length > 0 && (
+                            <Box sx={{ textAlign: 'right', marginTop: 4 }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleCheckout}
+                                    sx={{
+                                        paddingX: 4,
+                                        paddingY: 1.5,
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold',
+                                        borderRadius: 2,
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        transition: 'transform 0.3s, background-color 0.3s',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            backgroundColor: '#00509e',
+                                        },
+                                    }}
+                                >
+                                    結帳
+                                </Button>
+                            </Box>
                         )}
 
                         <Snackbar
@@ -502,6 +658,7 @@ const OrderCart = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
+                            borderRadius: 2,
                         }}
                     >
                         <MemberRegister onClose={() => setOpenRegisterModal(false)} />
@@ -520,6 +677,7 @@ const OrderCart = () => {
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
+                            borderRadius: 2,
                         }}
                     >
                         <Typography variant="h6" component="h2" sx={{ marginBottom: theme.spacing(2), color: theme.palette.text.primary, fontWeight: 'bold' }}>
@@ -532,98 +690,4 @@ const OrderCart = () => {
         </ThemeProvider>
     );
 };
-
-// LoginForm 組件
-const LoginForm = ({ onLogin, loading, error }) => {
-    const theme = useTheme();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        await onLogin(email, password);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <TextField
-                label="電子郵件"
-                variant="outlined"
-                fullWidth
-                required
-                margin="normal"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                sx={{
-                    '& .MuiInputLabel-root': {
-                        color: theme.palette.text.primary,
-                        fontWeight: 'bold',
-                    },
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                            borderColor: theme.palette.text.primary,
-                        },
-                        '&:hover fieldset': {
-                            borderColor: theme.palette.text.secondary,
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.text.secondary,
-                        },
-                    },
-                    '& .MuiInputBase-input': {
-                        color: theme.palette.text.primary,
-                        fontWeight: 'bold',
-                    },
-                }}
-            />
-            <TextField
-                label="密碼"
-                type="password"
-                variant="outlined"
-                fullWidth
-                required
-                margin="normal"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                sx={{
-                    '& .MuiInputLabel-root': {
-                        color: theme.palette.text.primary,
-                        fontWeight: 'bold',
-                    },
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                            borderColor: theme.palette.text.primary,
-                        },
-                        '&:hover fieldset': {
-                            borderColor: theme.palette.text.secondary,
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.text.secondary,
-                        },
-                    },
-                    '& .MuiInputBase-input': {
-                        color: theme.palette.text.primary,
-                        fontWeight: 'bold',
-                    },
-                }}
-            />
-            {error && (
-                <Alert severity="error" sx={{ marginTop: theme.spacing(2), fontWeight: 'bold' }}>
-                    {error}
-                </Alert>
-            )}
-            <Button
-                type="submit"
-                variant="contained"
-                color="secondary"
-                fullWidth
-                sx={{ marginTop: theme.spacing(2), fontWeight: 'bold', textTransform: 'none' }}
-                disabled={loading}
-            >
-                {loading ? <CircularProgress size={24} /> : '登入'}
-            </Button>
-        </form>
-    );
-};
-
 export default OrderCart;
