@@ -31,3 +31,9 @@ jspm_packages/
 *.ntvs*
 *.njsproj
 *.sln
+
+# Environment variables
+.env
+
+# Package lock file
+package-lock.json
