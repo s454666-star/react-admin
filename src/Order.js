@@ -77,15 +77,23 @@ const StatusEditField = ({ record }) => {
     const handleChange = (event) => {
         const newStatus = event.target.value;
         if (!record) return;
-        update('orders', record.id, { status: newStatus }, {
-            onSuccess: () => {
-                notify('訂單狀態已更新', 'info');
-                refresh();
+        update(
+            {
+                resource: 'orders',
+                id: record.id,
+                data: { status: newStatus },
+                previousData: record,
             },
-            onFailure: () => {
-                notify('更新失敗', 'warning');
-            },
-        });
+            {
+                onSuccess: () => {
+                    notify('訂單狀態已更新', 'info');
+                    refresh();
+                },
+                onFailure: () => {
+                    notify('更新失敗', 'warning');
+                },
+            }
+        );
         setStatus(newStatus);
     };
 
@@ -115,7 +123,7 @@ export const OrderList = (props) => {
     const classes = useStyles();
     return (
         <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
-            <Datagrid>
+            <Datagrid rowClick={false}>
                 <TextField source="id" label="ID" />
                 {/* 會員名稱 */}
                 <ReferenceField source="member_id" reference="members" label="會員" link={false}>
