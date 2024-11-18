@@ -83,7 +83,7 @@ export const OrderList = (props) => {
                     label="配送地址"
                     render={(record) => (
                         <span>
-                            {record.delivery_address
+                            {record.delivery_address && record.delivery_address.address
                                 ? record.delivery_address.address
                                 : '無配送地址'}
                         </span>
@@ -210,7 +210,7 @@ export const OrderShow = (props) => {
                             label="配送地址"
                             render={(record) => (
                                 <span>
-                                    {record.delivery_address
+                                    {record.delivery_address && record.delivery_address.address
                                         ? record.delivery_address.address
                                         : '無配送地址'}
                                 </span>
