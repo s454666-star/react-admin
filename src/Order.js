@@ -124,7 +124,9 @@ const exportToXLSX = (data) => {
         const address = order.delivery_address && (order.delivery_address.city || order.delivery_address.address)
             ? `${order.delivery_address.city || ''} ${order.delivery_address.address || ''}`
             : '無配送地址';
+        const memberName = order.member ? order.member.name : '未知會員';
         return {
+            會員: memberName,
             配送地址: address,
             訂單編號: order.order_number,
             狀態: orderStatusChoices.find(choice => choice.id === order.status)?.name || order.status,
@@ -155,6 +157,8 @@ export const OrderList = (props) => {
             perPage={25}
             title="訂單列表"
             exporter={exportToXLSX}
+            // Ensure that member data is included in the list
+            sort={{ field: 'created_at', order: 'DESC' }}
         >
             <Datagrid rowClick={false}>
                 <TextField source="id" label="ID" />
