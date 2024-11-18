@@ -257,14 +257,14 @@ const ProductFront = () => {
     const handleLogin = async (email, password) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post('/login', { email, password }, {
+            const response = await axios.post(`${API_URL}/login`, { email, password }, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
             const { access_token, user } = response.data;
             localStorage.setItem('access_token', access_token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`; // 設置 Authorization 標頭
             setUser(user);
             setIsLoggedIn(true);
             setAuthLoading(false);
