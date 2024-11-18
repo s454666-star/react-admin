@@ -79,15 +79,14 @@ const StatusEditField = ({ record }) => {
         if (!record) return;
         update(
             'orders',
-            record.id,
-            { status: newStatus },
+            { id: record.id, data: { status: newStatus } },
             {
                 onSuccess: () => {
-                    notify('訂單狀態已更新', 'info');
+                    notify('訂單狀態已更新', { type: 'info' });
                     refresh();
                 },
                 onFailure: () => {
-                    notify('更新失敗', 'warning');
+                    notify('更新失敗', { type: 'warning' });
                 },
             }
         );
@@ -122,11 +121,9 @@ export const OrderList = (props) => {
         <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
             <Datagrid rowClick={false}>
                 <TextField source="id" label="ID" />
-                {/* 會員名稱 */}
                 <ReferenceField source="member_id" reference="members" label="會員" link={false}>
                     <TextField source="name" />
                 </ReferenceField>
-                {/* 配送地址 */}
                 <FunctionField
                     label="配送地址"
                     render={(record) => (
@@ -138,12 +135,10 @@ export const OrderList = (props) => {
                     )}
                 />
                 <TextField source="order_number" label="訂單編號" />
-                {/* 狀態編輯 */}
                 <FunctionField
                     label="狀態"
                     render={(record) => <StatusEditField record={record} />}
                 />
-                {/* 訂單總金額 */}
                 <FunctionField
                     label="總金額"
                     render={(record) => formatAmount(Math.round(record.total_amount))}
