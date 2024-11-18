@@ -16,20 +16,9 @@ import { Helmet } from 'react-helmet';
 
 import Login from './Login';
 import MyAppBar from './MyAppBar';
-import {
-    ProductCreate,
-    ProductEdit,
-    ProductList,
-} from './Product';
-import {
-    ProductCategoryCreate,
-    ProductCategoryEdit,
-    ProductCategoryList,
-} from './ProductCategory';
-import UserList from './UserList';
-import UserCreate from './UserCreate';
-import UserEdit from './UserEdit';
-import UserShow from './UserShow';
+import { ProductCreate, ProductEdit, ProductList } from './Product';
+import { ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList } from './ProductCategory';
+import { UserList, UserCreate, UserEdit, UserShow } from './User';
 import {
     MemberList,
     MemberCreate,
@@ -167,12 +156,36 @@ const customTraditionalChineseMessages = {
         },
         users: {
             name: '使用者',
+            fields: {
+                id: 'ID',
+                username: '帳號',
+                name: '姓名',
+                email: '電子郵件',
+                phone: '電話',
+                address: '地址',
+                status: '狀態',
+            },
         },
         products: {
             name: '商品',
+            fields: {
+                id: '編號',
+                image_base64: '商品圖片',
+                product_name: '商品名稱',
+                price: '價格',
+                stock_quantity: '庫存數量',
+                status: '狀態',
+                category_id: '商品類別',
+            },
         },
         'product-categories': {
             name: '產品類別',
+            fields: {
+                id: '編號',
+                category_name: '名稱',
+                description: '描述',
+                status: '狀態',
+            },
         },
     },
 };
