@@ -82,11 +82,11 @@ export const OrderList = (props) => {
                 <FunctionField
                     label="配送地址"
                     render={(record) => (
-                        <span>
-                            {record.delivery_address && record.delivery_address.address
-                                ? record.delivery_address.address
-                                : '無配送地址'}
-                        </span>
+                    <span>
+                        {record.delivery_address
+                            ? `${record.delivery_address.city || ''}${record.delivery_address.address || ''}`
+                            : '無配送地址'}
+                    </span>
                     )}
                 />
                 <TextField source="order_number" label="訂單編號" />
