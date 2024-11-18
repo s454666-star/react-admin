@@ -17,11 +17,14 @@ import {
     SaveButton,
     useNotify,
     useRedirect,
-    useRefresh
+    useRefresh,
+    Show,
+    SimpleShowLayout,
 } from 'react-admin';
 import { Card, CardContent, CardHeader, Grid, Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Helmet } from 'react-helmet';
+import * as XLSX from 'xlsx';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -55,6 +58,28 @@ const CustomToolbar = props => (
     </Toolbar>
 );
 
+// 自定義匯出為XLSX的函數
+const exportToXLSX = (data) => {
+    const exportData = data.map(category => ({
+        編號: category.id,
+        名稱: category.category_name,
+        描述: category.description || '無',
+        狀態: category.status === 1 ? '啟用' : '停用',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '商品類別');
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'product_categories.xlsx';
+    link.click();
+    URL.revokeObjectURL(url);
+};
+
 // 商品類別清單頁面
 export const ProductCategoryList = (props) => {
     const classes = useStyles();
@@ -64,7 +89,13 @@ export const ProductCategoryList = (props) => {
                 <title>星夜後台</title>
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
-            <List {...props} title="商品類別清單">
+            <List
+                {...props}
+                title="商品類別清單"
+                exporter={exportToXLSX}
+                perPage={25}
+                sort={{ field: 'id', order: 'ASC' }}
+            >
                 <Card className={classes.card}>
                     <CardHeader className={classes.header} title="商品類別清單" />
                     <CardContent>
@@ -204,3 +235,33 @@ export const ProductCategoryEdit = (props) => {
         </>
     );
 };
+
+// 商品類別顯示詳情頁面
+export const ProductCategoryShow = (props) => {
+    const classes = useStyles();
+    return (
+        <Show {...props} title="商品類別詳情">
+            <SimpleShowLayout>
+                <Card className={classes.card}>
+                    <CardHeader className={classes.header} title="商品類別詳情" />
+                    <CardContent>
+                        <Grid container>
+                            <Grid item xs={12} className={classes.formItem}>
+                                <TextField source="id" label="編號" />
+                            </Grid>
+                            <Grid item xs={12} className={classes.formItem}>
+                                <TextField source="category_name" label="名稱" />
+                            </Grid>
+                            <Grid item xs={12} className={classes.formItem}>
+                                <TextField source="description" label="描述" />
+                            </Grid>
+                            <Grid item xs={12} className={classes.formItem}>
+                                <TextField source="status" label="狀態" />
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+            </SimpleShowLayout>
+        </Show>
+    );
+}
