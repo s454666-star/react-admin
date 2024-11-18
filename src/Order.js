@@ -7,7 +7,6 @@ import {
     ReferenceField,
     DateField,
     SelectInput,
-    SelectField,
     DeleteButton,
     ShowButton,
     Create,
@@ -26,7 +25,7 @@ import {
     useRefresh,
     useRedirect,
 } from 'react-admin';
-import { Grid, Card, CardContent, CardHeader, Select } from '@mui/material';
+import { Grid, Card, CardContent, CardHeader } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formatAmount } from './utils';
 
@@ -93,17 +92,13 @@ const StatusEditField = ({ record }) => {
     };
 
     return (
-        <Select
+        <SelectInput
+            source="status"
+            choices={orderStatusChoices}
             value={status}
             onChange={handleChange}
             fullWidth
-        >
-            {orderStatusChoices.map(choice => (
-                <option key={choice.id} value={choice.id}>
-                    {choice.name}
-                </option>
-            ))}
-        </Select>
+        />
     );
 };
 
@@ -112,7 +107,7 @@ export const OrderList = (props) => {
     const classes = useStyles();
     return (
         <List {...props} filters={<OrderFilter />} perPage={25} title="訂單列表">
-            <Datagrid rowClick="show">
+            <Datagrid>
                 <TextField source="id" label="ID" />
                 {/* 會員名稱 */}
                 <ReferenceField source="member_id" reference="members" label="會員" link={false}>
@@ -130,13 +125,8 @@ export const OrderList = (props) => {
                     )}
                 />
                 <TextField source="order_number" label="訂單編號" />
-                <FunctionField
-                    label="狀態"
-                    render={(record) => {
-                        const status = orderStatusChoices.find(choice => choice.id === record.status);
-                        return status ? status.name : record.status;
-                    }}
-                />
+                {/* 狀態編輯 */}
+                <StatusEditField record={props.record} />
                 {/* 顯示訂單品項 */}
                 <FunctionField
                     label="訂單品項"
@@ -161,8 +151,6 @@ export const OrderList = (props) => {
                 />
                 <DateField source="created_at" label="創建時間" />
                 <DateField source="updated_at" label="更新時間" />
-                <DeleteButton />
-                <ShowButton />
             </Datagrid>
         </List>
     );
@@ -208,90 +196,7 @@ export const OrderEdit = (props) => {
     return null;
 };
 
-// 訂單顯示詳情
+// 訂單顯示詳情（移除訪問）
 export const OrderShow = (props) => {
-    const classes = useStyles();
-    return (
-        <Show {...props} title="訂單詳情">
-            <SimpleShowLayout>
-                <Grid container>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <TextField source="id" label="ID" />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <ReferenceField source="member_id" reference="members" label="會員">
-                            <TextField source="name" />
-                        </ReferenceField>
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <FunctionField
-                            label="配送地址"
-                            render={(record) => (
-                                <span>
-                                    {record.delivery_address && record.delivery_address.address
-                                        ? record.delivery_address.address
-                                        : '無配送地址'}
-                                </span>
-                            )}
-                        />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <TextField source="order_number" label="訂單編號" />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <FunctionField
-                            label="狀態"
-                            render={(record) => {
-                                const status = orderStatusChoices.find(choice => choice.id === record.status);
-                                return status ? status.name : record.status;
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <TextField source="payment_method" label="付款方式" />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <FunctionField
-                            label="運費"
-                            render={(record) => formatAmount(Math.round(record.shipping_fee))}
-                        />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <FunctionField
-                            label="總金額"
-                            render={(record) => formatAmount(Math.round(record.total_amount))}
-                        />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <TextField source="notes" label="備註" />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <DateField source="created_at" label="創建時間" />
-                    </Grid>
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <DateField source="updated_at" label="更新時間" />
-                    </Grid>
-                    {/* 訂單明細 */}
-                    <Grid item xs={12} className={classes.gridItem}>
-                        <FunctionField
-                            label="訂單明細"
-                            render={(record) => (
-                                <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                                    {record.order_items && record.order_items.length > 0 ? (
-                                        record.order_items.map((item) => (
-                                            <li key={item.id}>
-                                                {item.product ? item.product.product_name : '無產品名稱'} - 數量: {item.quantity} - 價格: {formatAmount(item.price)}
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li>無品項</li>
-                                    )}
-                                </ul>
-                            )}
-                        />
-                    </Grid>
-                </Grid>
-            </SimpleShowLayout>
-        </Show>
-    );
+    return null;
 };
