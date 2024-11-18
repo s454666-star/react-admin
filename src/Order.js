@@ -70,7 +70,7 @@ const OrderFilter = (props) => (
 const StatusEditField = ({ record }) => {
     const classes = useStyles();
     const [status, setStatus] = React.useState(record ? record.status : '');
-    const update = useUpdate();
+    const [update] = useUpdate();
     const notify = useNotify();
     const refresh = useRefresh();
 
@@ -78,12 +78,9 @@ const StatusEditField = ({ record }) => {
         const newStatus = event.target.value;
         if (!record) return;
         update(
-            {
-                resource: 'orders',
-                id: record.id,
-                data: { status: newStatus },
-                previousData: record,
-            },
+            'orders',
+            record.id,
+            { status: newStatus },
             {
                 onSuccess: () => {
                     notify('訂單狀態已更新', 'info');
