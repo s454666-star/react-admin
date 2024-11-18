@@ -205,7 +205,6 @@ import { stringify } from 'query-string';
 
 const customHttpClient = (url, options = {}) => {
     const auth = JSON.parse(localStorage.getItem('auth'));
-    options.credentials = 'include';
     if (auth && auth.token) {
         options.headers = new Headers({
             Accept: 'application/json',
@@ -318,29 +317,24 @@ const getCookie = (name) => {
 };
 
 // 認證提供者
+// 認證提供者
 const authProvider = {
     login: async ({ username, password }) => {
-        // 获取 CSRF Token
-        await fetch('https://mystar.monster/sanctum/csrf-cookie', { credentials: 'include' });
-
-        const csrfToken = getCookie('XSRF-TOKEN');
-
-        const request = new Request(`${LOGIN_URL}/admin-login`, {
-            method: 'POST',
-            body: JSON.stringify({ username, password }),
-            headers: new Headers({
-                'Content-Type': 'application/json',
-                'X-XSRF-TOKEN': decodeURIComponent(csrfToken),
-            }),
-            credentials: 'include',
-        });
-
         try {
-            const response = await fetch(request);
+            const response = await fetch(`${API_URL}/admin-login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Login failed');
+                throw new Error(error.message || '登入失敗');
             }
+
             const { user, access_token } = await response.json();
 
             localStorage.setItem('auth', JSON.stringify({ user, token: access_token }));
