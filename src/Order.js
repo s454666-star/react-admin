@@ -7,23 +7,16 @@ import {
     ReferenceField,
     DateField,
     SelectInput,
-    DeleteButton,
-    ShowButton,
     Create,
     SimpleForm,
     ReferenceInput,
     TextInput,
-    Edit,
     Filter,
-    Show,
-    SimpleShowLayout,
-    NumberInput,
     FunctionField,
-    NumberField,
+    NumberInput,
     useUpdate,
     useNotify,
     useRefresh,
-    useRedirect,
 } from 'react-admin';
 import { Grid, Card, CardContent, CardHeader } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -72,13 +65,14 @@ const OrderFilter = (props) => (
 
 // 自定義狀態編輯欄位
 const StatusEditField = ({ record }) => {
-    const [status, setStatus] = React.useState(record.status);
+    const [status, setStatus] = React.useState(record ? record.status : '');
     const update = useUpdate();
     const notify = useNotify();
     const refresh = useRefresh();
 
     const handleChange = (event) => {
         const newStatus = event.target.value;
+        if (!record) return;
         update('orders', record.id, { status: newStatus }, {
             onSuccess: () => {
                 notify('訂單狀態已更新', 'info');
@@ -90,6 +84,8 @@ const StatusEditField = ({ record }) => {
         });
         setStatus(newStatus);
     };
+
+    if (!record) return null;
 
     return (
         <SelectInput
@@ -118,31 +114,17 @@ export const OrderList = (props) => {
                     label="配送地址"
                     render={(record) => (
                         <span>
-                            {record.delivery_address
-                                ? `${record.delivery_address.city || ''}${record.delivery_address.address || ''}`
+                            {record.delivery_address && (record.delivery_address.city || record.delivery_address.address)
+                                ? `${record.delivery_address.city || ''} ${record.delivery_address.address || ''}`
                                 : '無配送地址'}
                         </span>
                     )}
                 />
                 <TextField source="order_number" label="訂單編號" />
                 {/* 狀態編輯 */}
-                <StatusEditField record={props.record} />
-                {/* 顯示訂單品項 */}
                 <FunctionField
-                    label="訂單品項"
-                    render={(record) => (
-                        <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                            {record.order_items && record.order_items.length > 0 ? (
-                                record.order_items.map((item) => (
-                                    <li key={item.id}>
-                                        {item.product ? item.product.product_name : '無產品名稱'} - 數量: {item.quantity} - 價格: {formatAmount(item.price)}
-                                    </li>
-                                ))
-                            ) : (
-                                <li>無品項</li>
-                            )}
-                        </ul>
-                    )}
+                    label="狀態"
+                    render={(record) => <StatusEditField record={record} />}
                 />
                 {/* 訂單總金額 */}
                 <FunctionField
