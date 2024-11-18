@@ -21,6 +21,7 @@ import {
 } from 'react-admin';
 import { Grid, Card, CardContent, CardHeader, Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as XLSX from 'xlsx';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -43,7 +44,6 @@ const useStyles = makeStyles({
     },
 });
 
-
 // 會員列表篩選器
 const MemberFilter = (props) => (
     <Filter {...props}>
@@ -53,11 +53,46 @@ const MemberFilter = (props) => (
     </Filter>
 );
 
+// 自定義匯出為XLSX的函數
+const exportToXLSX = (data) => {
+    const exportData = data.map(member => ({
+        ID: member.id,
+        帳號: member.username,
+        姓名: member.name,
+        電子郵件: member.email,
+        電話: member.phone || '無',
+        地址: member.address || '無',
+        是否管理員: member.is_admin ? '是' : '否',
+        狀態: member.status,
+        創建時間: member.created_at ? new Date(member.created_at).toLocaleString() : '無',
+        更新時間: member.updated_at ? new Date(member.updated_at).toLocaleString() : '無',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '會員');
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'members.xlsx';
+    link.click();
+    URL.revokeObjectURL(url);
+};
+
 // 會員列表
 export const MemberList = (props) => {
     const classes = useStyles();
     return (
-        <List {...props} filters={<MemberFilter />} perPage={25} title="會員列表">
+        <List
+            {...props}
+            filters={<MemberFilter />}
+            perPage={25}
+            title="會員列表"
+            exporter={exportToXLSX}
+            sort={{ field: 'created_at', order: 'DESC' }}
+        >
             <Datagrid rowClick="show">
                 <TextField source="id" label="ID" />
                 <TextField source="username" label="帳號" />
@@ -210,4 +245,4 @@ export const MemberShow = (props) => {
             </SimpleShowLayout>
         </Show>
     );
-}
+};
