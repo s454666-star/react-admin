@@ -1,7 +1,7 @@
 // src/index.js
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'; // 更新的引入方式
 import {
     Admin,
     Resource,
@@ -450,4 +450,7 @@ const App = () => (
     </BrowserRouter>
 );
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// 使用 createRoot 來渲染應用
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);

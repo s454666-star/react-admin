@@ -1,12 +1,23 @@
 {
   "dependencies": {
+    "@mui/icons-material": "^6.1.7",
+    "@mui/lab": "^6.0.0-beta.15",
+    "@mui/material": "^6.1.7",
+    "@mui/styles": "^6.1.7",
+    "axios": "^1.7.7",
     "ra-data-json-server": "^5.2.3",
+    "ra-data-simple-rest": "^5.3.4",
     "react-admin": "^5.2.3",
-    "react-scripts": "^5.0.1"
+    "react-helmet": "^6.1.0",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-player": "^2.16.0",
+    "react-scripts": "^5.0.1",
+    "react-stars": "^2.2.5"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "dev": "npm start"
   },
   "browserslist": {
     "production": [
