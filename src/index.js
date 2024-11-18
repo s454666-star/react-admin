@@ -298,9 +298,9 @@ const customDataProvider = {
 };
 
 const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+    return null;
 };
 
 // 認證提供者
@@ -316,7 +316,7 @@ const authProvider = {
             body: JSON.stringify({ username, password }),
             headers: new Headers({
                 'Content-Type': 'application/json',
-                'X-XSRF-TOKEN': csrfToken,
+                'X-XSRF-TOKEN': decodeURIComponent(csrfToken),
             }),
             credentials: 'include',
         });
