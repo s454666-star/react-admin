@@ -203,6 +203,7 @@ const LOGIN_URL = 'https://mystar.monster';
 
 // 自訂資料提供者
 import { stringify } from 'query-string';
+import {ReturnOrderList} from "./ReturnOrderList";
 
 const customHttpClient = (url, options = {}) => {
     const auth = JSON.parse(localStorage.getItem('auth'));
@@ -433,6 +434,11 @@ const AdminApp = () => (
             create={ProductCategoryCreate}
             edit={ProductCategoryEdit}
             options={{ label: '產品類別' }}
+        />
+        <Resource
+            name="return-orders"
+            list={ReturnOrderList}
+            options={{ label: '退貨單' }}
         />
     </Admin>
 );
