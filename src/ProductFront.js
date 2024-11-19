@@ -521,8 +521,8 @@ const ProductFront = () => {
                                         fontWeight: 'bold',
                                     }}
                                 >
-                                    <MenuItem value="asc">升冪</MenuItem>
-                                    <MenuItem value="desc">降冪</MenuItem>
+                                    <MenuItem value="asc">低到高</MenuItem>
+                                    <MenuItem value="desc">高到低</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
