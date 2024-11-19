@@ -1,4 +1,5 @@
 // OrderHistory.js
+
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -21,11 +22,14 @@ import {
     useTheme,
     IconButton,
     TextField,
+    Checkbox,
+    FormControlLabel,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { formatAmount } from './utils';
+import { Add, Remove } from '@mui/icons-material';
 
 const API_URL = 'https://mystar.monster/api';
 
@@ -47,6 +51,7 @@ const OrderHistory = () => {
     const [returnReason, setReturnReason] = useState('');
     const [returnLoading, setReturnLoading] = useState(false);
     const [returnError, setReturnError] = useState('');
+    const [returnItems, setReturnItems] = useState([]);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -56,6 +61,7 @@ const OrderHistory = () => {
                     params: {
                         'filter[status_ne]': 'pending',
                         sort: JSON.stringify(['created_at', 'desc']),
+                        include: 'orderItems.product',
                     },
                 });
                 setOrders(response.data);
@@ -71,6 +77,15 @@ const OrderHistory = () => {
 
     const handleOpenReturnModal = (order) => {
         setSelectedOrder(order);
+        const initialReturnItems = order.order_items.map(item => ({
+            id: item.id,
+            product_name: item.product.product_name,
+            quantity: item.quantity,
+            return_quantity: 0,
+            selected: false,
+            available: item.quantity - item.return_quantity,
+        }));
+        setReturnItems(initialReturnItems);
         setOpenReturnModal(true);
     };
 
@@ -79,6 +94,20 @@ const OrderHistory = () => {
         setSelectedOrder(null);
         setReturnReason('');
         setReturnError('');
+        setReturnItems([]);
+    };
+
+    const handleReturnItemChange = (index, field, value) => {
+        const updatedItems = [...returnItems];
+        if (field === 'selected') {
+            updatedItems[index].selected = value;
+            if (!value) {
+                updatedItems[index].return_quantity = 0;
+            }
+        } else if (field === 'return_quantity') {
+            updatedItems[index].return_quantity = value;
+        }
+        setReturnItems(updatedItems);
     };
 
     const handleReturnSubmit = async () => {
@@ -87,11 +116,23 @@ const OrderHistory = () => {
             return;
         }
 
+        const itemsToReturn = returnItems.filter(item => item.selected && item.return_quantity > 0);
+
+        if (itemsToReturn.length === 0) {
+            setReturnError('請選擇至少一個退貨項目並填寫退貨數量');
+            return;
+        }
+
         try {
             setReturnLoading(true);
-            await axios.post(`${API_URL}/orders/${selectedOrder.id}/return`, {
-                reason: returnReason,
-            });
+            for (const item of itemsToReturn) {
+                await axios.post(`${API_URL}/return-orders`, {
+                    order_id: selectedOrder.id,
+                    order_item_id: item.id,
+                    reason: returnReason,
+                    return_quantity: item.return_quantity,
+                });
+            }
             setSnackbar({
                 open: true,
                 message: '退貨申請成功！',
@@ -102,7 +143,16 @@ const OrderHistory = () => {
             // 更新訂單列表
             setOrders(prevOrders =>
                 prevOrders.map(order =>
-                    order.id === selectedOrder.id ? { ...order, status: 'returned' } : order
+                    order.id === selectedOrder.id
+                        ? {
+                            ...order,
+                            order_items: order.order_items.map(oi =>
+                                itemsToReturn.find(item => item.id === oi.id)
+                                    ? { ...oi, return_quantity: oi.return_quantity + itemsToReturn.find(item => item.id === oi.id).return_quantity }
+                                    : oi
+                            ),
+                        }
+                        : order
                 )
             );
         } catch (err) {
@@ -256,11 +306,14 @@ const OrderHistory = () => {
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            width: { xs: '90%', sm: 400 },
+                            width: { xs: '90%', sm: 600 },
                             bgcolor: 'background.paper',
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
+                            borderRadius: 2,
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
                         }}
                     >
                         <Typography variant="h6" sx={{ marginBottom: theme.spacing(2), fontWeight: 'bold' }}>
@@ -269,6 +322,54 @@ const OrderHistory = () => {
                         <Typography variant="body1" sx={{ marginBottom: theme.spacing(2) }}>
                             訂單編號：{selectedOrder?.id}
                         </Typography>
+                        <Typography variant="subtitle1" sx={{ marginBottom: theme.spacing(1), fontWeight: 'bold' }}>
+                            選擇退貨項目：
+                        </Typography>
+                        {returnItems.map((item, index) => (
+                            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(1) }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={item.selected}
+                                            onChange={(e) => handleReturnItemChange(index, 'selected', e.target.checked)}
+                                        />
+                                    }
+                                    label={item.product_name}
+                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: theme.spacing(2) }}>
+                                    <Typography sx={{ marginRight: 1 }}>退貨數量：</Typography>
+                                    <IconButton
+                                        onClick={() =>
+                                            handleReturnItemChange(index, 'return_quantity', Math.max(item.return_quantity - 1, 0))
+                                        }
+                                        disabled={!item.selected || item.return_quantity <= 0}
+                                    >
+                                        <Remove />
+                                    </IconButton>
+                                    <TextField
+                                        type="number"
+                                        inputProps={{ min: 0, max: item.available }}
+                                        value={item.return_quantity}
+                                        onChange={(e) =>
+                                            handleReturnItemChange(index, 'return_quantity', Math.min(Math.max(parseInt(e.target.value) || 0, 0), item.available))
+                                        }
+                                        sx={{ width: 60, marginX: 1 }}
+                                        disabled={!item.selected}
+                                    />
+                                    <IconButton
+                                        onClick={() =>
+                                            handleReturnItemChange(index, 'return_quantity', Math.min(item.return_quantity + 1, item.available))
+                                        }
+                                        disabled={!item.selected || item.return_quantity >= item.available}
+                                    >
+                                        <Add />
+                                    </IconButton>
+                                    <Typography sx={{ marginLeft: 1 }}>
+                                        / {item.available}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        ))}
                         <TextField
                             label="退貨原因"
                             variant="outlined"
@@ -297,6 +398,7 @@ const OrderHistory = () => {
                                     color: theme.palette.text.primary,
                                     fontWeight: 'bold',
                                 },
+                                marginTop: theme.spacing(2),
                                 marginBottom: theme.spacing(2),
                             }}
                         />

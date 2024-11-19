@@ -208,6 +208,9 @@ const OrderCart = () => {
                 const calculatedTotalAmount = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0);
                 setCartItems(items);
                 setTotalAmount(calculatedTotalAmount);
+                if (items.length === 0) {
+                    await deleteOrder(pendingOrder.id);
+                }
             } else {
                 setCartItems([]);
                 setTotalAmount(0);
@@ -217,6 +220,24 @@ const OrderCart = () => {
             setError('無法取得購物車項目');
             setCartItems([]);
             setTotalAmount(0);
+        }
+    };
+
+    const deleteOrder = async (orderId) => {
+        try {
+            await axios.delete(`${API_URL}/orders/${orderId}`);
+            setSnackbar({
+                open: true,
+                message: '訂單已刪除！',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            setSnackbar({
+                open: true,
+                message: '無法刪除訂單，請稍後再試。',
+                severity: 'error',
+            });
         }
     };
 
@@ -251,6 +272,9 @@ const OrderCart = () => {
 
         try {
             await handleUpdateQuantity(item.order_id, item.id, newQuantity);
+            if (newQuantity === 0) {
+                await handleRemoveItem(item.order_id, item.id);
+            }
         } catch (error) {
             console.error('Error updating cart quantity:', error);
         }
@@ -265,6 +289,10 @@ const OrderCart = () => {
                 message: '品項已刪除！',
                 severity: 'success',
             });
+            const remainingItems = cartItems.filter(item => item.id !== itemId);
+            if (remainingItems.length === 0) {
+                await deleteOrder(orderId);
+            }
         } catch (error) {
             console.error('Error removing cart item:', error);
             setSnackbar({
@@ -352,7 +380,9 @@ const OrderCart = () => {
 
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/orders/process`);
+            const response = await axios.post(`${API_URL}/orders/process`, {
+                order_date: new Date().toISOString(),
+            });
             if (response.status === 200) {
                 setSnackbar({
                     open: true,
@@ -560,24 +590,24 @@ const OrderCart = () => {
                                                                 </IconButton>
                                                             </Grid>
                                                             <Grid item xs={12} sm={3} display="flex" justifyContent="flex-end">
+                                                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                                                    單項金額：${formatAmount(parseFloat(item.price) * item.quantity)}
+                                                                </Typography>
                                                                 <Button
                                                                     color="error"
                                                                     onClick={() => handleRemoveItem(item.order_id, item.id)}
                                                                     startIcon={<Delete />}
-                                                                    sx={{ fontWeight: 'bold', borderRadius: 2 }}
+                                                                    sx={{ fontWeight: 'bold', borderRadius: 2, marginLeft: 2 }}
                                                                 >
                                                                     刪除
                                                                 </Button>
                                                             </Grid>
                                                         </Grid>
-                                                        <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold' }}>
-                                                            小計金額：${formatAmount(parseFloat(item.price) * item.quantity)}
-                                                        </Typography>
                                                     </Box>
                                                 );
                                             })}
-                                            <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold' }}>
-                                                小計金額：${formatAmount(parseFloat(totalAmount))}
+                                            <Typography variant="h6" sx={{ paddingTop: 2, fontWeight: 'bold', textAlign: 'right' }}>
+                                                小計總額：${formatAmount(parseFloat(totalAmount))}
                                             </Typography>
                                         </>
                                     ) : (
