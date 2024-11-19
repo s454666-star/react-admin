@@ -14,6 +14,7 @@ import {
     CircularProgress,
     Container,
     createTheme,
+    Fade,
     FormControl,
     Grid,
     InputLabel,
@@ -26,6 +27,7 @@ import {
     Toolbar,
     Typography,
     useMediaQuery,
+    Menu,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -83,6 +85,10 @@ const ProductFront = () => {
         message: '',
         severity: 'success',
     });
+
+    // Menu state
+    const [anchorEl, setAnchorEl] = useState(null);
+    const openMenu = Boolean(anchorEl);
 
     useEffect(() => {
         const token = localStorage.getItem('access_token');
@@ -292,6 +298,20 @@ const ProductFront = () => {
         }
     };
 
+    // Menu handlers for hover
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleOrderHistory = () => {
+        navigate('/order-history');
+        handleMenuClose();
+    };
+
     return (
         <ThemeProvider theme={appTheme}>
             <div>
@@ -372,7 +392,10 @@ const ProductFront = () => {
                                 </Button>
                             </>
                         ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Box
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                                onMouseLeave={handleMenuClose} // 當滑鼠離開整個 Box 時關閉選單
+                            >
                                 <Typography
                                     variant="body1"
                                     sx={{
@@ -381,7 +404,7 @@ const ProductFront = () => {
                                         fontWeight: 'bold',
                                         cursor: 'pointer',
                                     }}
-                                    onClick={() => navigate('/order-history')}
+                                    onMouseEnter={handleMenuOpen} // 滑鼠進入時打開選單
                                 >
                                     {user.username}
                                 </Typography>
@@ -408,6 +431,38 @@ const ProductFront = () => {
                                 >
                                     登出
                                 </Button>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={openMenu}
+                                    onClose={handleMenuClose}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left', // 修改為 'left' 以對齊左側
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'left', // 修改為 'left' 以對齊左側
+                                    }}
+                                    TransitionComponent={Fade}
+                                    sx={{
+                                        mt: 1,
+                                    }}
+                                    // 添加滑鼠進入和離開事件以控制選單的顯示
+                                    onMouseEnter={() => setAnchorEl(anchorEl)}
+                                    onMouseLeave={handleMenuClose}
+                                >
+                                    <MenuItem
+                                        onClick={handleOrderHistory}
+                                        sx={{
+                                            '&:hover': {
+                                                backgroundColor: '#f0f0f0',
+                                            },
+                                            transition: 'background-color 0.3s',
+                                        }}
+                                    >
+                                        歷史訂單
+                                    </MenuItem>
+                                </Menu>
                             </Box>
                         )}
                     </Toolbar>

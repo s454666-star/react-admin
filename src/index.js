@@ -38,6 +38,7 @@ import FileScreenshotDetail from './FileScreenshotDetail';
 import ProductFront from './ProductFront';
 import MemberRegister from './MemberRegister';
 import OrderCart from './OrderCart';
+import OrderHistory from "./OrderHistory.js"; // 更新匯入路徑
 
 // 繁體中文翻譯訊息
 const customTraditionalChineseMessages = {
@@ -317,7 +318,6 @@ const getCookie = (name) => {
 };
 
 // 認證提供者
-// 認證提供者
 const authProvider = {
     login: async ({ username, password }) => {
         try {
@@ -461,6 +461,7 @@ const App = () => (
                     element={<FileScreenshotDetail />}
                 />
                 <Route path="/star-mall" element={<ProductFront />} />
+                <Route path="/order-history" element={<OrderHistory />} />
                 <Route path="/member-register" element={<MemberRegister />} />
                 <Route path="/order-cart" element={<OrderCart />} />
 
