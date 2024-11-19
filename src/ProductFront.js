@@ -379,7 +379,9 @@ const ProductFront = () => {
                                         marginRight: theme.spacing(2),
                                         color: '#f7f8fa',
                                         fontWeight: 'bold',
+                                        cursor: 'pointer',
                                     }}
+                                    onClick={() => navigate('/order-history')}
                                 >
                                     {user.username}
                                 </Typography>
@@ -405,18 +407,6 @@ const ProductFront = () => {
                                     }}
                                 >
                                     登出
-                                </Button>
-                                <Button
-                                    color="secondary"
-                                    onClick={() => navigate('/order-history')}
-                                    sx={{
-                                        color: '#f7f8fa',
-                                        fontWeight: 'bold',
-                                        textTransform: 'none',
-                                        marginLeft: theme.spacing(1),
-                                    }}
-                                >
-                                    歷史訂單
                                 </Button>
                             </Box>
                         )}
