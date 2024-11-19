@@ -99,7 +99,7 @@ const exportToXLSX = (data) => {
         退貨商品: returnOrder.orderItem.product.product_name,
         退貨數量: returnOrder.return_quantity,
         退貨原因: returnOrder.reason,
-        會員配送地址: returnOrder.order.delivery_address ? returnOrder.order.delivery_address.address : '',
+        會員配送地址: returnOrder.member && returnOrder.member.address ? returnOrder.member.address : '',
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -142,7 +142,7 @@ export const ReturnOrderList = (props) => (
             <TextField source="reason" label="退貨原因" />
             <FunctionField
                 label="會員配送地址"
-                render={(record) => record.order && record.order.delivery_address ? record.order.delivery_address.address : ''}
+                render={(record) => record.member && record.member.address ? record.member.address : ''}
             />
             <FunctionField
                 label="狀態"
