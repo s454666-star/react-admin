@@ -34,7 +34,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import MemberRegister from './MemberRegister';
-import { formatAmount } from './utils'; // 引入格式化函數
+import { formatAmount } from './utils';
 
 const appTheme = createTheme({
     palette: {
@@ -88,7 +88,7 @@ const ProductFront = () => {
 
     // Menu state
     const [anchorEl, setAnchorEl] = useState(null);
-    const openMenu = Boolean(anchorEl);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('access_token');
@@ -298,13 +298,14 @@ const ProductFront = () => {
         }
     };
 
-    // Menu handlers for hover
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
+        setMenuOpen(true);
     };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+        setMenuOpen(false);
     };
 
     const handleOrderHistory = () => {
@@ -345,7 +346,6 @@ const ProductFront = () => {
                         >
                             星夜電商平台
                         </Typography>
-                        {/* 購物車按鈕 */}
                         <Button
                             color="secondary"
                             onClick={() => navigate('/order-cart')}
@@ -356,6 +356,11 @@ const ProductFront = () => {
                                 marginRight: theme.spacing(2),
                                 display: 'flex',
                                 alignItems: 'center',
+                                transition: 'transform 0.2s, background-color 0.2s',
+                                '&:hover': {
+                                    transform: 'scale(1.05)',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                },
                             }}
                         >
                             <Badge badgeContent={cartItems.length} color="error">
@@ -374,6 +379,11 @@ const ProductFront = () => {
                                         color: '#f5f6f6',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
+                                        transition: 'transform 0.2s, background-color 0.2s',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        },
                                     }}
                                 >
                                     登入
@@ -386,6 +396,11 @@ const ProductFront = () => {
                                         fontWeight: 'bold',
                                         textTransform: 'none',
                                         marginLeft: theme.spacing(1),
+                                        transition: 'transform 0.2s, background-color 0.2s',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        },
                                     }}
                                 >
                                     註冊
@@ -393,8 +408,9 @@ const ProductFront = () => {
                             </>
                         ) : (
                             <Box
-                                sx={{ display: 'flex', alignItems: 'center' }}
-                                onMouseLeave={handleMenuClose} // 當滑鼠離開整個 Box 時關閉選單
+                                sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
+                                onMouseEnter={handleMenuOpen}
+                                onMouseLeave={handleMenuClose}
                             >
                                 <Typography
                                     variant="body1"
@@ -402,9 +418,13 @@ const ProductFront = () => {
                                         marginRight: theme.spacing(2),
                                         color: '#f7f8fa',
                                         fontWeight: 'bold',
-                                        cursor: 'pointer',
+                                        cursor: 'default',
+                                        transition: 'transform 0.2s, color 0.2s',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            color: '#ffeb3b',
+                                        },
                                     }}
-                                    onMouseEnter={handleMenuOpen} // 滑鼠進入時打開選單
                                 >
                                     {user.username}
                                 </Typography>
@@ -415,6 +435,11 @@ const ProductFront = () => {
                                             color: '#d32f2f',
                                             marginRight: theme.spacing(2),
                                             fontWeight: 'bold',
+                                            transition: 'transform 0.2s, color 0.2s',
+                                            '&:hover': {
+                                                transform: 'scale(1.05)',
+                                                color: '#ffeb3b',
+                                            },
                                         }}
                                     >
                                         未驗證
@@ -427,29 +452,35 @@ const ProductFront = () => {
                                         color: '#f7f8fa',
                                         fontWeight: 'bold',
                                         textTransform: 'none',
+                                        transition: 'transform 0.2s, background-color 0.2s',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        },
                                     }}
                                 >
                                     登出
                                 </Button>
                                 <Menu
                                     anchorEl={anchorEl}
-                                    open={openMenu}
+                                    open={menuOpen}
                                     onClose={handleMenuClose}
+                                    MenuListProps={{
+                                        onMouseEnter: () => setMenuOpen(true),
+                                        onMouseLeave: handleMenuClose,
+                                    }}
                                     anchorOrigin={{
                                         vertical: 'bottom',
-                                        horizontal: 'left', // 修改為 'left' 以對齊左側
+                                        horizontal: 'left',
                                     }}
                                     transformOrigin={{
                                         vertical: 'top',
-                                        horizontal: 'left', // 修改為 'left' 以對齊左側
+                                        horizontal: 'left',
                                     }}
                                     TransitionComponent={Fade}
                                     sx={{
                                         mt: 1,
                                     }}
-                                    // 添加滑鼠進入和離開事件以控制選單的顯示
-                                    onMouseEnter={() => setAnchorEl(anchorEl)}
-                                    onMouseLeave={handleMenuClose}
                                 >
                                     <MenuItem
                                         onClick={handleOrderHistory}
@@ -658,7 +689,7 @@ const ProductFront = () => {
                                                     <Button
                                                         size="small"
                                                         color="secondary"
-                                                        onClick={() => navigate(`/product/${product.id}`)} // 假設有詳細資訊頁面
+                                                        onClick={() => navigate(`/product/${product.id}`)}
                                                         sx={{ fontWeight: 'bold', textTransform: 'none' }}
                                                     >
                                                         詳細資訊
@@ -670,7 +701,6 @@ const ProductFront = () => {
                                 })}
                             </Grid>
 
-                            {/* 顯示購物車內容 */}
                             {cartItems.length > 0 && (
                                 <Box sx={{ marginTop: theme.spacing(6) }}>
                                     <Typography variant="h5" sx={{ marginBottom: theme.spacing(2), fontWeight: 'bold' }}>
@@ -775,7 +805,6 @@ const ProductFront = () => {
                     </Snackbar>
                 </Container>
 
-                {/* 會員註冊的 Modal */}
                 <Modal open={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                     <Box
                         sx={{
@@ -794,7 +823,6 @@ const ProductFront = () => {
                     </Box>
                 </Modal>
 
-                {/* 會員登入的 Modal */}
                 <Modal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
                     <Box
                         sx={{
@@ -820,7 +848,6 @@ const ProductFront = () => {
     );
 };
 
-// LoginForm 組件
 const LoginForm = ({ onLogin, loading, error }) => {
     const theme = useTheme();
     const [email, setEmail] = useState('');
