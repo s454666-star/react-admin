@@ -95,8 +95,8 @@ const exportToXLSX = (data) => {
         退貨單號: returnOrder.return_order_number,
         退貨日期: returnOrder.return_date,
         原訂單單號: returnOrder.order.order_number,
-        退貨會員: returnOrder.order.member.name,
-        退貨商品: returnOrder.order_item.product.product_name,
+        退貨會員: returnOrder.member.name,
+        退貨商品: returnOrder.orderItem.product.product_name,
         退貨數量: returnOrder.return_quantity,
         退貨原因: returnOrder.reason,
         會員配送地址: returnOrder.order.delivery_address ? returnOrder.order.delivery_address.address : '',
@@ -131,12 +131,12 @@ export const ReturnOrderList = (props) => (
             <ReferenceField source="order_id" reference="orders" label="原訂單單號" link={false}>
                 <TextField source="order_number" />
             </ReferenceField>
-            <ReferenceField source="order.member_id" reference="members" label="退貨會員" link={false}>
+            <ReferenceField source="member_id" reference="members" label="退貨會員" link={false}>
                 <TextField source="name" />
             </ReferenceField>
             <FunctionField
                 label="退貨商品"
-                render={(record) => record.order_item && record.order_item.product ? record.order_item.product.product_name : ''}
+                render={(record) => record.orderItem && record.orderItem.product ? record.orderItem.product.product_name : ''}
             />
             <TextField source="return_quantity" label="退貨數量" />
             <TextField source="reason" label="退貨原因" />
