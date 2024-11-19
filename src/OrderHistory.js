@@ -1,6 +1,7 @@
 // OrderHistory.js
 
 import React, { useEffect, useState } from 'react';
+
 import {
     Alert,
     AppBar,
@@ -140,21 +141,7 @@ const OrderHistory = () => {
             });
             setReturnLoading(false);
             handleCloseReturnModal();
-            // 更新訂單列表
-            setOrders(prevOrders =>
-                prevOrders.map(order =>
-                    order.id === selectedOrder.id
-                        ? {
-                            ...order,
-                            order_items: order.order_items.map(oi =>
-                                itemsToReturn.find(item => item.id === oi.id)
-                                    ? { ...oi, return_quantity: oi.return_quantity + itemsToReturn.find(item => item.id === oi.id).return_quantity }
-                                    : oi
-                            ),
-                        }
-                        : order
-                )
-            );
+            navigate('/'); // 返回商城首頁
         } catch (err) {
             setReturnError('退貨申請失敗，請稍後再試');
             setReturnLoading(false);
@@ -306,13 +293,13 @@ const OrderHistory = () => {
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            width: { xs: '90%', sm: 600 },
+                            width: { xs: '95%', sm: 800 },
                             bgcolor: 'background.paper',
                             border: '2px solid #000',
                             boxShadow: 24,
                             p: 4,
                             borderRadius: 2,
-                            maxHeight: '80vh',
+                            maxHeight: '90vh',
                             overflowY: 'auto',
                         }}
                     >
@@ -326,7 +313,7 @@ const OrderHistory = () => {
                             選擇退貨項目：
                         </Typography>
                         {returnItems.map((item, index) => (
-                            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(1) }}>
+                            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -353,7 +340,7 @@ const OrderHistory = () => {
                                         onChange={(e) =>
                                             handleReturnItemChange(index, 'return_quantity', Math.min(Math.max(parseInt(e.target.value) || 0, 0), item.available))
                                         }
-                                        sx={{ width: 60, marginX: 1 }}
+                                        sx={{ width: 80, marginX: 1 }}
                                         disabled={!item.selected}
                                     />
                                     <IconButton
