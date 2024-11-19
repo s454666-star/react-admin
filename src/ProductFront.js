@@ -215,7 +215,7 @@ const ProductFront = () => {
                 await axios.post(`${API_URL}/orders`, {
                     product_id: product.id,
                     quantity: 1,
-                    price: product.price,
+                    price: parseInt(product.price, 10),
                 });
                 fetchCartItems();
                 setSnackbar({
@@ -575,7 +575,7 @@ const ProductFront = () => {
                                                         {product.product_name}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                        價格：${formatAmount(product.price)}
+                                                        價格：${formatAmount(parseInt(product.price, 10))}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                         庫存：{product.stock_quantity}
@@ -660,13 +660,13 @@ const ProductFront = () => {
                                                                 {item.product?.product_name || '未知商品'}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                                價格：${formatAmount(item.price)}
+                                                                價格：${formatAmount(parseInt(item.price, 10))}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
                                                                 數量：{item.quantity}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                                                                小計：${formatAmount(item.price * item.quantity)}
+                                                                小計：${formatAmount(parseInt(item.price, 10) * item.quantity)}
                                                             </Typography>
                                                         </CardContent>
                                                         <CardActions>
