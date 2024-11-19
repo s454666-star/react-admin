@@ -406,6 +406,18 @@ const ProductFront = () => {
                                 >
                                     登出
                                 </Button>
+                                <Button
+                                    color="secondary"
+                                    onClick={() => navigate('/order-history')}
+                                    sx={{
+                                        color: '#f7f8fa',
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                        marginLeft: theme.spacing(1),
+                                    }}
+                                >
+                                    歷史訂單
+                                </Button>
                             </Box>
                         )}
                     </Toolbar>
