@@ -35,6 +35,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { useDropzone } from 'react-dropzone';
 import { Helmet } from 'react-helmet';
+import * as XLSX from 'xlsx';
 
 // 自定義樣式
 const useStyles = makeStyles({
@@ -175,6 +176,36 @@ const MyImageField = ({ source }) => {
     );
 };
 
+// 自定義 Exporter 函數
+const exporter = (data) => {
+    // 選擇需要匯出的欄位，去除圖片欄位
+    const exportData = data.map(record => ({
+        編號: record.id,
+        商品名稱: record.product_name,
+        價格: record.price,
+        庫存數量: record.stock_quantity,
+        狀態: record.status,
+        // 根據需要添加其他欄位
+    }));
+
+    // 創建工作表
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "商品列表");
+
+    // 生成 XLSX 文件的二進制數據
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // 創建 Blob 並觸發下載
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '商品列表.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
+};
+
 // 商品清單頁面
 export const ProductList = (props) => {
     const classes = useStyles();
@@ -184,13 +215,14 @@ export const ProductList = (props) => {
                 <title>星夜後台</title>
                 <link rel="icon" href="/icon_198x278.png" type="image/png" />
             </Helmet>
-            <List {...props} title="商品清單">
+            <List {...props} title="商品清單" exporter={exporter}>
                 <Card className={classes.card}>
                     <CardHeader className={classes.header} title="商品清單" />
                     <CardContent>
                         <Datagrid>
                             <TextField source="id" label="編號" />
-                            <MyImageField source="image_base64" label="商品圖片" />
+                            {/* 如果不需要在列表中顯示圖片，可以移除以下行 */}
+                            {/* <MyImageField source="image_base64" label="商品圖片" /> */}
                             <TextField source="product_name" label="商品名稱" />
                             <NumberField source="price" label="價格" />
                             <NumberField source="stock_quantity" label="庫存數量" />
